@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * CloudSyncService Tests
- * 
+ *
  * Tests cloud synchronization functionality.
  */
 
@@ -29,6 +30,7 @@ describe('CloudSyncService', () => {
       hapticFeedbackEnabled: true,
       soundEnabled: true,
       theme: 'auto',
+      analyticsEnabled: false,
     },
     thresholds: {
       sadThreshold: 2000,
@@ -97,10 +99,7 @@ describe('CloudSyncService', () => {
       const result = await CloudSyncService.sync();
 
       expect(result).toBe(false);
-      expect(StorageService.set).toHaveBeenCalledWith(
-        expect.any(String),
-        true
-      );
+      expect(StorageService.set).toHaveBeenCalledWith(expect.any(String), true);
     });
 
     it('should only upload when uploadOnly option is set', async () => {
@@ -224,10 +223,7 @@ describe('CloudSyncService', () => {
 
       await CloudSyncService.markPendingChanges();
 
-      expect(StorageService.set).toHaveBeenCalledWith(
-        expect.any(String),
-        true
-      );
+      expect(StorageService.set).toHaveBeenCalledWith(expect.any(String), true);
     });
   });
 

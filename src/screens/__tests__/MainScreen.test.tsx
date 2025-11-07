@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 import { MainScreen } from '../MainScreen';
@@ -27,17 +28,41 @@ jest.mock('../../services/HealthDataUpdateService', () => ({
 }));
 
 // Mock BackgroundSyncService
+const mockStopBackgroundSync = jest.fn();
+const mockStartBackgroundSync = jest.fn().mockResolvedValue(undefined);
+
+// Create a singleton mock instance
+const mockBackgroundSyncInstance = {
+  startBackgroundSync: mockStartBackgroundSync,
+  stopBackgroundSync: mockStopBackgroundSync,
+  destroy: jest.fn(),
+};
+
 jest.mock('../../services/BackgroundSyncService', () => ({
-  getBackgroundSyncService: jest.fn(() => ({
-    startBackgroundSync: jest.fn().mockResolvedValue(undefined),
-    stopBackgroundSync: jest.fn(),
+  BackgroundSyncService: jest.fn().mockImplementation(() => mockBackgroundSyncInstance),
+  getBackgroundSyncService: jest.fn(() => mockBackgroundSyncInstance),
+}));
+
+// Mock InteractiveSessionManager
+jest.mock('../../services/InteractiveSessionManager', () => ({
+  InteractiveSessionManager: jest.fn().mockImplementation(() => ({
+    startSession: jest.fn().mockResolvedValue(undefined),
+    pauseSession: jest.fn(),
+    resumeSession: jest.fn(),
+    completeSession: jest.fn().mockResolvedValue({ success: true }),
+    cancelSession: jest.fn(),
   })),
+  SessionType: {
+    BREATHING_EXERCISE: 'breathing_exercise',
+  },
 }));
 
 describe('MainScreen', () => {
+  let unmount: (() => void) | undefined;
+
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Reset stores to initial state
     useHealthDataStore.setState({
       emotionalState: EmotionalState.RESTING,
@@ -67,6 +92,7 @@ describe('MainScreen', () => {
           hapticFeedbackEnabled: true,
           soundEnabled: true,
           theme: 'auto',
+          analyticsEnabled: false,
         },
         thresholds: {
           sadThreshold: 2000,
@@ -84,49 +110,67 @@ describe('MainScreen', () => {
     });
   });
 
-  it('renders main screen with Symbi animation', async () => {
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
+  afterEach(() => {
+    // Unmount component to trigger cleanup
+    if (unmount) {
+      unmount();
+      unmount = undefined;
+    }
     
+    // Force cleanup of background service
+    mockStopBackgroundSync();
+    mockBackgroundSyncInstance.destroy();
+  });
+
+  it('renders main screen with Symbi animation', async () => {
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
     await waitFor(() => {
-      expect(getByText('Symbi')).toBeTruthy();
+      expect(result.getByText('Symbi')).toBeTruthy();
     });
   });
 
   it('displays step count and emotional state', async () => {
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
-    
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
     await waitFor(() => {
-      expect(getByText('5,000')).toBeTruthy();
-      expect(getByText('Resting')).toBeTruthy();
+      expect(result.getByText('5,000')).toBeTruthy();
+      expect(result.getAllByText('Resting').length).toBeGreaterThan(0);
     });
   });
 
   it('shows configure thresholds button', async () => {
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
-    
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
     await waitFor(() => {
-      expect(getByText('⚡ Configure Thresholds')).toBeTruthy();
+      expect(result.getByText('⚡ Configure Thresholds')).toBeTruthy();
     });
   });
 
   it('displays progress bar based on step count', async () => {
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
-    
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
     await waitFor(() => {
       // 5000 steps / 8000 active threshold = 62.5%
-      expect(getByText('63%')).toBeTruthy();
+      expect(result.getByText('63%')).toBeTruthy();
     });
   });
 
   it('shows error message when error exists', async () => {
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
+    // Set error after component is mounted
     useHealthDataStore.setState({
       error: 'Test error message',
     });
 
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
-    
     await waitFor(() => {
-      expect(getByText(/Test error message/)).toBeTruthy();
+      expect(result.getByText(/Test error message/)).toBeTruthy();
     });
   });
 
@@ -135,9 +179,10 @@ describe('MainScreen', () => {
       isLoading: true,
     });
 
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
-    
-    expect(getByText('Loading Symbi...')).toBeTruthy();
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
+    expect(result.getByText('Loading Symbi...')).toBeTruthy();
   });
 
   it('shows waiting for data message when no data available', async () => {
@@ -147,22 +192,24 @@ describe('MainScreen', () => {
       isLoading: false,
     });
 
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
-    
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
     await waitFor(() => {
-      expect(getByText('Waiting for today\'s data...')).toBeTruthy();
+      expect(result.getByText("Waiting for today's data...")).toBeTruthy();
     });
   });
 
   it('displays threshold indicators', async () => {
-    const { getByText } = render(<MainScreen navigation={mockNavigation as any} />);
-    
+    const result = render(<MainScreen navigation={mockNavigation as any} />);
+    unmount = result.unmount;
+
     await waitFor(() => {
-      expect(getByText('Sad')).toBeTruthy();
-      expect(getByText('Resting')).toBeTruthy();
-      expect(getByText('Active')).toBeTruthy();
-      expect(getByText('< 2,000')).toBeTruthy();
-      expect(getByText('> 8,000')).toBeTruthy();
+      expect(result.getByText('Sad')).toBeTruthy();
+      expect(result.getAllByText('Resting').length).toBeGreaterThan(0);
+      expect(result.getByText('Active')).toBeTruthy();
+      expect(result.getByText('< 2,000')).toBeTruthy();
+      expect(result.getByText('> 8,000')).toBeTruthy();
     });
   });
 });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ViewStyle, Animated, AppState, AppStateStatus } from 'react-native';
 import LottieView from 'lottie-react-native';
@@ -6,10 +7,10 @@ import { getAnimationSpeed } from '../services/BackgroundTaskConfig';
 
 /**
  * SymbiAnimation Component
- * 
+ *
  * Renders the Symbi creature with Lottie animations based on emotional state.
  * Supports smooth transitions between states and preloads animations for performance.
- * 
+ *
  * Requirements: 4.4, 4.5, 9.4
  */
 
@@ -23,6 +24,7 @@ interface SymbiAnimationProps {
 }
 
 // Animation source mapping for Phase 1 states
+
 const ANIMATION_SOURCES = {
   [EmotionalState.SAD]: require('../assets/animations/phase1/sad.json'),
   [EmotionalState.RESTING]: require('../assets/animations/phase1/resting.json'),
@@ -45,25 +47,21 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
   loop = true,
 }) => {
   const animationRef = useRef<LottieView>(null);
-  const [currentAnimation, setCurrentAnimation] = useState(
-    ANIMATION_SOURCES[emotionalState]
-  );
-  const [isPreloaded, setIsPreloaded] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentAnimation, setCurrentAnimation] = useState(ANIMATION_SOURCES[emotionalState]);
   const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
   const [speed, setSpeed] = useState(1.0);
-  
+
   // Animated values for smooth transitions
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  
+
   // Cache for rendered frames (optimization)
-  const frameCache = useRef<Map<EmotionalState, any>>(new Map());
+  const frameCache = useRef<Map<EmotionalState, number>>(new Map());
 
   // Preload animations on component mount
   useEffect(() => {
     preloadAnimations();
-    
+
     // Cleanup on unmount to prevent memory leaks
     return () => {
       // Clear frame cache
@@ -74,7 +72,7 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
   // Monitor app state for performance optimization
   useEffect(() => {
     const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
+
     return () => {
       subscription.remove();
     };
@@ -88,7 +86,7 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
   const handleAppStateChange = (nextAppState: AppStateStatus) => {
     const isBackground = nextAppState === 'background' || nextAppState === 'inactive';
     const newSpeed = getAnimationSpeed(isBackground);
-    
+
     if (appState.match(/active/) && isBackground) {
       // App moved to background - throttle to 10 FPS
       setSpeed(newSpeed);
@@ -98,7 +96,7 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
       setSpeed(newSpeed);
       console.log('Animation restored to normal speed');
     }
-    
+
     setAppState(nextAppState);
   };
 
@@ -120,18 +118,17 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
     // In React Native, requiring the animations already loads them
     // Initialize cache for Phase 1 states (most frequently used)
     // Limit cache to 3 most common states to keep memory usage low
-    frameCache.current.set(EmotionalState.SAD, ANIMATION_SOURCES[EmotionalState.SAD]);
-    frameCache.current.set(EmotionalState.RESTING, ANIMATION_SOURCES[EmotionalState.RESTING]);
-    frameCache.current.set(EmotionalState.ACTIVE, ANIMATION_SOURCES[EmotionalState.ACTIVE]);
-    
-    setIsPreloaded(true);
+    frameCache.current.set(EmotionalState.SAD, 1);
+    frameCache.current.set(EmotionalState.RESTING, 1);
+    frameCache.current.set(EmotionalState.ACTIVE, 1);
+
     console.log('Animations preloaded and cached (3 states)');
   };
 
   /**
    * Transition to a new emotional state with smooth animation
    * Uses fade and scale effects to prevent flickering
-   * 
+   *
    * @param newState - The target emotional state
    * @param duration - Transition duration in milliseconds (1000-3000ms)
    */
@@ -140,10 +137,8 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
     const clampedDuration = Math.max(1000, Math.min(3000, duration));
     const halfDuration = clampedDuration / 2;
 
-    setIsTransitioning(true);
-
     // Fade out and scale down
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -169,7 +164,7 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
     }
 
     // Fade in and scale up
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -183,8 +178,6 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
         }),
       ]).start(() => resolve());
     });
-
-    setIsTransitioning(false);
   };
 
   /**
@@ -217,8 +210,7 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
             opacity: fadeAnim,
             transform: [{ scale: scaleAnim }],
           },
-        ]}
-      >
+        ]}>
         <LottieView
           ref={animationRef}
           source={getAnimationSource()}

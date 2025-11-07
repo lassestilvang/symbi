@@ -1,6 +1,6 @@
 /**
  * Secure Storage Service
- * 
+ *
  * Extends StorageService with encryption for sensitive health data.
  * Uses EncryptionService for AES-256 encryption of health data cache.
  * Requirements: 11.2, 14.3
@@ -13,7 +13,7 @@ import { StorageService } from './StorageService';
 
 /**
  * SecureStorageService provides encrypted storage for sensitive health data.
- * 
+ *
  * Encryption Strategy:
  * - Health data cache: Encrypted with AES-256
  * - User preferences: Not encrypted (non-sensitive)
@@ -251,10 +251,7 @@ export class SecureStorageService {
       await AsyncStorage.removeItem(testKey);
 
       // Verify data matches
-      return (
-        decrypted.test === testData.test &&
-        decrypted.timestamp === testData.timestamp
-      );
+      return decrypted.test === testData.test && decrypted.timestamp === testData.timestamp;
     } catch (error) {
       console.error('Encryption verification failed:', error);
       return false;

@@ -1,9 +1,9 @@
 /**
  * ImageCacheManager
- * 
+ *
  * Manages caching of evolved Symbi appearance images to optimize memory usage.
  * Implements LRU (Least Recently Used) cache eviction strategy.
- * 
+ *
  * Requirement 10.4: Optimize image caching for evolved appearances
  */
 
@@ -24,11 +24,7 @@ export class ImageCacheManager {
   /**
    * Add an image to the cache
    */
-  static async cacheImage(
-    key: string,
-    data: string,
-    evolutionLevel: number
-  ): Promise<void> {
+  static async cacheImage(key: string, data: string, evolutionLevel: number): Promise<void> {
     // Estimate size (base64 is ~1.33x the actual size)
     const size = Math.ceil((data.length * 3) / 4);
 
@@ -51,7 +47,7 @@ export class ImageCacheManager {
 
     console.log(
       `Image cached: ${key} (${(size / 1024).toFixed(2)}KB) - ` +
-      `Total cache: ${(this.currentCacheSize / 1024 / 1024).toFixed(2)}MB`
+        `Total cache: ${(this.currentCacheSize / 1024 / 1024).toFixed(2)}MB`
     );
   }
 
@@ -145,7 +141,7 @@ export class ImageCacheManager {
    */
   static async preloadEvolutionImages(evolutionLevels: number[]): Promise<void> {
     console.log(`Preloading images for evolution levels: ${evolutionLevels.join(', ')}`);
-    
+
     // This would load images from storage
     // Implementation depends on how evolution images are stored
     // Placeholder for now
@@ -156,8 +152,8 @@ export class ImageCacheManager {
    */
   static getCachedEvolutionLevels(): number[] {
     const levels = new Set<number>();
-    
-    this.cache.forEach((value) => {
+
+    this.cache.forEach(value => {
       levels.add(value.evolutionLevel);
     });
 
@@ -196,7 +192,7 @@ export class ImageCacheManager {
     });
 
     keysToRemove.forEach(key => this.removeFromCache(key));
-    
+
     if (keysToRemove.length > 0) {
       console.log(`Optimized cache: removed ${keysToRemove.length} old images`);
     }

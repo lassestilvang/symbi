@@ -13,15 +13,15 @@ import { StepThresholds } from '../types';
 
 /**
  * ThresholdConfigScreen
- * 
+ *
  * UI component for configuring step count thresholds that determine
  * the Symbi's emotional state transitions.
- * 
+ *
  * Requirements: 3.2, 3.3, 3.4, 3.5
  */
 export const ThresholdConfigScreen: React.FC = () => {
   const { profile, updateThresholds } = useUserPreferencesStore();
-  
+
   const [sadThreshold, setSadThreshold] = useState<string>('');
   const [activeThreshold, setActiveThreshold] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
@@ -77,9 +77,9 @@ export const ThresholdConfigScreen: React.FC = () => {
         sadThreshold: sad,
         activeThreshold: active,
       };
-      
+
       await updateThresholds(newThresholds);
-      
+
       Alert.alert(
         'Success',
         'Thresholds updated successfully! Your Symbi will now use these values.',
@@ -125,9 +125,7 @@ export const ThresholdConfigScreen: React.FC = () => {
         {/* Sad Threshold Input */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Sad Threshold</Text>
-          <Text style={styles.hint}>
-            Steps below this value will make your Symbi sad
-          </Text>
+          <Text style={styles.hint}>Steps below this value will make your Symbi sad</Text>
           <TextInput
             style={styles.input}
             value={sadThreshold}
@@ -141,9 +139,7 @@ export const ThresholdConfigScreen: React.FC = () => {
         {/* Active Threshold Input */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Active Threshold</Text>
-          <Text style={styles.hint}>
-            Steps above this value will make your Symbi active
-          </Text>
+          <Text style={styles.hint}>Steps above this value will make your Symbi active</Text>
           <TextInput
             style={styles.input}
             value={activeThreshold}
@@ -178,19 +174,15 @@ export const ThresholdConfigScreen: React.FC = () => {
           <TouchableOpacity
             style={[styles.button, styles.resetButton]}
             onPress={handleReset}
-            disabled={isSaving}
-          >
+            disabled={isSaving}>
             <Text style={styles.resetButtonText}>Reset to Defaults</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.saveButton, isSaving && styles.disabledButton]}
             onPress={handleSave}
-            disabled={isSaving}
-          >
-            <Text style={styles.saveButtonText}>
-              {isSaving ? 'Saving...' : 'Save Thresholds'}
-            </Text>
+            disabled={isSaving}>
+            <Text style={styles.saveButtonText}>{isSaving ? 'Saving...' : 'Save Thresholds'}</Text>
           </TouchableOpacity>
         </View>
       </View>

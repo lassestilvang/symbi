@@ -82,9 +82,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
           />
         );
       case 3:
-        return (
-          <ManualEntryExplanationScreen onComplete={handleComplete} onBack={handleBack} />
-        );
+        return <ManualEntryExplanationScreen onComplete={handleComplete} onBack={handleBack} />;
       default:
         return <WelcomeScreen onNext={handleNext} onSkip={handleSkip} />;
     }

@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Sentry from '@sentry/react-native';
-import { Platform } from 'react-native';
+// import { Platform } from 'react-native';
 
 /**
  * Error Reporting Service
- * 
+ *
  * Integrates Sentry for crash reporting and monitoring with privacy-preserving features.
  * Sanitizes health data from error reports and implements breadcrumb logging.
  */
@@ -42,31 +43,31 @@ class ErrorReportingService {
       Sentry.init({
         dsn: config.dsn,
         environment: config.environment,
-        
+
         // Performance monitoring
         tracesSampleRate: config.tracesSampleRate ?? 0.2,
-        
+
         // Sanitize data before sending
-        beforeSend: (event, hint) => {
+        beforeSend: (event, _hint) => {
           // Custom sanitization
           return this.sanitizeEvent(event);
         },
-        
+
         // Breadcrumb filtering
-        beforeBreadcrumb: (breadcrumb) => {
+        beforeBreadcrumb: breadcrumb => {
           return this.sanitizeBreadcrumb(breadcrumb);
         },
-        
+
         // Platform-specific configuration
         integrations: [],
-        
+
         // Enable native crash handling
         enableNative: true,
         enableNativeCrashHandling: true,
-        
+
         // Attach stack traces
         attachStacktrace: true,
-        
+
         // Session tracking
         enableAutoSessionTracking: true,
         sessionTrackingIntervalMillis: 30000,
@@ -124,9 +125,10 @@ class ErrorReportingService {
   private sanitizeBreadcrumb(breadcrumb: Sentry.Breadcrumb): Sentry.Breadcrumb | null {
     // Remove breadcrumbs that might contain health data
     const sensitiveCategories = ['health', 'biometric', 'steps', 'sleep', 'hrv'];
-    if (breadcrumb.category && sensitiveCategories.some(cat => 
-      breadcrumb.category?.toLowerCase().includes(cat)
-    )) {
+    if (
+      breadcrumb.category &&
+      sensitiveCategories.some(cat => breadcrumb.category?.toLowerCase().includes(cat))
+    ) {
       return {
         ...breadcrumb,
         data: { sanitized: true },
@@ -312,12 +314,7 @@ class ErrorReportingService {
   /**
    * Track API call
    */
-  trackAPICall(
-    endpoint: string,
-    method: string,
-    statusCode?: number,
-    duration?: number
-  ): void {
+  trackAPICall(endpoint: string, method: string, statusCode?: number, duration?: number): void {
     if (!this.initialized) return;
 
     this.addBreadcrumb(

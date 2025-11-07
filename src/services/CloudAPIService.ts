@@ -1,6 +1,6 @@
 /**
  * Cloud API Service
- * 
+ *
  * Handles communication with cloud backend for data sync.
  * Implements TLS 1.3 encryption and data encryption for cloud storage.
  * Requirements: 9.5, 11.2, 11.3
@@ -23,7 +23,7 @@ export interface SyncResult {
 
 /**
  * CloudAPIService provides methods to sync data with cloud backend.
- * 
+ *
  * Note: This is a simplified implementation. In production, this should integrate
  * with Firebase Firestore or a custom REST API with proper authentication and encryption.
  */
@@ -164,6 +164,43 @@ export class CloudAPIService {
     // In production, implement proper AES-256 decryption
     // For now, just parse the JSON
     return JSON.parse(encryptedData);
+  }
+
+  /**
+   * Delete user account and all associated data from cloud
+   */
+  static async deleteAccount(): Promise<SyncResult> {
+    try {
+      const token = await AuthService.getAuthToken();
+      if (!token) {
+        return {
+          success: false,
+          error: 'Not authenticated',
+        };
+      }
+
+      // Simulate API call to delete account
+      await this.delay(500);
+
+      // In production, make actual API call:
+      // const response = await fetch(`${this.API_BASE_URL}${this.DELETE_ENDPOINT}`, {
+      //   method: 'DELETE',
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`,
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      console.error('Error deleting account from cloud:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 
   /**

@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * MemoryMonitor
- * 
+ *
  * Monitors and reports memory usage to help identify memory leaks
  * and ensure the app stays within the target <100MB footprint.
- * 
+ *
  * Requirement 10.4: Monitor memory footprint (target <100MB)
  */
 
@@ -67,7 +68,9 @@ export class MemoryMonitor {
 
     // Log if exceeding target
     if (!stats.isWithinTarget) {
-      console.warn(`⚠️ Memory usage: ${stats.usedMemoryMB.toFixed(2)}MB (target: <${this.TARGET_MEMORY_MB}MB)`);
+      console.warn(
+        `⚠️ Memory usage: ${stats.usedMemoryMB.toFixed(2)}MB (target: <${this.TARGET_MEMORY_MB}MB)`
+      );
       if (onMemoryWarning) {
         onMemoryWarning(stats);
       }
@@ -83,7 +86,7 @@ export class MemoryMonitor {
     // Note: React Native doesn't provide direct memory access
     // In production, you would use native modules or performance APIs
     // This is a placeholder implementation
-    
+
     let usedMemoryMB = 0;
 
     if (Platform.OS === 'web' && (performance as any).memory) {

@@ -16,16 +16,18 @@ import { EvolutionSystem } from '../services';
 
 /**
  * EvolutionGalleryScreen Component
- * 
+ *
  * Displays all past evolution forms of the Symbi.
  * Shows evolution level, date, and appearance for each record.
  * Allows viewing full-size images and sharing evolution milestones.
- * 
+ *
  * Requirements: 8.5
  */
 
 interface EvolutionGalleryScreenProps {
-  navigation: any;
+  navigation: {
+    goBack: () => void;
+  };
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -97,15 +99,10 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
     <TouchableOpacity
       style={styles.card}
       onPress={() => handleCardPress(item)}
-      accessibilityLabel={`Evolution level ${item.evolutionLevel}`}
-    >
+      accessibilityLabel={`Evolution level ${item.evolutionLevel}`}>
       <View style={styles.cardImageContainer}>
         {item.appearanceUrl ? (
-          <Image
-            source={{ uri: item.appearanceUrl }}
-            style={styles.cardImage}
-            resizeMode="cover"
-          />
+          <Image source={{ uri: item.appearanceUrl }} style={styles.cardImage} resizeMode="cover" />
         ) : (
           <View style={styles.placeholderImage}>
             <Text style={styles.placeholderEmoji}>👻</Text>
@@ -115,12 +112,10 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
           <Text style={styles.levelBadgeText}>Lv {item.evolutionLevel}</Text>
         </View>
       </View>
-      
+
       <View style={styles.cardInfo}>
         <Text style={styles.cardDate}>{formatDate(item.timestamp)}</Text>
-        <Text style={styles.cardDays}>
-          {item.daysInPositiveState} days active
-        </Text>
+        <Text style={styles.cardDays}>{item.daysInPositiveState} days active</Text>
       </View>
     </TouchableOpacity>
   );
@@ -145,8 +140,7 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-          accessibilityLabel="Go back"
-        >
+          accessibilityLabel="Go back">
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Evolution Gallery</Text>
@@ -165,7 +159,7 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
           <FlatList
             data={evolutionRecords}
             renderItem={renderEvolutionCard}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             numColumns={2}
             contentContainerStyle={styles.gridContainer}
             ListEmptyComponent={renderEmptyState}
@@ -178,16 +172,14 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
               visible={showFullImage}
               transparent
               animationType="fade"
-              onRequestClose={() => setShowFullImage(false)}
-            >
+              onRequestClose={() => setShowFullImage(false)}>
               <View style={styles.modalOverlay}>
                 <View style={styles.modalContainer}>
                   {/* Close button */}
                   <TouchableOpacity
                     style={styles.closeButton}
                     onPress={() => setShowFullImage(false)}
-                    accessibilityLabel="Close"
-                  >
+                    accessibilityLabel="Close">
                     <Text style={styles.closeButtonText}>✕</Text>
                   </TouchableOpacity>
 
@@ -211,9 +203,7 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
                     <Text style={styles.modalLevel}>
                       Evolution Level {selectedRecord.evolutionLevel}
                     </Text>
-                    <Text style={styles.modalDate}>
-                      {formatDate(selectedRecord.timestamp)}
-                    </Text>
+                    <Text style={styles.modalDate}>{formatDate(selectedRecord.timestamp)}</Text>
                     <Text style={styles.modalDays}>
                       Achieved after {selectedRecord.daysInPositiveState} days in positive states
                     </Text>
@@ -228,8 +218,7 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
                   <TouchableOpacity
                     style={styles.shareButton}
                     onPress={() => handleShare(selectedRecord)}
-                    accessibilityLabel="Share evolution"
-                  >
+                    accessibilityLabel="Share evolution">
                     <Text style={styles.shareButtonText}>📤 Share</Text>
                   </TouchableOpacity>
                 </View>

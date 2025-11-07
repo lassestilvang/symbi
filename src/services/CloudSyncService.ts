@@ -1,6 +1,6 @@
 /**
  * Cloud Sync Service
- * 
+ *
  * Manages synchronization of user data between local storage and cloud.
  * Handles conflict resolution, offline queueing, and automatic sync.
  * Requirements: 9.5, 14.4
@@ -97,7 +97,7 @@ export class CloudSyncService {
     } catch (error) {
       console.error('Sync error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Sync failed';
-      
+
       await this.updateSyncStatus({
         isSyncing: false,
         error: errorMessage,
@@ -128,12 +128,14 @@ export class CloudSyncService {
    */
   static async getSyncStatus(): Promise<SyncStatus> {
     const status = await StorageService.get<SyncStatus>(this.SYNC_STATUS_KEY);
-    return status || {
-      isSyncing: false,
-      lastSyncTime: null,
-      pendingChanges: false,
-      error: null,
-    };
+    return (
+      status || {
+        isSyncing: false,
+        lastSyncTime: null,
+        pendingChanges: false,
+        error: null,
+      }
+    );
   }
 
   /**
@@ -174,7 +176,7 @@ export class CloudSyncService {
    */
   static addSyncListener(listener: (status: SyncStatus) => void): () => void {
     this.syncListeners.push(listener);
-    
+
     // Return unsubscribe function
     return () => {
       this.syncListeners = this.syncListeners.filter(l => l !== listener);

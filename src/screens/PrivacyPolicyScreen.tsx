@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 
 interface PrivacyPolicyScreenProps {
   onClose?: () => void;
@@ -49,11 +42,16 @@ export const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onClos
             <Text style={styles.text}>
               Symbi collects the following health metrics to power your digital companion:
             </Text>
-            <BulletPoint>Step Count: Daily step count from Apple Health (iOS) or Google Fit (Android)</BulletPoint>
+            <BulletPoint>
+              Step Count: Daily step count from Apple Health (iOS) or Google Fit (Android)
+            </BulletPoint>
             <BulletPoint>Sleep Duration: Hours of sleep per night (Phase 2+)</BulletPoint>
             <BulletPoint>Heart Rate Variability (HRV): HRV measurements (Phase 2+)</BulletPoint>
-            <BulletPoint>Mindful Minutes: Duration of wellness activities you complete within the app (Phase 3+)</BulletPoint>
-            
+            <BulletPoint>
+              Mindful Minutes: Duration of wellness activities you complete within the app (Phase
+              3+)
+            </BulletPoint>
+
             <HighlightBox>
               <Text style={styles.highlightText}>
                 You have full control over what data we access. You can grant or deny permissions at
@@ -87,16 +85,22 @@ export const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onClos
 
         <Section title="Data Retention">
           <Subsection title="Local Storage">
-            <BulletPoint>Health Data Cache: 30-day rolling window (older data is automatically deleted)</BulletPoint>
+            <BulletPoint>
+              Health Data Cache: 30-day rolling window (older data is automatically deleted)
+            </BulletPoint>
             <BulletPoint>Emotional State History: 90 days</BulletPoint>
             <BulletPoint>Evolution Records: Stored permanently until you delete them</BulletPoint>
-            <BulletPoint>User Preferences: Stored until you delete the app or clear data</BulletPoint>
+            <BulletPoint>
+              User Preferences: Stored until you delete the app or clear data
+            </BulletPoint>
           </Subsection>
 
           <Subsection title="Cloud Storage (if enabled)">
             <BulletPoint>User Preferences: Stored until account deletion</BulletPoint>
             <BulletPoint>Evolution History: Stored until account deletion</BulletPoint>
-            <BulletPoint>Deleted Data: Permanently removed within 7 days of account deletion</BulletPoint>
+            <BulletPoint>
+              Deleted Data: Permanently removed within 7 days of account deletion
+            </BulletPoint>
           </Subsection>
         </Section>
 
@@ -106,7 +110,9 @@ export const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onClos
           </Text>
 
           <Subsection title="Encryption at Rest">
-            <BulletPoint>All local data is encrypted using your device's secure storage</BulletPoint>
+            <BulletPoint>
+              All local data is encrypted using your device's secure storage
+            </BulletPoint>
             <BulletPoint>Health data cache uses AES-256 encryption</BulletPoint>
             <BulletPoint>Evolution images are stored in encrypted storage</BulletPoint>
           </Subsection>
@@ -121,10 +127,18 @@ export const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onClos
         <Section title="Your Rights and Choices">
           <Text style={styles.text}>You have complete control over your data:</Text>
           <BulletPoint>View Your Data: See all collected health data in the app</BulletPoint>
-          <BulletPoint>Export Your Data: Download all your data in JSON format at any time</BulletPoint>
-          <BulletPoint>Delete Your Data: Permanently delete all local data with one tap</BulletPoint>
-          <BulletPoint>Revoke Permissions: Disable health data access through device settings</BulletPoint>
-          <BulletPoint>Switch to Manual Entry: Use the app without granting health data permissions</BulletPoint>
+          <BulletPoint>
+            Export Your Data: Download all your data in JSON format at any time
+          </BulletPoint>
+          <BulletPoint>
+            Delete Your Data: Permanently delete all local data with one tap
+          </BulletPoint>
+          <BulletPoint>
+            Revoke Permissions: Disable health data access through device settings
+          </BulletPoint>
+          <BulletPoint>
+            Switch to Manual Entry: Use the app without granting health data permissions
+          </BulletPoint>
         </Section>
 
         <Section title="Third-Party Services">
@@ -134,7 +148,9 @@ export const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onClos
           </Subsection>
 
           <Subsection title="AI Services (Phase 2+)">
-            <BulletPoint>Google Gemini API: Used for emotional state analysis and evolution image generation</BulletPoint>
+            <BulletPoint>
+              Google Gemini API: Used for emotional state analysis and evolution image generation
+            </BulletPoint>
             <BulletPoint>Data sent: Aggregated daily health metrics (no PII)</BulletPoint>
             <BulletPoint>Subject to Google's privacy policy and terms of service</BulletPoint>
           </Subsection>
@@ -174,7 +190,10 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
   </View>
 );
 
-const Subsection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+const Subsection: React.FC<{ title: string; children: React.ReactNode }> = ({
+  title,
+  children,
+}) => (
   <View style={styles.subsection}>
     <Text style={styles.subsectionTitle}>{title}</Text>
     {children}

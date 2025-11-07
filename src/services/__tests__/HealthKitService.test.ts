@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Platform } from 'react-native';
 import { HealthKitService } from '../HealthKitService';
 import { HealthDataType } from '../../types';
-import { AuthStatus } from '../HealthDataService';
+// import { AuthStatus } from '../HealthDataService';
 
 // Mock react-native-health
 const mockHealthKit = {
@@ -28,7 +29,7 @@ describe('HealthKitService', () => {
 
   describe('Initialization', () => {
     it('should initialize successfully on iOS', async () => {
-      mockHealthKit.isAvailable.mockImplementation((callback) => callback(null, true));
+      mockHealthKit.isAvailable.mockImplementation(callback => callback(null, true));
       mockHealthKit.initHealthKit.mockImplementation((permissions, callback) => callback(null));
 
       const result = await service.initialize({
@@ -53,7 +54,7 @@ describe('HealthKitService', () => {
     });
 
     it('should handle HealthKit unavailable', async () => {
-      mockHealthKit.isAvailable.mockImplementation((callback) => callback(null, false));
+      mockHealthKit.isAvailable.mockImplementation(callback => callback(null, false));
 
       const result = await service.initialize({
         read: [HealthDataType.STEPS],
@@ -65,7 +66,7 @@ describe('HealthKitService', () => {
     });
 
     it('should handle initialization errors', async () => {
-      mockHealthKit.isAvailable.mockImplementation((callback) => callback(null, true));
+      mockHealthKit.isAvailable.mockImplementation(callback => callback(null, true));
       mockHealthKit.initHealthKit.mockImplementation((permissions, callback) =>
         callback(new Error('Permission denied'))
       );
@@ -82,7 +83,7 @@ describe('HealthKitService', () => {
 
   describe('Data Retrieval', () => {
     beforeEach(async () => {
-      mockHealthKit.isAvailable.mockImplementation((callback) => callback(null, true));
+      mockHealthKit.isAvailable.mockImplementation(callback => callback(null, true));
       mockHealthKit.initHealthKit.mockImplementation((permissions, callback) => callback(null));
 
       await service.initialize({
@@ -135,11 +136,7 @@ describe('HealthKitService', () => {
     });
 
     it('should calculate average HRV', async () => {
-      const hrvSamples = [
-        { value: 50 },
-        { value: 60 },
-        { value: 70 },
-      ];
+      const hrvSamples = [{ value: 50 }, { value: 60 }, { value: 70 }];
 
       mockHealthKit.getHeartRateVariabilitySamples.mockImplementation((options, callback) =>
         callback(null, hrvSamples)
@@ -152,7 +149,7 @@ describe('HealthKitService', () => {
 
   describe('Data Writing', () => {
     beforeEach(async () => {
-      mockHealthKit.isAvailable.mockImplementation((callback) => callback(null, true));
+      mockHealthKit.isAvailable.mockImplementation(callback => callback(null, true));
       mockHealthKit.initHealthKit.mockImplementation((permissions, callback) => callback(null));
 
       await service.initialize({
@@ -181,7 +178,7 @@ describe('HealthKitService', () => {
 
   describe('Permission Handling', () => {
     it('should map permissions correctly', async () => {
-      mockHealthKit.isAvailable.mockImplementation((callback) => callback(null, true));
+      mockHealthKit.isAvailable.mockImplementation(callback => callback(null, true));
       mockHealthKit.initHealthKit.mockImplementation((permissions, callback) => {
         expect(permissions.permissions.read).toContain('StepCount');
         expect(permissions.permissions.read).toContain('SleepAnalysis');

@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * PerformanceMonitor
- * 
+ *
  * Comprehensive performance monitoring for battery, memory, API response times,
  * and animation frame rates.
- * 
+ *
  * Requirements: 10.1, 10.2, 10.3, 10.4
  */
 
-import { Platform } from 'react-native';
+// import { Platform } from 'react-native';
 import { MemoryMonitor } from './MemoryMonitor';
 
 export interface PerformanceMetrics {
@@ -65,11 +66,7 @@ export class PerformanceMonitor {
   /**
    * Record an API call
    */
-  static recordAPICall(
-    endpoint: string,
-    responseTimeMs: number,
-    success: boolean
-  ): void {
+  static recordAPICall(endpoint: string, responseTimeMs: number, success: boolean): void {
     const metric: APICallMetric = {
       endpoint,
       responseTimeMs,
@@ -108,9 +105,7 @@ export class PerformanceMonitor {
     }
 
     // Check if FPS is within target
-    const target = isBackground
-      ? this.FPS_TARGET_BACKGROUND
-      : this.FPS_TARGET_FOREGROUND;
+    const target = isBackground ? this.FPS_TARGET_BACKGROUND : this.FPS_TARGET_FOREGROUND;
 
     if (fps < target * 0.8) {
       // Allow 20% tolerance
@@ -147,9 +142,7 @@ export class PerformanceMonitor {
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     // Find readings closest to 24 hours ago and now
-    const oldReading = this.batteryHistory.find(
-      (reading) => reading.timestamp >= twentyFourHoursAgo
-    );
+    const oldReading = this.batteryHistory.find(reading => reading.timestamp >= twentyFourHoursAgo);
     const latestReading = this.batteryHistory[this.batteryHistory.length - 1];
 
     if (!oldReading) {
@@ -168,8 +161,8 @@ export class PerformanceMonitor {
     }
 
     const responseTimes = this.apiCallHistory
-      .filter((call) => call.success)
-      .map((call) => call.responseTimeMs)
+      .filter(call => call.success)
+      .map(call => call.responseTimeMs)
       .sort((a, b) => a - b);
 
     if (responseTimes.length === 0) {
@@ -184,7 +177,7 @@ export class PerformanceMonitor {
    * Calculate average API response time
    */
   static calculateAverageAPIResponseTime(): number | null {
-    const successfulCalls = this.apiCallHistory.filter((call) => call.success);
+    const successfulCalls = this.apiCallHistory.filter(call => call.success);
 
     if (successfulCalls.length === 0) {
       return null;
@@ -201,7 +194,7 @@ export class PerformanceMonitor {
     let metrics = this.animationHistory;
 
     if (isBackground !== undefined) {
-      metrics = metrics.filter((m) => m.isBackground === isBackground);
+      metrics = metrics.filter(m => m.isBackground === isBackground);
     }
 
     if (metrics.length === 0) {
@@ -223,9 +216,8 @@ export class PerformanceMonitor {
 
     return {
       batteryDrainPercent24h: batteryDrain ?? undefined,
-      isWithinBatteryTarget: batteryDrain !== null
-        ? batteryDrain < this.BATTERY_TARGET_PERCENT
-        : true,
+      isWithinBatteryTarget:
+        batteryDrain !== null ? batteryDrain < this.BATTERY_TARGET_PERCENT : true,
 
       memoryUsageMB: memoryStats.usedMemoryMB,
       isWithinMemoryTarget: memoryStats.isWithinTarget,
@@ -234,9 +226,7 @@ export class PerformanceMonitor {
       isWithinApiTarget: apiP95 !== null ? apiP95 < this.API_P95_TARGET_MS : true,
 
       animationFPS: avgFPS ?? undefined,
-      isWithinFPSTarget: avgFPS !== null
-        ? avgFPS >= this.FPS_TARGET_FOREGROUND * 0.8
-        : true,
+      isWithinFPSTarget: avgFPS !== null ? avgFPS >= this.FPS_TARGET_FOREGROUND * 0.8 : true,
 
       timestamp: new Date(),
     };

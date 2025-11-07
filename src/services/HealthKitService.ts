@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { Platform } from 'react-native';
 import { HealthDataService, HealthPermissions, InitResult, AuthStatus } from './HealthDataService';
 import { HealthDataType } from '../types';
@@ -22,7 +24,7 @@ export class HealthKitService extends HealthDataService {
       this.healthKit = AppleHealthKit;
 
       // Check if HealthKit is available
-      const isAvailable = await new Promise<boolean>((resolve) => {
+      const isAvailable = await new Promise<boolean>(resolve => {
         this.healthKit.isAvailable((err: any, available: boolean) => {
           if (err) {
             console.error('HealthKit availability check error:', err);
@@ -80,16 +82,16 @@ export class HealthKitService extends HealthDataService {
       // HealthKit doesn't provide a direct way to check authorization status
       // We'll attempt to read data and infer from the result
       const hasStepsPermission = permissions.read.includes(HealthDataType.STEPS);
-      
+
       if (hasStepsPermission) {
         // Try to read a small amount of data to check permission
         const endDate = new Date();
         const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
-        
+
         try {
           await this.getStepCount(startDate, endDate);
           return AuthStatus.AUTHORIZED;
-        } catch (error) {
+        } catch {
           return AuthStatus.DENIED;
         }
       }
@@ -270,16 +272,19 @@ export class HealthKitService extends HealthDataService {
 
     // Set up background observer for step count updates
     // This uses HKObserverQuery under the hood
-    const observer = setInterval(async () => {
-      try {
-        const endDate = new Date();
-        const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
-        const steps = await this.getStepCount(startDate, endDate);
-        callback({ steps, timestamp: new Date() });
-      } catch (error) {
-        console.error('Error in step count observer:', error);
-      }
-    }, 15 * 60 * 1000); // Poll every 15 minutes
+    const observer = setInterval(
+      async () => {
+        try {
+          const endDate = new Date();
+          const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
+          const steps = await this.getStepCount(startDate, endDate);
+          callback({ steps, timestamp: new Date() });
+        } catch (error) {
+          console.error('Error in step count observer:', error);
+        }
+      },
+      15 * 60 * 1000
+    ); // Poll every 15 minutes
 
     this.observers.set(HealthDataType.STEPS, observer);
   }
@@ -293,7 +298,7 @@ export class HealthKitService extends HealthDataService {
     };
 
     // Map read permissions
-    permissions.read.forEach((dataType) => {
+    permissions.read.forEach(dataType => {
       switch (dataType) {
         case HealthDataType.STEPS:
           healthKitPerms.permissions.read.push('StepCount');
@@ -311,7 +316,7 @@ export class HealthKitService extends HealthDataService {
     });
 
     // Map write permissions
-    permissions.write.forEach((dataType) => {
+    permissions.write.forEach(dataType => {
       switch (dataType) {
         case HealthDataType.MINDFUL_MINUTES:
           healthKitPerms.permissions.write.push('MindfulSession');

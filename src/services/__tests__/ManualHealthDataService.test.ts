@@ -141,9 +141,7 @@ describe('ManualHealthDataService', () => {
     it('should handle retrieval errors', async () => {
       (StorageService.get as jest.Mock).mockRejectedValue(new Error('Storage error'));
 
-      await expect(
-        service.getStepCount(new Date(), new Date())
-      ).rejects.toThrow();
+      await expect(service.getStepCount(new Date(), new Date())).rejects.toThrow();
     });
   });
 

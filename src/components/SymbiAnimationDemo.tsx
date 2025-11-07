@@ -5,15 +5,13 @@ import { EmotionalState } from '../types';
 
 /**
  * SymbiAnimationDemo Component
- * 
+ *
  * Demo component showing how to use SymbiAnimation with state transitions.
  * This can be used for testing and demonstration purposes.
  */
 
 export const SymbiAnimationDemo: React.FC = () => {
-  const [emotionalState, setEmotionalState] = useState<EmotionalState>(
-    EmotionalState.RESTING
-  );
+  const [emotionalState, setEmotionalState] = useState<EmotionalState>(EmotionalState.RESTING);
 
   const states = [
     { state: EmotionalState.SAD, label: 'Sad' },
@@ -24,28 +22,19 @@ export const SymbiAnimationDemo: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Symbi Animation Demo</Text>
-      
+
       <View style={styles.animationContainer}>
-        <SymbiAnimation 
-          emotionalState={emotionalState}
-          style={styles.animation}
-        />
+        <SymbiAnimation emotionalState={emotionalState} style={styles.animation} />
       </View>
 
-      <Text style={styles.currentState}>
-        Current State: {emotionalState.toUpperCase()}
-      </Text>
+      <Text style={styles.currentState}>Current State: {emotionalState.toUpperCase()}</Text>
 
       <View style={styles.buttonContainer}>
         {states.map(({ state, label }) => (
           <TouchableOpacity
             key={state}
-            style={[
-              styles.button,
-              emotionalState === state && styles.buttonActive,
-            ]}
-            onPress={() => setEmotionalState(state)}
-          >
+            style={[styles.button, emotionalState === state && styles.buttonActive]}
+            onPress={() => setEmotionalState(state)}>
             <Text style={styles.buttonText}>{label}</Text>
           </TouchableOpacity>
         ))}

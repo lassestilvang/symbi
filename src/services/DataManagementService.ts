@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Data Management Service
- * 
+ *
  * Handles data export, deletion, and account management.
  * Requirements: 11.4, 11.5
  */
@@ -62,7 +63,8 @@ export class DataManagementService {
         metadata: {
           platform: Platform.OS,
           appVersion: this.APP_VERSION,
-          dataRetentionPolicy: 'Health data: 30 days, Emotional state history: 90 days, Evolution records: Permanent',
+          dataRetentionPolicy:
+            'Health data: 30 days, Emotional state history: 90 days, Evolution records: Permanent',
         },
       };
 
@@ -91,7 +93,7 @@ export class DataManagementService {
   static async shareExportedData(): Promise<boolean> {
     try {
       const result = await this.exportAllData();
-      
+
       if (!result.success || !result.filePath) {
         Alert.alert('Export Failed', result.error || 'Unable to export data');
         return false;
@@ -99,7 +101,7 @@ export class DataManagementService {
 
       // Check if sharing is available
       const isAvailable = await Sharing.isAvailableAsync();
-      
+
       if (isAvailable) {
         await Sharing.shareAsync(result.filePath, {
           mimeType: 'application/json',
@@ -326,13 +328,12 @@ export class DataManagementService {
    */
   private static async saveToFile(data: string): Promise<string> {
     const fileName = `${this.EXPORT_FILE_NAME.replace('.json', '')}-${Date.now()}.json`;
-    const filePath = `${FileSystem.documentDirectory}${fileName}`;
+    
+    // Use the new expo-file-system API
+    const file = new FileSystem.File(FileSystem.Paths.cache, fileName);
+    await file.write(data);
 
-    await FileSystem.writeAsStringAsync(filePath, data, {
-      encoding: FileSystem.EncodingType.UTF8,
-    });
-
-    return filePath;
+    return file.uri;
   }
 
   /**

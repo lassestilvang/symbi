@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
-import { StorageService } from '../services/StorageService';
 import { DataManagementService } from '../services/DataManagementService';
 import { AnalyticsService } from '../services/AnalyticsService';
 
@@ -57,7 +56,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   const handleToggleAnalytics = async (value: boolean) => {
     await updatePreferences({ analyticsEnabled: value });
-    
+
     if (value) {
       await AnalyticsService.enableAnalytics();
     } else {
@@ -92,10 +91,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       } else {
         // Request permissions for automatic tracking (Phase 3 includes mindful minutes write)
         const result = await PermissionService.requestPhase3Permissions();
-        
+
         if (result.granted) {
           await setDataSource(result.dataSource);
-          Alert.alert('Success', `Connected to ${PermissionService.getPlatformHealthServiceName()}`);
+          Alert.alert(
+            'Success',
+            `Connected to ${PermissionService.getPlatformHealthServiceName()}`
+          );
         } else {
           Alert.alert(
             'Permission Denied',
@@ -123,11 +125,9 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     DataManagementService.showDeleteDataConfirmation(async () => {
       const result = await DataManagementService.deleteAllLocalData();
       if (result.success) {
-        Alert.alert(
-          'Data Deleted',
-          `Successfully deleted:\n${result.deletedItems.join('\n')}`,
-          [{ text: 'OK' }]
-        );
+        Alert.alert('Data Deleted', `Successfully deleted:\n${result.deletedItems.join('\n')}`, [
+          { text: 'OK' },
+        ]);
       } else {
         Alert.alert('Error', result.error || 'Failed to delete data. Please try again.');
       }
@@ -166,7 +166,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       {/* Data Source Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Data Source</Text>
-        
+
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
             <Text style={styles.settingLabel}>Current Source</Text>
@@ -182,8 +182,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               profile.preferences.dataSource === 'manual' ? platformSource : 'manual'
             );
           }}
-          disabled={isChangingDataSource}
-        >
+          disabled={isChangingDataSource}>
           <Text style={styles.buttonText}>
             {profile.preferences.dataSource === 'manual'
               ? `Connect to ${PermissionService.getPlatformHealthServiceName()}`
@@ -201,7 +200,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       {/* Thresholds Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Emotional State Thresholds</Text>
-        
+
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
             <Text style={styles.settingLabel}>Sad Threshold</Text>
@@ -225,7 +224,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       {onNavigateToEvolutionGallery && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Evolution History</Text>
-          
+
           <TouchableOpacity style={styles.button} onPress={onNavigateToEvolutionGallery}>
             <Text style={styles.buttonText}>✨ View Evolution Gallery</Text>
           </TouchableOpacity>

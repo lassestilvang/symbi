@@ -1,6 +1,6 @@
 /**
  * Core Type Definitions for Symbi
- * 
+ *
  * This file contains all TypeScript interfaces and enums used throughout the application.
  * Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.4, 8.4
  */
@@ -48,8 +48,8 @@ export enum HealthDataType {
  * Default: sadThreshold = 2000, activeThreshold = 8000
  */
 export interface StepThresholds {
-  sadThreshold: number;      // Steps below this = SAD state
-  activeThreshold: number;   // Steps above this = ACTIVE state
+  sadThreshold: number; // Steps below this = SAD state
+  activeThreshold: number; // Steps above this = ACTIVE state
 }
 
 /**
@@ -104,7 +104,7 @@ export interface HealthMetrics {
  * Cached for 30 days rolling window
  */
 export interface HealthDataCache {
-  date: string;              // ISO date string (YYYY-MM-DD)
+  date: string; // ISO date string (YYYY-MM-DD)
   steps: number;
   sleepHours?: number;
   hrv?: number;

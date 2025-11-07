@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { Platform } from 'react-native';
 import { HealthDataService, HealthPermissions, InitResult, AuthStatus } from './HealthDataService';
 import { HealthDataType } from '../types';
@@ -7,7 +9,7 @@ export class GoogleFitService extends HealthDataService {
   private isInitialized = false;
   private syncInterval: NodeJS.Timeout | null = null;
 
-  async initialize(permissions: HealthPermissions): Promise<InitResult> {
+  async initialize(_permissions: HealthPermissions): Promise<InitResult> {
     if (Platform.OS !== 'android') {
       return {
         success: false,
@@ -22,13 +24,14 @@ export class GoogleFitService extends HealthDataService {
       this.googleFit = GoogleFit.default || GoogleFit;
 
       // Map our HealthDataType to Google Fit scopes
-      const scopes = this.mapToGoogleFitScopes(permissions);
+      const scopes = this.mapToGoogleFitScopes(_permissions);
 
       // Authorize Google Fit
       const authResult = await new Promise<any>((resolve, reject) => {
-        this.googleFit.authorize({
-          scopes,
-        })
+        this.googleFit
+          .authorize({
+            scopes,
+          })
           .then((res: any) => resolve(res))
           .catch((err: any) => reject(err));
       });
@@ -42,13 +45,13 @@ export class GoogleFitService extends HealthDataService {
       }
 
       // Start recording for background data collection
-      await this.startRecording(permissions);
+      await this.startRecording(_permissions);
 
       this.isInitialized = true;
 
       return {
         success: true,
-        grantedPermissions: permissions.read,
+        grantedPermissions: _permissions.read,
       };
     } catch (error) {
       console.error('Google Fit initialization error:', error);
@@ -60,7 +63,7 @@ export class GoogleFitService extends HealthDataService {
     }
   }
 
-  async checkAuthorizationStatus(permissions: HealthPermissions): Promise<AuthStatus> {
+  async checkAuthorizationStatus(_permissions: HealthPermissions): Promise<AuthStatus> {
     if (!this.isInitialized || !this.googleFit) {
       return AuthStatus.NOT_DETERMINED;
     }
@@ -136,7 +139,11 @@ export class GoogleFitService extends HealthDataService {
       // Calculate total sleep duration in hours
       if (Array.isArray(result) && result.length > 0) {
         const totalMinutes = result.reduce((sum: number, sample: any) => {
-          if (sample.value === 'sleep' || sample.value === 'light_sleep' || sample.value === 'deep_sleep') {
+          if (
+            sample.value === 'sleep' ||
+            sample.value === 'light_sleep' ||
+            sample.value === 'deep_sleep'
+          ) {
             const start = new Date(sample.startDate).getTime();
             const end = new Date(sample.endDate).getTime();
             return sum + (end - start) / (1000 * 60);
@@ -173,8 +180,11 @@ export class GoogleFitService extends HealthDataService {
       if (Array.isArray(result) && result.length > 1) {
         // Simple HRV approximation: standard deviation of heart rate intervals
         const heartRates = result.map((sample: any) => sample.value);
-        const mean = heartRates.reduce((sum: number, hr: number) => sum + hr, 0) / heartRates.length;
-        const variance = heartRates.reduce((sum: number, hr: number) => sum + Math.pow(hr - mean, 2), 0) / heartRates.length;
+        const mean =
+          heartRates.reduce((sum: number, hr: number) => sum + hr, 0) / heartRates.length;
+        const variance =
+          heartRates.reduce((sum: number, hr: number) => sum + Math.pow(hr - mean, 2), 0) /
+          heartRates.length;
         const stdDev = Math.sqrt(variance);
 
         // Convert to milliseconds (rough approximation)
@@ -232,13 +242,13 @@ export class GoogleFitService extends HealthDataService {
     }
   }
 
-  private async startRecording(permissions: HealthPermissions): Promise<void> {
+  private async startRecording(_permissions: HealthPermissions): Promise<void> {
     if (!this.googleFit) return;
 
     try {
       // Start recording for step count
-      if (permissions.read.includes(HealthDataType.STEPS)) {
-        await this.googleFit.startRecording((callback: any) => {
+      if (_permissions.read.includes(HealthDataType.STEPS)) {
+        await this.googleFit.startRecording((_callback: any) => {
           // Recording started callback
           console.log('Google Fit recording started');
         });
@@ -250,23 +260,26 @@ export class GoogleFitService extends HealthDataService {
 
   private setupPeriodicSync(callback: (data: any) => void): void {
     // Set up periodic sync every 15 minutes
-    this.syncInterval = setInterval(async () => {
-      try {
-        const endDate = new Date();
-        const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
-        const steps = await this.getStepCount(startDate, endDate);
-        callback({ steps, timestamp: new Date() });
-      } catch (error) {
-        console.error('Error in periodic sync:', error);
-      }
-    }, 15 * 60 * 1000); // Poll every 15 minutes
+    this.syncInterval = setInterval(
+      async () => {
+        try {
+          const endDate = new Date();
+          const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
+          const steps = await this.getStepCount(startDate, endDate);
+          callback({ steps, timestamp: new Date() });
+        } catch (error) {
+          console.error('Error in periodic sync:', error);
+        }
+      },
+      15 * 60 * 1000
+    ); // Poll every 15 minutes
   }
 
-  private mapToGoogleFitScopes(permissions: HealthPermissions): string[] {
+  private mapToGoogleFitScopes(_permissions: HealthPermissions): string[] {
     const scopes: string[] = [];
 
     // Map read permissions
-    permissions.read.forEach((dataType) => {
+    _permissions.read.forEach((dataType: HealthDataType) => {
       switch (dataType) {
         case HealthDataType.STEPS:
           scopes.push('https://www.googleapis.com/auth/fitness.activity.read');
@@ -281,7 +294,7 @@ export class GoogleFitService extends HealthDataService {
     });
 
     // Map write permissions
-    permissions.write.forEach((dataType) => {
+    _permissions.write.forEach((dataType: HealthDataType) => {
       switch (dataType) {
         case HealthDataType.MINDFUL_MINUTES:
           scopes.push('https://www.googleapis.com/auth/fitness.activity.write');

@@ -3,15 +3,32 @@ import { EmotionalState, HealthMetrics, HealthGoals } from '../../types';
 
 /**
  * Unit tests for AIBrainService
- * 
+ *
  * Tests Gemini API integration, prompt construction, response parsing,
  * timeout and retry logic, and caching behavior.
- * 
+ *
  * Requirements: 5.3, 5.4, 6.1, 6.2, 6.3, 6.4
  */
 
 // Mock fetch globally
 global.fetch = jest.fn();
+
+// Mock StorageService to prevent caching
+jest.mock('../StorageService', () => ({
+  StorageService: {
+    getItem: jest.fn().mockResolvedValue(null),
+    setItem: jest.fn().mockResolvedValue(undefined),
+    removeItem: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+
+// Mock RequestDeduplicator to prevent deduplication
+jest.mock('../RequestDeduplicator', () => ({
+  RequestDeduplicator: {
+    generateKey: jest.fn((prefix, params) => `${prefix}:${JSON.stringify(params)}`),
+    deduplicate: jest.fn((key, fn) => fn()),
+  },
+}));
 
 describe('AIBrainService', () => {
   let service: AIBrainService;
@@ -20,8 +37,7 @@ describe('AIBrainService', () => {
   beforeEach(() => {
     service = new AIBrainService(mockApiKey);
     jest.clearAllMocks();
-    // Clear any cached data
-    jest.clearAllTimers();
+    (global.fetch as jest.Mock).mockClear();
   });
 
   describe('analyzeHealthData', () => {
@@ -247,7 +263,7 @@ describe('AIBrainService', () => {
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       await expect(service.analyzeHealthData(mockMetrics, mockGoals)).rejects.toThrow();
-      
+
       // Should have tried 2 times (initial + 1 retry)
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
@@ -350,7 +366,7 @@ describe('AIBrainService', () => {
 
       const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
-      
+
       expect(requestBody.contents).toBeDefined();
       expect(requestBody.contents[0].parts[0].text).toContain('Steps: 8500');
       expect(requestBody.contents[0].parts[0].text).toContain('Sleep: 7.5 hours');
@@ -384,7 +400,7 @@ describe('AIBrainService', () => {
       const result = await service.analyzeHealthData(metricsWithoutSleep, mockGoals);
 
       expect(result.emotionalState).toBe(EmotionalState.ACTIVE);
-      
+
       const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
       expect(requestBody.contents[0].parts[0].text).toContain('not available');

@@ -3,7 +3,7 @@ import { EmotionalState, StepThresholds } from '../../types';
 
 /**
  * Unit tests for EmotionalStateCalculator
- * 
+ *
  * Tests threshold logic with various step counts and edge cases.
  * Requirements: 3.1, 3.2, 3.3, 3.4
  */
@@ -104,13 +104,16 @@ describe('EmotionalStateCalculator', () => {
           sadThreshold: 100,
           activeThreshold: 500,
         };
-        
-        expect(EmotionalStateCalculator.calculateStateFromSteps(50, lowThresholds))
-          .toBe(EmotionalState.SAD);
-        expect(EmotionalStateCalculator.calculateStateFromSteps(300, lowThresholds))
-          .toBe(EmotionalState.RESTING);
-        expect(EmotionalStateCalculator.calculateStateFromSteps(600, lowThresholds))
-          .toBe(EmotionalState.ACTIVE);
+
+        expect(EmotionalStateCalculator.calculateStateFromSteps(50, lowThresholds)).toBe(
+          EmotionalState.SAD
+        );
+        expect(EmotionalStateCalculator.calculateStateFromSteps(300, lowThresholds)).toBe(
+          EmotionalState.RESTING
+        );
+        expect(EmotionalStateCalculator.calculateStateFromSteps(600, lowThresholds)).toBe(
+          EmotionalState.ACTIVE
+        );
       });
 
       it('should handle very high custom thresholds', () => {
@@ -118,13 +121,16 @@ describe('EmotionalStateCalculator', () => {
           sadThreshold: 15000,
           activeThreshold: 25000,
         };
-        
-        expect(EmotionalStateCalculator.calculateStateFromSteps(10000, highThresholds))
-          .toBe(EmotionalState.SAD);
-        expect(EmotionalStateCalculator.calculateStateFromSteps(20000, highThresholds))
-          .toBe(EmotionalState.RESTING);
-        expect(EmotionalStateCalculator.calculateStateFromSteps(30000, highThresholds))
-          .toBe(EmotionalState.ACTIVE);
+
+        expect(EmotionalStateCalculator.calculateStateFromSteps(10000, highThresholds)).toBe(
+          EmotionalState.SAD
+        );
+        expect(EmotionalStateCalculator.calculateStateFromSteps(20000, highThresholds)).toBe(
+          EmotionalState.RESTING
+        );
+        expect(EmotionalStateCalculator.calculateStateFromSteps(30000, highThresholds)).toBe(
+          EmotionalState.ACTIVE
+        );
       });
     });
 
@@ -162,7 +168,7 @@ describe('EmotionalStateCalculator', () => {
       const metrics = {
         steps: 5000,
       };
-      
+
       const goals = {
         targetSteps: 10000,
         targetSleepHours: 8,

@@ -4,7 +4,7 @@ import { StorageService } from '../services/StorageService';
 
 /**
  * Health Data Store
- * 
+ *
  * Manages reactive health data state including:
  * - Current emotional state
  * - Latest health metrics (steps, sleep, HRV)
@@ -18,15 +18,19 @@ interface HealthDataState {
   healthMetrics: HealthMetrics;
   lastUpdated: Date | null;
   calculationMethod: 'rule-based' | 'ai';
-  
+
   // UI state
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   setEmotionalState: (state: EmotionalState, method: 'rule-based' | 'ai') => void;
   setHealthMetrics: (metrics: HealthMetrics) => void;
-  updateHealthData: (metrics: HealthMetrics, state: EmotionalState, method: 'rule-based' | 'ai') => Promise<void>;
+  updateHealthData: (
+    metrics: HealthMetrics,
+    state: EmotionalState,
+    method: 'rule-based' | 'ai'
+  ) => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
@@ -42,12 +46,12 @@ const initialState = {
   error: null,
 };
 
-export const useHealthDataStore = create<HealthDataState>((set, get) => ({
+export const useHealthDataStore = create<HealthDataState>((set, _get) => ({
   ...initialState,
 
   setEmotionalState: (state: EmotionalState, method: 'rule-based' | 'ai') => {
-    set({ 
-      emotionalState: state, 
+    set({
+      emotionalState: state,
       calculationMethod: method,
       lastUpdated: new Date(),
     });
@@ -57,7 +61,11 @@ export const useHealthDataStore = create<HealthDataState>((set, get) => ({
     set({ healthMetrics: metrics });
   },
 
-  updateHealthData: async (metrics: HealthMetrics, state: EmotionalState, method: 'rule-based' | 'ai') => {
+  updateHealthData: async (
+    metrics: HealthMetrics,
+    state: EmotionalState,
+    method: 'rule-based' | 'ai'
+  ) => {
     set({
       healthMetrics: metrics,
       emotionalState: state,

@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Security Audit Tests
- * 
+ *
  * Comprehensive security testing for privacy, encryption, and data handling.
  * Requirements: 11.1, 11.2, 11.3, 11.4, 11.5
  */
 
-import { EncryptionService } from '../EncryptionService';
+// import { EncryptionService } from '../EncryptionService';
 import { SecureStorageService } from '../SecureStorageService';
 import { DataManagementService } from '../DataManagementService';
 import { AnalyticsService, AnalyticsEvent } from '../AnalyticsService';
@@ -103,7 +104,7 @@ describe('Security Audit Tests', () => {
       const tlsInfo = await require('../SecureAPIService').SecureAPIService.getTLSInfo(
         'https://generativelanguage.googleapis.com'
       );
-      
+
       expect(tlsInfo.version).toContain('TLS 1.3');
     });
   });
@@ -127,7 +128,7 @@ describe('Security Audit Tests', () => {
 
       // Attempt to track event (should be silently ignored)
       await AnalyticsService.trackEvent(AnalyticsEvent.APP_OPENED);
-      
+
       // No error should be thrown
       expect(true).toBe(true);
     });
@@ -139,7 +140,7 @@ describe('Security Audit Tests', () => {
       const fs = require('fs');
       const path = require('path');
       const privacyPolicyPath = path.join(__dirname, '../../../docs/privacy-policy.md');
-      
+
       expect(fs.existsSync(privacyPolicyPath)).toBe(true);
     });
 
@@ -340,7 +341,7 @@ describe('Security Audit Tests', () => {
       // Note: This requires network access and valid API key
       // In production, this would be a real integration test
       const SecureAPIService = require('../SecureAPIService').SecureAPIService;
-      
+
       // For now, just verify the service exists
       expect(SecureAPIService.testSecureConnection).toBeDefined();
     });
@@ -367,45 +368,45 @@ describe('Security Audit Tests', () => {
 
 /**
  * Security Audit Checklist
- * 
+ *
  * ✅ Data Encryption at Rest
  *    - Health data cache encrypted with AES-256
  *    - Authentication tokens encrypted
  *    - Encryption verification test passes
- * 
+ *
  * ✅ Data Encryption in Transit
  *    - All API calls use HTTPS
  *    - TLS 1.3 enforced at platform level
  *    - Certificate pinning configured (native implementation required)
- * 
+ *
  * ✅ Permission Handling
  *    - Health data access requires explicit user consent
  *    - Analytics opt-out respected
  *    - Manual entry mode available as alternative
- * 
+ *
  * ✅ Privacy Policy
  *    - Comprehensive privacy policy document created
  *    - In-app privacy policy viewer implemented
  *    - Privacy policy linked in onboarding and settings
- * 
+ *
  * ✅ Data Export and Deletion
  *    - Export all data as JSON
  *    - Delete all local data
  *    - Delete account and cloud data
  *    - Confirmation dialogs for destructive actions
  *    - Data export offered before deletion
- * 
+ *
  * ✅ PII Leakage Prevention
  *    - No PII in analytics events
  *    - Step counts sanitized to ranges
  *    - Anonymous device IDs only
  *    - No sensitive data in logs
- * 
+ *
  * ✅ Data Retention
  *    - 30-day rolling window for health data cache
  *    - 90-day retention for emotional state history
  *    - Automatic cleanup of old data
- * 
+ *
  * 🔄 Production Recommendations
  *    - Implement native certificate pinning (iOS/Android)
  *    - Use react-native-keychain for secure key storage

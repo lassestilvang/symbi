@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+// import { Platform } from 'react-native';
 import { AIBrainService } from './AIBrainService';
 import { createHealthDataService } from './HealthDataService';
 import { EmotionalStateCalculator } from './EmotionalStateCalculator';
@@ -7,11 +7,11 @@ import { EmotionalState, HealthMetrics, HealthGoals } from '../types';
 
 /**
  * DailyAIAnalysisService
- * 
+ *
  * Schedules and performs daily AI analysis of health data at 8:00 AM local time.
  * Batches health data from the previous day and calls AIBrainService.
  * Falls back to Phase 1 rule-based logic if AI fails.
- * 
+ *
  * Requirements: 5.3, 6.4, 6.5
  */
 
@@ -36,7 +36,7 @@ export class DailyAIAnalysisService {
   async initialize(apiKey?: string): Promise<void> {
     // Get API key from storage if not provided
     if (!apiKey) {
-      apiKey = await StorageService.get<string>(DailyAIAnalysisService.GEMINI_API_KEY_STORAGE);
+      apiKey = (await StorageService.get<string>(DailyAIAnalysisService.GEMINI_API_KEY_STORAGE)) || undefined;
     }
 
     if (apiKey) {
@@ -51,11 +51,11 @@ export class DailyAIAnalysisService {
   /**
    * Schedule daily analysis at 8:00 AM local time
    * Requirement 10.2: Use WorkManager/BackgroundTasks efficiently
-   * 
+   *
    * Note: In production, this should use platform-specific background task schedulers:
    * - iOS: BackgroundTasks framework (BGAppRefreshTask)
    * - Android: WorkManager with PeriodicWorkRequest
-   * 
+   *
    * This implementation uses setTimeout for simplicity but should be replaced
    * with native background task APIs for production deployment.
    */
@@ -176,7 +176,7 @@ export class DailyAIAnalysisService {
 
       // Fetch all metrics
       const steps = await healthService.getStepCount(startDate, endDate);
-      
+
       let sleepHours: number | undefined;
       let hrv: number | undefined;
 
@@ -208,8 +208,8 @@ export class DailyAIAnalysisService {
    */
   private async getHealthGoals(): Promise<HealthGoals> {
     try {
-      const profile = await StorageService.get<any>('user_profile');
-      
+      const profile = await StorageService.get<{ goals?: HealthGoals }>('user_profile');
+
       if (profile?.goals) {
         return profile.goals;
       }
@@ -234,7 +234,7 @@ export class DailyAIAnalysisService {
   /**
    * Fallback to Phase 1 rule-based calculation when AI is unavailable
    */
-  private fallbackToRuleBased(metrics: HealthMetrics, goals: HealthGoals): EmotionalState {
+  private fallbackToRuleBased(metrics: HealthMetrics, _goals: HealthGoals): EmotionalState {
     // Get thresholds from storage or use defaults
     const thresholds = {
       sadThreshold: 2000,

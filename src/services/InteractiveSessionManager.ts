@@ -33,7 +33,7 @@ interface ActiveSession {
 /**
  * InteractiveSessionManager handles guided wellness activities
  * that improve the Symbi's emotional state
- * 
+ *
  * Requirements: 7.2, 7.3, 7.4
  */
 export class InteractiveSessionManager {
@@ -46,7 +46,7 @@ export class InteractiveSessionManager {
 
   /**
    * Start a new interactive session
-   * 
+   *
    * @param type - The type of session to start
    * @param duration - Duration in minutes (default: 5)
    * @throws Error if a session is already active
@@ -66,7 +66,7 @@ export class InteractiveSessionManager {
 
   /**
    * Complete the current session and write health data
-   * 
+   *
    * @returns SessionResult with success status and new emotional state
    * @throws Error if no session is active
    */
@@ -105,7 +105,7 @@ export class InteractiveSessionManager {
 
   /**
    * Cancel the current session without writing health data
-   * 
+   *
    * @throws Error if no session is active
    */
   cancelSession(): void {
@@ -118,7 +118,7 @@ export class InteractiveSessionManager {
 
   /**
    * Pause the current session
-   * 
+   *
    * @throws Error if no session is active
    */
   pauseSession(): void {
@@ -131,7 +131,7 @@ export class InteractiveSessionManager {
 
   /**
    * Resume a paused session
-   * 
+   *
    * @throws Error if no session is active or not paused
    */
   resumeSession(): void {
@@ -148,7 +148,7 @@ export class InteractiveSessionManager {
 
   /**
    * Get the current active session
-   * 
+   *
    * @returns The active session or null if no session is active
    */
   getActiveSession(): ActiveSession | null {
@@ -157,7 +157,7 @@ export class InteractiveSessionManager {
 
   /**
    * Check if a session is currently active
-   * 
+   *
    * @returns true if a session is active, false otherwise
    */
   isSessionActive(): boolean {
@@ -166,7 +166,7 @@ export class InteractiveSessionManager {
 
   /**
    * Get elapsed time for the current session in seconds
-   * 
+   *
    * @returns Elapsed time in seconds, or 0 if no session is active
    */
   getElapsedTime(): number {
@@ -180,7 +180,7 @@ export class InteractiveSessionManager {
 
   /**
    * Get remaining time for the current session in seconds
-   * 
+   *
    * @returns Remaining time in seconds, or 0 if no session is active
    */
   getRemainingTime(): number {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { Platform } from 'react-native';
 import { HealthDataType } from '../types';
 
@@ -45,7 +47,9 @@ export abstract class HealthDataService {
 }
 
 // Factory function to create platform-specific health data service
-export function createHealthDataService(dataSource?: 'healthkit' | 'googlefit' | 'manual'): HealthDataService {
+export function createHealthDataService(
+  dataSource?: 'healthkit' | 'googlefit' | 'manual'
+): HealthDataService {
   // If manual is explicitly requested, return ManualHealthDataService
   if (dataSource === 'manual') {
     const { ManualHealthDataService } = require('./ManualHealthDataService');

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Platform } from 'react-native';
-import { createHealthDataService, AuthStatus } from '../HealthDataService';
-import { HealthDataType } from '../../types';
+import { createHealthDataService } from '../HealthDataService';
+// import { HealthDataType } from '../../types';
 import { HealthKitService } from '../HealthKitService';
 import { GoogleFitService } from '../GoogleFitService';
 import { ManualHealthDataService } from '../ManualHealthDataService';

@@ -12,10 +12,10 @@ import {
 
 /**
  * EvolutionCelebration Component
- * 
+ *
  * Displays a celebratory modal when the Symbi evolves.
  * Shows the new evolved appearance with animations and confetti effects.
- * 
+ *
  * Requirements: 8.2, 8.3, 8.4
  */
 
@@ -26,7 +26,7 @@ interface EvolutionCelebrationProps {
   onClose: () => void;
 }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const EvolutionCelebration: React.FC<EvolutionCelebrationProps> = ({
   visible,
@@ -82,12 +82,7 @@ export const EvolutionCelebration: React.FC<EvolutionCelebrationProps> = ({
   });
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <Animated.View
           style={[
@@ -96,8 +91,7 @@ export const EvolutionCelebration: React.FC<EvolutionCelebrationProps> = ({
               opacity: fadeAnim,
               transform: [{ scale: scaleAnim }],
             },
-          ]}
-        >
+          ]}>
           {/* Sparkle effects */}
           <Animated.View style={[styles.sparkle, styles.sparkle1, { opacity: sparkleOpacity }]}>
             <Text style={styles.sparkleText}>✨</Text>
@@ -123,11 +117,7 @@ export const EvolutionCelebration: React.FC<EvolutionCelebrationProps> = ({
           {/* Evolved appearance */}
           <View style={styles.imageContainer}>
             {appearanceUrl ? (
-              <Image
-                source={{ uri: appearanceUrl }}
-                style={styles.image}
-                resizeMode="contain"
-              />
+              <Image source={{ uri: appearanceUrl }} style={styles.image} resizeMode="contain" />
             ) : (
               <View style={styles.placeholderImage}>
                 <Text style={styles.placeholderEmoji}>👻</Text>
@@ -136,9 +126,7 @@ export const EvolutionCelebration: React.FC<EvolutionCelebrationProps> = ({
           </View>
 
           {/* Message */}
-          <Text style={styles.message}>
-            Your Symbi has evolved into a more powerful form!
-          </Text>
+          <Text style={styles.message}>Your Symbi has evolved into a more powerful form!</Text>
           <Text style={styles.submessage}>
             Keep up the healthy habits to unlock the next evolution.
           </Text>
@@ -147,8 +135,7 @@ export const EvolutionCelebration: React.FC<EvolutionCelebrationProps> = ({
           <TouchableOpacity
             style={styles.closeButton}
             onPress={onClose}
-            accessibilityLabel="Close evolution celebration"
-          >
+            accessibilityLabel="Close evolution celebration">
             <Text style={styles.closeButtonText}>Continue</Text>
           </TouchableOpacity>
         </Animated.View>

@@ -1,6 +1,6 @@
 /**
  * Account Management Screen
- * 
+ *
  * Provides UI for account creation, login, and cloud sync management.
  * Requirements: 9.5, 11.4, 11.5
  */
@@ -18,7 +18,6 @@ import {
 } from 'react-native';
 import { AuthService, AuthUser } from '../services/AuthService';
 import { CloudSyncService, SyncStatus } from '../services/CloudSyncService';
-import { StorageService } from '../services/StorageService';
 import { DataManagementService } from '../services/DataManagementService';
 
 interface AccountScreenProps {
@@ -83,7 +82,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
       setCurrentUser(result.user);
       setMode('status');
       Alert.alert('Success', 'Account created successfully!');
-      
+
       // Perform initial sync
       handleSync();
     } else {
@@ -105,7 +104,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
       setCurrentUser(result.user);
       setMode('status');
       Alert.alert('Success', 'Signed in successfully!');
-      
+
       // Download cloud data
       handleDownloadData();
     } else {
@@ -202,7 +201,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
   const renderSignInForm = () => (
     <View style={styles.formContainer}>
       <Text style={styles.title}>Sign In</Text>
-      
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -227,8 +226,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
       <TouchableOpacity
         style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleSignIn}
-        disabled={isLoading}
-      >
+        disabled={isLoading}>
         {isLoading ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
@@ -239,16 +237,14 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
       <TouchableOpacity
         style={styles.linkButton}
         onPress={() => setMode('signup')}
-        disabled={isLoading}
-      >
+        disabled={isLoading}>
         <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.linkButton}
         onPress={() => setMode('status')}
-        disabled={isLoading}
-      >
+        disabled={isLoading}>
         <Text style={styles.linkText}>← Back</Text>
       </TouchableOpacity>
     </View>
@@ -257,7 +253,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
   const renderSignUpForm = () => (
     <View style={styles.formContainer}>
       <Text style={styles.title}>Create Account</Text>
-      
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -292,8 +288,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
       <TouchableOpacity
         style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleSignUp}
-        disabled={isLoading}
-      >
+        disabled={isLoading}>
         {isLoading ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
@@ -304,16 +299,14 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
       <TouchableOpacity
         style={styles.linkButton}
         onPress={() => setMode('signin')}
-        disabled={isLoading}
-      >
+        disabled={isLoading}>
         <Text style={styles.linkText}>Already have an account? Sign In</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.linkButton}
         onPress={() => setMode('status')}
-        disabled={isLoading}
-      >
+        disabled={isLoading}>
         <Text style={styles.linkText}>← Back</Text>
       </TouchableOpacity>
     </View>
@@ -335,7 +328,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Sync Status</Text>
-            
+
             {syncStatus.lastSyncTime && (
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Last Sync:</Text>
@@ -360,8 +353,7 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
             <TouchableOpacity
               style={[styles.button, (isLoading || syncStatus.isSyncing) && styles.buttonDisabled]}
               onPress={handleSync}
-              disabled={isLoading || syncStatus.isSyncing}
-            >
+              disabled={isLoading || syncStatus.isSyncing}>
               {isLoading || syncStatus.isSyncing ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
@@ -372,36 +364,32 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={handleDownloadData}
-              disabled={isLoading || syncStatus.isSyncing}
-            >
+              disabled={isLoading || syncStatus.isSyncing}>
               <Text style={styles.secondaryButtonText}>⬇️ Download Cloud Data</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Data Management</Text>
-            
+
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={handleExportData}
-              disabled={isLoading}
-            >
+              disabled={isLoading}>
               <Text style={styles.secondaryButtonText}>📦 Export Data (JSON)</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.dangerButton}
               onPress={handleSignOut}
-              disabled={isLoading}
-            >
+              disabled={isLoading}>
               <Text style={styles.dangerButtonText}>Sign Out</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.dangerButton}
               onPress={handleDeleteAccount}
-              disabled={isLoading}
-            >
+              disabled={isLoading}>
               <Text style={styles.dangerButtonText}>Delete Account</Text>
             </TouchableOpacity>
           </View>
@@ -412,24 +400,15 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
             Sign in to sync your data across devices and back up your Symbi's evolution history.
           </Text>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setMode('signin')}
-          >
+          <TouchableOpacity style={styles.button} onPress={() => setMode('signin')}>
             <Text style={styles.buttonText}>Sign In</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => setMode('signup')}
-          >
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => setMode('signup')}>
             <Text style={styles.secondaryButtonText}>Create Account</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={handleExportData}
-          >
+          <TouchableOpacity style={styles.linkButton} onPress={handleExportData}>
             <Text style={styles.linkText}>Export Data (No Account Required)</Text>
           </TouchableOpacity>
         </View>

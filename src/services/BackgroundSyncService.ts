@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Platform, AppState, AppStateStatus } from 'react-native';
 import { HealthDataType } from '../types';
 import { createHealthDataService } from './HealthDataService';
@@ -14,7 +15,7 @@ export class BackgroundSyncService {
   private appStateSubscription: any = null;
   private isActive = false;
   private lastSyncTime = 0;
-  
+
   // Battery optimization: Batch API calls to minimize wake-ups
   private pendingUpdates: Map<HealthDataType, any> = new Map();
   private batchTimer: NodeJS.Timeout | null = null;
@@ -46,8 +47,8 @@ export class BackgroundSyncService {
     this.isActive = true;
 
     // Subscribe to updates for each data type with batching
-    dataTypes.forEach((dataType) => {
-      this.healthService.subscribeToUpdates(dataType, (data) => {
+    dataTypes.forEach(dataType => {
+      this.healthService.subscribeToUpdates(dataType, data => {
         // Batch updates to minimize wake-ups (Requirement 10.2)
         this.batchUpdate(dataType, data, onUpdate);
       });
@@ -80,7 +81,7 @@ export class BackgroundSyncService {
     }
 
     // Unsubscribe from all updates
-    Object.values(HealthDataType).forEach((dataType) => {
+    Object.values(HealthDataType).forEach(dataType => {
       this.healthService.unsubscribeFromUpdates(dataType);
     });
 
@@ -237,7 +238,7 @@ export class BackgroundSyncService {
    */
   private processBatchedUpdates(onUpdate: (dataType: HealthDataType, data: any) => void): void {
     console.log(`Processing ${this.pendingUpdates.size} batched updates`);
-    
+
     this.pendingUpdates.forEach((data, dataType) => {
       onUpdate(dataType, data);
     });

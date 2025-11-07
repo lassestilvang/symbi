@@ -1,13 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  Vibration,
-} from 'react-native';
-import { InteractiveSessionManager, SessionType, SessionResult } from '../services';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Vibration } from 'react-native';
+import { InteractiveSessionManager, SessionResult } from '../services';
 
 /**
  * BreathingPhase represents the current phase of the breathing cycle
@@ -28,7 +21,7 @@ interface BreathingExerciseProps {
 /**
  * BreathingExercise component implements a 4-7-8 breathing pattern
  * with animated circle and haptic feedback
- * 
+ *
  * Pattern: 4s inhale, 7s hold, 8s exhale
  * Requirements: 7.2, 7.3
  */
@@ -111,8 +104,8 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({
   /**
    * Move to the next breathing phase
    */
-  const nextPhase = () => {
-    setPhase((currentPhase) => {
+  const advancePhase = () => {
+    setPhase(currentPhase => {
       let nextPhase: BreathingPhase;
       let phaseDuration: number;
 
@@ -128,7 +121,7 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({
         case BreathingPhase.EXHALE:
           nextPhase = BreathingPhase.INHALE;
           phaseDuration = INHALE_DURATION;
-          setCycleCount((count) => count + 1);
+          setCycleCount(count => count + 1);
           break;
       }
 
@@ -141,7 +134,7 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({
       // Schedule next phase transition
       phaseTimerRef.current = setTimeout(() => {
         if (!isPaused) {
-          nextPhase();
+          advancePhase();
         }
       }, phaseDuration);
 
@@ -158,12 +151,12 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({
 
     // Schedule first phase transition
     phaseTimerRef.current = setTimeout(() => {
-      nextPhase();
+      advancePhase();
     }, INHALE_DURATION);
 
     // Start countdown timer
     countdownTimerRef.current = setInterval(() => {
-      setRemainingTime((time) => {
+      setRemainingTime(time => {
         if (time <= 1) {
           handleComplete();
           return 0;
@@ -187,6 +180,11 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({
    * Handle pause/resume
    */
   useEffect(() => {
+    // Skip initial mount - session is already started by parent
+    if (isPaused === false && phaseTimerRef.current === null) {
+      return;
+    }
+
     if (isPaused) {
       // Pause timers
       if (phaseTimerRef.current) {
@@ -200,11 +198,11 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({
       // Resume timers
       const phaseDuration = getPhaseDuration(phase);
       phaseTimerRef.current = setTimeout(() => {
-        nextPhase();
+        advancePhase();
       }, phaseDuration);
 
       countdownTimerRef.current = setInterval(() => {
-        setRemainingTime((time) => {
+        setRemainingTime(time => {
           if (time <= 1) {
             handleComplete();
             return 0;
@@ -305,29 +303,19 @@ export const BreathingExercise: React.FC<BreathingExerciseProps> = ({
 
       {/* Controls */}
       <View style={styles.controlsContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.pauseButton]}
-          onPress={togglePause}
-        >
+        <TouchableOpacity style={[styles.button, styles.pauseButton]} onPress={togglePause}>
           <Text style={styles.buttonText}>{isPaused ? 'Resume' : 'Pause'}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.button, styles.cancelButton]}
-          onPress={handleCancel}
-        >
+        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
       </View>
 
       {/* Instructions */}
       <View style={styles.instructionsContainer}>
-        <Text style={styles.instructionsText}>
-          Follow the circle's rhythm
-        </Text>
-        <Text style={styles.instructionsSubtext}>
-          4s inhale • 7s hold • 8s exhale
-        </Text>
+        <Text style={styles.instructionsText}>Follow the circle's rhythm</Text>
+        <Text style={styles.instructionsSubtext}>4s inhale • 7s hold • 8s exhale</Text>
       </View>
     </View>
   );

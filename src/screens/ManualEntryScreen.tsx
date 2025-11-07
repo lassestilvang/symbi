@@ -23,7 +23,7 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
   const [sleepHours, setSleepHours] = useState('');
   const [hrv, setHrv] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { updateHealthData } = useHealthDataStore();
   const { profile } = useUserPreferencesStore();
 
@@ -57,10 +57,7 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
 
     // Validate HRV if provided
     if (hrvValue !== undefined && (isNaN(hrvValue) || hrvValue < 0 || hrvValue > 200)) {
-      Alert.alert(
-        'Invalid Range',
-        'HRV must be between 0 and 200. Please enter a valid value.'
-      );
+      Alert.alert('Invalid Range', 'HRV must be between 0 and 200. Please enter a valid value.');
       return;
     }
 
@@ -118,8 +115,7 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={styles.content}>
         <Text style={styles.title}>Enter Your Health Data</Text>
         <Text style={styles.subtitle}>Track your daily health metrics</Text>
@@ -181,11 +177,8 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
         <TouchableOpacity
           style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
           onPress={handleSubmit}
-          disabled={isSubmitting || !stepCount}
-        >
-          <Text style={styles.submitText}>
-            {isSubmitting ? 'Saving...' : 'Save Health Data'}
-          </Text>
+          disabled={isSubmitting || !stepCount}>
+          <Text style={styles.submitText}>{isSubmitting ? 'Saving...' : 'Save Health Data'}</Text>
         </TouchableOpacity>
 
         <View style={styles.tipBox}>

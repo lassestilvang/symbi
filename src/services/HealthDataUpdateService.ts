@@ -4,15 +4,15 @@ import { StorageService } from './StorageService';
 import { useSymbiStateStore } from '../stores/symbiStateStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { useHealthDataStore } from '../stores/healthDataStore';
-import { EmotionalState, HealthDataCache, HealthDataType, HealthMetrics } from '../types';
+import { HealthDataCache, HealthDataType, HealthMetrics } from '../types';
 
 /**
  * HealthDataUpdateService
- * 
+ *
  * Manages the daily health data fetch cycle and emotional state updates.
  * Coordinates between health data services, emotional state calculator,
  * and state stores.
- * 
+ *
  * Requirements: 1.5, 4.1, 4.2, 4.3, 14.1, 14.3
  */
 export class HealthDataUpdateService {
@@ -68,10 +68,7 @@ export class HealthDataUpdateService {
       };
 
       // Calculate emotional state
-      const emotionalState = EmotionalStateCalculator.calculateStateFromSteps(
-        steps,
-        thresholds
-      );
+      const emotionalState = EmotionalStateCalculator.calculateStateFromSteps(steps, thresholds);
 
       // Create health metrics
       const metrics: HealthMetrics = { steps };
@@ -89,19 +86,17 @@ export class HealthDataUpdateService {
       console.log(`Health data updated: ${steps} steps → ${emotionalState} state`);
     } catch (error) {
       console.error('Error updating daily health data:', error);
-      
+
       // Set error state
       const healthStore = useHealthDataStore.getState();
       healthStore.setLoading(false);
-      
+
       // Fallback to cached data
       await this.loadCachedHealthData();
-      
+
       throw error;
     }
   }
-
-
 
   /**
    * Load cached health data when fresh data is unavailable
@@ -134,15 +129,17 @@ export class HealthDataUpdateService {
           sleepHours: cacheEntry.sleepHours,
           hrv: cacheEntry.hrv,
         };
-        
+
         healthStore.setHealthMetrics(metrics);
         healthStore.setEmotionalState(cacheEntry.emotionalState, cacheEntry.calculationMethod);
-        
+
         // Update Symbi state store
         const symbiStore = useSymbiStateStore.getState();
         symbiStore.setEmotionalState(cacheEntry.emotionalState);
-        
-        console.log(`Loaded cached health data: ${cacheEntry.steps} steps → ${cacheEntry.emotionalState} state`);
+
+        console.log(
+          `Loaded cached health data: ${cacheEntry.steps} steps → ${cacheEntry.emotionalState} state`
+        );
       }
     } catch (error) {
       console.error('Error loading cached health data:', error);
@@ -156,13 +153,10 @@ export class HealthDataUpdateService {
   private static subscribeToHealthDataUpdates(): void {
     if (!this.healthDataService) return;
 
-    this.healthDataService.subscribeToUpdates(
-      HealthDataType.STEPS,
-      async (data) => {
-        console.log('Received background health data update:', data);
-        await this.updateDailyHealthData();
-      }
-    );
+    this.healthDataService.subscribeToUpdates(HealthDataType.STEPS, async data => {
+      console.log('Received background health data update:', data);
+      await this.updateDailyHealthData();
+    });
   }
 
   /**

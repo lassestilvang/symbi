@@ -1,9 +1,9 @@
 /**
  * Firebase Configuration
- * 
+ *
  * This file contains Firebase initialization and configuration.
  * Requirements: 9.5, 11.2, 11.3
- * 
+ *
  * Note: In production, these values should be stored in environment variables
  * and loaded via a secure configuration system.
  */
@@ -31,8 +31,5 @@ export const firebaseConfig: FirebaseConfig = {
  * Check if Firebase is properly configured
  */
 export const isFirebaseConfigured = (): boolean => {
-  return (
-    firebaseConfig.apiKey !== 'YOUR_API_KEY' &&
-    firebaseConfig.projectId !== 'symbi-app'
-  );
+  return firebaseConfig.apiKey !== 'YOUR_API_KEY' && firebaseConfig.projectId !== 'symbi-app';
 };

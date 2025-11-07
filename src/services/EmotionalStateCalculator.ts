@@ -3,11 +3,11 @@ import { AIBrainService } from './AIBrainService';
 
 /**
  * EmotionalStateCalculator
- * 
+ *
  * Determines the Symbi's emotional state based on health metrics.
  * Phase 1: Rule-based calculation using step count and thresholds
  * Phase 2: AI-based calculation using multiple metrics
- * 
+ *
  * Requirements: 3.1, 4.1, 4.2, 4.3, 5.3, 5.4, 6.4
  */
 export class EmotionalStateCalculator {
@@ -29,20 +29,17 @@ export class EmotionalStateCalculator {
   }
   /**
    * Calculate emotional state from step count using threshold logic (Phase 1)
-   * 
+   *
    * @param steps - Daily step count
    * @param thresholds - User-configured thresholds
    * @returns EmotionalState enum value
-   * 
+   *
    * Logic:
    * - steps < sadThreshold → SAD
    * - sadThreshold ≤ steps < activeThreshold → RESTING
    * - steps ≥ activeThreshold → ACTIVE
    */
-  static calculateStateFromSteps(
-    steps: number,
-    thresholds: StepThresholds
-  ): EmotionalState {
+  static calculateStateFromSteps(steps: number, thresholds: StepThresholds): EmotionalState {
     // Handle edge cases
     if (steps < 0) {
       steps = 0;
@@ -52,22 +49,22 @@ export class EmotionalStateCalculator {
     if (steps < thresholds.sadThreshold) {
       return EmotionalState.SAD;
     }
-    
+
     if (steps < thresholds.activeThreshold) {
       return EmotionalState.RESTING;
     }
-    
+
     return EmotionalState.ACTIVE;
   }
 
   /**
    * Calculate emotional state from multiple health metrics using AI (Phase 2)
-   * 
+   *
    * @param metrics - Health metrics (steps, sleep, HRV)
    * @param goals - User's health goals
    * @param thresholds - Optional thresholds for fallback calculation
    * @returns Promise<EmotionalState>
-   * 
+   *
    * This method attempts to use AI analysis if available, otherwise falls back to rule-based logic
    */
   static async calculateStateFromMultipleMetrics(
@@ -93,14 +90,14 @@ export class EmotionalStateCalculator {
       sadThreshold: 2000,
       activeThreshold: 8000,
     };
-    
+
     return this.calculateStateFromSteps(metrics.steps, defaultThresholds);
   }
 
   /**
    * Calculate emotional state with enhanced rule-based logic using multiple metrics
    * This provides a more nuanced calculation without AI when sleep and HRV data is available
-   * 
+   *
    * @param metrics - Health metrics (steps, sleep, HRV)
    * @param goals - User's health goals
    * @param thresholds - Step thresholds
@@ -119,7 +116,7 @@ export class EmotionalStateCalculator {
     const sleepPercentage = sleepHours ? (sleepHours / targetSleepHours) * 100 : null;
 
     // Enhanced logic using multiple metrics
-    
+
     // Vibrant: Exceeding goals across the board
     if (stepPercentage > 100 && sleepPercentage && sleepPercentage > 90 && hrv && hrv > 60) {
       return EmotionalState.VIBRANT;

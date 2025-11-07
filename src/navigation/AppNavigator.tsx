@@ -14,7 +14,7 @@ import { ThresholdConfigScreen } from '../components/ThresholdConfigScreen';
 const Stack = createNativeStackNavigator();
 
 export const AppNavigator: React.FC = () => {
-  const { profile, isInitialized, initializeProfile, setDataSource } = useUserPreferencesStore();
+  const { isInitialized, initializeProfile, setDataSource } = useUserPreferencesStore();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,7 +26,7 @@ export const AppNavigator: React.FC = () => {
     try {
       // Initialize user profile
       await initializeProfile();
-      
+
       // Check if this is first launch (no profile exists yet)
       // For now, we'll show onboarding if profile was just created
       // In production, you'd check a separate "hasCompletedOnboarding" flag
@@ -85,18 +85,10 @@ export const AppNavigator: React.FC = () => {
           headerTitleStyle: {
             fontWeight: 'bold',
           },
-        }}
-      >
-        <Stack.Screen
-          name="Main"
-          component={MainScreen}
-          options={{ title: 'Symbi' }}
-        />
-        <Stack.Screen
-          name="Settings"
-          options={{ title: 'Settings' }}
-        >
-          {(props) => (
+        }}>
+        <Stack.Screen name="Main" component={MainScreen} options={{ title: 'Symbi' }} />
+        <Stack.Screen name="Settings" options={{ title: 'Settings' }}>
+          {props => (
             <SettingsScreen
               {...props}
               onReplayOnboarding={handleReplayOnboarding}

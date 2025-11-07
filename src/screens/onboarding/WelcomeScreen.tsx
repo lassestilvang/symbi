@@ -14,8 +14,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext, onSkip }) 
         <Text style={styles.title}>Welcome to Symbi</Text>
         <Text style={styles.subtitle}>Your Biometric Tamagotchi</Text>
         <Text style={styles.description}>
-          Meet your new digital companion! Symbi is a cute Halloween ghost that reflects your
-          health and activity through its mood and appearance.
+          Meet your new digital companion! Symbi is a cute Halloween ghost that reflects your health
+          and activity through its mood and appearance.
         </Text>
         <Text style={styles.description}>
           The more you move and take care of yourself, the happier your Symbi becomes!

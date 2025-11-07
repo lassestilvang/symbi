@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserProfile, HealthDataCache, EvolutionRecord } from '../types';
 
 /**
  * StorageService provides type-safe access to AsyncStorage with encryption support.
- * 
+ *
  * Storage Keys:
  * - USER_PROFILE: User profile data including preferences, thresholds, and goals
  * - HEALTH_DATA_CACHE: Cached health data and emotional states (30-day rolling window)
@@ -20,7 +21,7 @@ export class StorageService {
     try {
       const value = await AsyncStorage.getItem(key);
       if (!value) return null;
-      
+
       const parsed = JSON.parse(value);
       return this.deserializeDates(parsed);
     } catch (error) {
@@ -80,7 +81,7 @@ export class StorageService {
     // Clean up old entries (keep only last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const cleaned: Record<string, HealthDataCache> = {};
     for (const [dateKey, data] of Object.entries(cache)) {
       const entryDate = new Date(dateKey);
@@ -102,7 +103,7 @@ export class StorageService {
   }
 
   static async addHealthDataEntry(dateKey: string, data: HealthDataCache): Promise<boolean> {
-    const cache = await this.getHealthDataCache() || {};
+    const cache = (await this.getHealthDataCache()) || {};
     cache[dateKey] = data;
     return this.setHealthDataCache(cache);
   }
@@ -134,7 +135,7 @@ export class StorageService {
   // Helper method to deserialize Date objects from JSON
   private static deserializeDates<T>(obj: T): T {
     if (obj === null || obj === undefined) return obj;
-    
+
     if (typeof obj === 'string') {
       // Check if string is an ISO date
       const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
@@ -143,11 +144,11 @@ export class StorageService {
       }
       return obj;
     }
-    
+
     if (Array.isArray(obj)) {
       return obj.map(item => this.deserializeDates(item)) as unknown as T;
     }
-    
+
     if (typeof obj === 'object') {
       const result: any = {};
       for (const [key, value] of Object.entries(obj)) {
@@ -155,7 +156,7 @@ export class StorageService {
       }
       return result;
     }
-    
+
     return obj;
   }
 

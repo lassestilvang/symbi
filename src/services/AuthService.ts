@@ -1,6 +1,6 @@
 /**
  * Authentication Service
- * 
+ *
  * Handles user authentication for cloud sync functionality.
  * Uses a simple email/password authentication system.
  * Requirements: 9.5, 11.2, 11.3
@@ -22,7 +22,7 @@ export interface AuthResult {
 
 /**
  * AuthService provides authentication functionality for cloud sync.
- * 
+ *
  * Note: This is a simplified implementation. In production, this should integrate
  * with Firebase Authentication or another secure authentication provider.
  */
@@ -79,7 +79,7 @@ export class AuthService {
   /**
    * Sign in an existing user
    */
-  static async signIn(email: string, password: string): Promise<AuthResult> {
+  static async signIn(email: string, _password: string): Promise<AuthResult> {
     try {
       // In production, this would call Firebase Auth API
       // For now, we'll check if user exists locally

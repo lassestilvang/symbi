@@ -43,14 +43,14 @@ export const HealthDataExplanationScreen: React.FC<HealthDataExplanationScreenPr
         </View>
 
         <Text style={styles.infoText}>
-          Symbi uses your daily step count, sleep quality, and heart rate variability to determine 
+          Symbi uses your daily step count, sleep quality, and heart rate variability to determine
           its emotional state. The healthier your habits, the happier your Symbi becomes!
         </Text>
 
         <View style={styles.phase2Info}>
           <Text style={styles.phase2Title}>✨ Enhanced with AI</Text>
           <Text style={styles.phase2Text}>
-            With multiple health metrics, Symbi can show more nuanced emotions like Vibrant, Calm, 
+            With multiple health metrics, Symbi can show more nuanced emotions like Vibrant, Calm,
             Tired, Stressed, Anxious, and Rested.
           </Text>
         </View>

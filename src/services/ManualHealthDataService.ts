@@ -19,16 +19,16 @@ export class ManualHealthDataService extends HealthDataService {
   private static readonly MIN_HRV = 0;
   private static readonly MAX_HRV = 200;
 
-  async initialize(permissions: HealthPermissions): Promise<InitResult> {
+  async initialize(_permissions: HealthPermissions): Promise<InitResult> {
     // Manual data entry doesn't require actual permissions
     // Just return success
     return {
       success: true,
-      grantedPermissions: permissions.read,
+      grantedPermissions: _permissions.read,
     };
   }
 
-  async checkAuthorizationStatus(permissions: HealthPermissions): Promise<AuthStatus> {
+  async checkAuthorizationStatus(_permissions: HealthPermissions): Promise<AuthStatus> {
     // Manual data entry is always authorized
     return AuthStatus.AUTHORIZED;
   }
@@ -36,10 +36,10 @@ export class ManualHealthDataService extends HealthDataService {
   async getStepCount(startDate: Date, endDate: Date): Promise<number> {
     try {
       const data = await this.getHealthDataForDateRange(startDate, endDate);
-      
+
       // Sum up steps for all days in the range
       const totalSteps = data.reduce((sum, dayData) => sum + (dayData.steps || 0), 0);
-      
+
       return totalSteps;
     } catch (error) {
       console.error('Error getting step count:', error);
@@ -50,13 +50,13 @@ export class ManualHealthDataService extends HealthDataService {
   async getSleepDuration(startDate: Date, endDate: Date): Promise<number> {
     try {
       const data = await this.getHealthDataForDateRange(startDate, endDate);
-      
+
       // Average sleep hours for the date range
       const sleepData = data.filter(d => d.sleepHours !== undefined);
       if (sleepData.length === 0) return 0;
-      
+
       const totalSleep = sleepData.reduce((sum, dayData) => sum + (dayData.sleepHours || 0), 0);
-      
+
       return totalSleep / sleepData.length;
     } catch (error) {
       console.error('Error getting sleep duration:', error);
@@ -67,13 +67,13 @@ export class ManualHealthDataService extends HealthDataService {
   async getHeartRateVariability(startDate: Date, endDate: Date): Promise<number> {
     try {
       const data = await this.getHealthDataForDateRange(startDate, endDate);
-      
+
       // Average HRV for the date range
       const hrvData = data.filter(d => d.hrv !== undefined);
       if (hrvData.length === 0) return 0;
-      
+
       const totalHRV = hrvData.reduce((sum, dayData) => sum + (dayData.hrv || 0), 0);
-      
+
       return totalHRV / hrvData.length;
     } catch (error) {
       console.error('Error getting HRV:', error);
@@ -85,14 +85,14 @@ export class ManualHealthDataService extends HealthDataService {
     try {
       const dateKey = this.getDateKey(timestamp);
       const allData = await this.getAllHealthData();
-      
+
       const existingData = allData[dateKey] || {};
       existingData.mindfulMinutes = (existingData.mindfulMinutes || 0) + duration;
-      
+
       allData[dateKey] = existingData;
-      
+
       await StorageService.set(ManualHealthDataService.STORAGE_KEY, allData);
-      
+
       return true;
     } catch (error) {
       console.error('Error writing mindful minutes:', error);
@@ -105,23 +105,25 @@ export class ManualHealthDataService extends HealthDataService {
    */
   async saveStepCount(steps: number, date: Date = new Date()): Promise<boolean> {
     if (!this.validateStepCount(steps)) {
-      throw new Error(`Step count must be between ${ManualHealthDataService.MIN_STEPS} and ${ManualHealthDataService.MAX_STEPS}`);
+      throw new Error(
+        `Step count must be between ${ManualHealthDataService.MIN_STEPS} and ${ManualHealthDataService.MAX_STEPS}`
+      );
     }
 
     try {
       const dateKey = this.getDateKey(date);
       const allData = await this.getAllHealthData();
-      
+
       const existingData = allData[dateKey] || {};
       existingData.steps = steps;
-      
+
       allData[dateKey] = existingData;
-      
+
       await StorageService.set(ManualHealthDataService.STORAGE_KEY, allData);
-      
+
       // Notify subscribers
       this.notifyUpdate(HealthDataType.STEPS, { steps, timestamp: date });
-      
+
       return true;
     } catch (error) {
       console.error('Error saving step count:', error);
@@ -134,23 +136,25 @@ export class ManualHealthDataService extends HealthDataService {
    */
   async saveSleepDuration(hours: number, date: Date = new Date()): Promise<boolean> {
     if (!this.validateSleepDuration(hours)) {
-      throw new Error(`Sleep duration must be between ${ManualHealthDataService.MIN_SLEEP} and ${ManualHealthDataService.MAX_SLEEP} hours`);
+      throw new Error(
+        `Sleep duration must be between ${ManualHealthDataService.MIN_SLEEP} and ${ManualHealthDataService.MAX_SLEEP} hours`
+      );
     }
 
     try {
       const dateKey = this.getDateKey(date);
       const allData = await this.getAllHealthData();
-      
+
       const existingData = allData[dateKey] || {};
       existingData.sleepHours = hours;
-      
+
       allData[dateKey] = existingData;
-      
+
       await StorageService.set(ManualHealthDataService.STORAGE_KEY, allData);
-      
+
       // Notify subscribers
       this.notifyUpdate(HealthDataType.SLEEP, { sleepHours: hours, timestamp: date });
-      
+
       return true;
     } catch (error) {
       console.error('Error saving sleep duration:', error);
@@ -163,23 +167,25 @@ export class ManualHealthDataService extends HealthDataService {
    */
   async saveHRV(hrv: number, date: Date = new Date()): Promise<boolean> {
     if (!this.validateHRV(hrv)) {
-      throw new Error(`HRV must be between ${ManualHealthDataService.MIN_HRV} and ${ManualHealthDataService.MAX_HRV}`);
+      throw new Error(
+        `HRV must be between ${ManualHealthDataService.MIN_HRV} and ${ManualHealthDataService.MAX_HRV}`
+      );
     }
 
     try {
       const dateKey = this.getDateKey(date);
       const allData = await this.getAllHealthData();
-      
+
       const existingData = allData[dateKey] || {};
       existingData.hrv = hrv;
-      
+
       allData[dateKey] = existingData;
-      
+
       await StorageService.set(ManualHealthDataService.STORAGE_KEY, allData);
-      
+
       // Notify subscribers
       this.notifyUpdate(HealthDataType.HRV, { hrv, timestamp: date });
-      
+
       return true;
     } catch (error) {
       console.error('Error saving HRV:', error);
@@ -231,7 +237,10 @@ export class ManualHealthDataService extends HealthDataService {
     return data || {};
   }
 
-  private async getHealthDataForDateRange(startDate: Date, endDate: Date): Promise<ManualHealthData[]> {
+  private async getHealthDataForDateRange(
+    startDate: Date,
+    endDate: Date
+  ): Promise<ManualHealthData[]> {
     const allData = await this.getAllHealthData();
     const result: ManualHealthData[] = [];
 
@@ -239,7 +248,7 @@ export class ManualHealthDataService extends HealthDataService {
     while (currentDate <= endDate) {
       const dateKey = this.getDateKey(currentDate);
       const dayData = allData[dateKey];
-      
+
       if (dayData) {
         result.push({ ...dayData, date: dateKey });
       }

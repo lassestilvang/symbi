@@ -4,7 +4,7 @@ import { StorageService } from '../services/StorageService';
 
 /**
  * Symbi State Store
- * 
+ *
  * Manages the Symbi creature's state including:
  * - Current emotional state
  * - Evolution level and appearance
@@ -17,14 +17,14 @@ interface SymbiStateStore {
   emotionalState: EmotionalState;
   evolutionLevel: number;
   customAppearanceUrl: string | null;
-  
+
   // Evolution tracking
   evolutionRecords: EvolutionRecord[];
   daysInPositiveState: number;
-  
+
   // Animation state
   isTransitioning: boolean;
-  
+
   // Actions
   setEmotionalState: (state: EmotionalState) => void;
   transitionToState: (state: EmotionalState, duration?: number) => Promise<void>;
@@ -55,11 +55,11 @@ export const useSymbiStateStore = create<SymbiStateStore>((set, get) => ({
 
   transitionToState: async (state: EmotionalState, duration: number = 2000) => {
     set({ isTransitioning: true });
-    
+
     // Simulate transition animation
     await new Promise(resolve => setTimeout(resolve, duration));
-    
-    set({ 
+
+    set({
       emotionalState: state,
       isTransitioning: false,
     });
@@ -76,10 +76,10 @@ export const useSymbiStateStore = create<SymbiStateStore>((set, get) => ({
   addEvolutionRecord: async (record: EvolutionRecord) => {
     const { evolutionRecords } = get();
     const updatedRecords = [...evolutionRecords, record];
-    
+
     await StorageService.addEvolutionRecord(record);
-    
-    set({ 
+
+    set({
       evolutionRecords: updatedRecords,
       evolutionLevel: record.evolutionLevel,
       customAppearanceUrl: record.appearanceUrl,
@@ -89,7 +89,7 @@ export const useSymbiStateStore = create<SymbiStateStore>((set, get) => ({
   loadEvolutionRecords: async () => {
     try {
       const records = await StorageService.getEvolutionRecords();
-      
+
       // Set current evolution level and appearance from latest record
       if (records.length > 0) {
         const latestRecord = records[records.length - 1];

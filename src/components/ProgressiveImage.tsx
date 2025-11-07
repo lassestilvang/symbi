@@ -3,10 +3,10 @@ import { View, Image, ActivityIndicator, StyleSheet, ViewStyle, ImageStyle } fro
 
 /**
  * ProgressiveImage Component
- * 
+ *
  * Implements progressive image loading for evolved Symbi appearances.
  * Shows a loading indicator while the image is being fetched.
- * 
+ *
  * Requirement 8.3: Implement progressive image loading for evolutions
  */
 
@@ -17,7 +17,7 @@ interface ProgressiveImageProps {
   placeholderColor?: string;
   onLoadStart?: () => void;
   onLoadEnd?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => void;
 }
 
 export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
@@ -49,7 +49,7 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
     onLoadEnd?.();
   };
 
-  const handleError = (e: any) => {
+  const handleError = (e: unknown) => {
     setLoading(false);
     setError(true);
     onError?.(e);
@@ -63,12 +63,10 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
           <ActivityIndicator size="large" color="#FFFFFF" />
         </View>
       )}
-      
+
       {error && (
         <View style={[styles.placeholder, { backgroundColor: placeholderColor }]}>
-          <View style={styles.errorContainer}>
-            {/* Could add an error icon here */}
-          </View>
+          <View style={styles.errorContainer}>{/* Could add an error icon here */}</View>
         </View>
       )}
 

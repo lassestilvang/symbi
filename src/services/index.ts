@@ -54,4 +54,10 @@ export type { MemoryStats } from './MemoryMonitor';
 export { ImageCacheManager } from './ImageCacheManager';
 export type { CachedImage } from './ImageCacheManager';
 export { RequestDeduplicator } from './RequestDeduplicator';
-export { BackgroundTaskConfig, getAnimationSpeed, getNextAnalysisTime, getMillisecondsUntilNextAnalysis, shouldSync } from './BackgroundTaskConfig';
+export {
+  BackgroundTaskConfig,
+  getAnimationSpeed,
+  getNextAnalysisTime,
+  getMillisecondsUntilNextAnalysis,
+  shouldSync,
+} from './BackgroundTaskConfig';

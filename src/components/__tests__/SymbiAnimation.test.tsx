@@ -1,14 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
 import { EmotionalState } from '../../types';
 
 /**
  * SymbiAnimation Component Tests
- * 
+ *
  * Tests core functionality of the Symbi animation component:
  * - Animation rendering for different emotional states
  * - State transitions
  * - Performance optimizations
- * 
+ *
  * Requirements: 4.4, 4.5, 9.4
  */
 
@@ -29,10 +31,10 @@ jest.mock('react-native', () => ({
   Animated: {
     View: 'Animated.View',
     timing: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback()),
+      start: jest.fn(callback => callback && callback()),
     })),
-    parallel: jest.fn((animations) => ({
-      start: jest.fn((callback) => callback && callback()),
+    parallel: jest.fn(_animations => ({
+      start: jest.fn(callback => callback && callback()),
     })),
     Value: jest.fn(() => ({
       setValue: jest.fn(),
@@ -69,27 +71,21 @@ describe('SymbiAnimation', () => {
     it('should accept custom style prop', () => {
       const customStyle = { width: 400, height: 400 };
       const component = (
-        <SymbiAnimation 
-          emotionalState={EmotionalState.RESTING} 
-          style={customStyle}
-        />
+        <SymbiAnimation emotionalState={EmotionalState.RESTING} style={customStyle} />
       );
       expect(component).toBeDefined();
     });
 
     it('should support evolution level prop', () => {
       const component = (
-        <SymbiAnimation 
-          emotionalState={EmotionalState.ACTIVE}
-          evolutionLevel={1}
-        />
+        <SymbiAnimation emotionalState={EmotionalState.ACTIVE} evolutionLevel={1} />
       );
       expect(component).toBeDefined();
     });
 
     it('should support custom appearance URL', () => {
       const component = (
-        <SymbiAnimation 
+        <SymbiAnimation
           emotionalState={EmotionalState.ACTIVE}
           evolutionLevel={1}
           customAppearance="https://example.com/evolved.json"
@@ -101,22 +97,12 @@ describe('SymbiAnimation', () => {
 
   describe('Animation Control', () => {
     it('should support autoPlay prop', () => {
-      const component = (
-        <SymbiAnimation 
-          emotionalState={EmotionalState.RESTING}
-          autoPlay={false}
-        />
-      );
+      const component = <SymbiAnimation emotionalState={EmotionalState.RESTING} autoPlay={false} />;
       expect(component).toBeDefined();
     });
 
     it('should support loop prop', () => {
-      const component = (
-        <SymbiAnimation 
-          emotionalState={EmotionalState.ACTIVE}
-          loop={false}
-        />
-      );
+      const component = <SymbiAnimation emotionalState={EmotionalState.ACTIVE} loop={false} />;
       expect(component).toBeDefined();
     });
   });
@@ -124,11 +110,7 @@ describe('SymbiAnimation', () => {
   describe('State Transitions', () => {
     it('should handle emotional state changes', () => {
       // This test verifies the component can handle state prop changes
-      const states = [
-        EmotionalState.SAD,
-        EmotionalState.RESTING,
-        EmotionalState.ACTIVE,
-      ];
+      const states = [EmotionalState.SAD, EmotionalState.RESTING, EmotionalState.ACTIVE];
 
       states.forEach(state => {
         const component = <SymbiAnimation emotionalState={state} />;
@@ -137,11 +119,7 @@ describe('SymbiAnimation', () => {
     });
 
     it('should support all Phase 1 emotional states', () => {
-      const phase1States = [
-        EmotionalState.SAD,
-        EmotionalState.RESTING,
-        EmotionalState.ACTIVE,
-      ];
+      const phase1States = [EmotionalState.SAD, EmotionalState.RESTING, EmotionalState.ACTIVE];
 
       phase1States.forEach(state => {
         const component = <SymbiAnimation emotionalState={state} />;

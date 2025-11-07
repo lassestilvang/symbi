@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EmotionalState, HealthMetrics, HealthGoals } from '../types';
 import { StorageService } from './StorageService';
 import { ImageCacheManager } from './ImageCacheManager';
@@ -5,10 +6,10 @@ import { RequestDeduplicator } from './RequestDeduplicator';
 
 /**
  * AIBrainService
- * 
+ *
  * Integrates with Gemini API to analyze health data and determine emotional states.
  * Implements caching, timeout, and retry logic for robust AI-powered analysis.
- * 
+ *
  * Requirements: 5.3, 5.4, 6.1, 6.2, 6.3, 11.2
  */
 
@@ -25,8 +26,10 @@ export interface EvolutionContext {
 }
 
 export class AIBrainService {
-  private static readonly GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
-  private static readonly GEMINI_IMAGE_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent';
+  private static readonly GEMINI_API_URL =
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+  private static readonly GEMINI_IMAGE_API_URL =
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent';
   private static readonly TIMEOUT_MS = 10000; // 10 seconds
   private static readonly MAX_RETRIES = 2;
   private static readonly CACHE_KEY = 'ai_analysis_cache';
@@ -41,17 +44,14 @@ export class AIBrainService {
   /**
    * Analyze health data using Gemini API to determine emotional state
    * Implements caching, timeout, retry logic, and request deduplication
-   * 
+   *
    * Requirements: 6.3, 8.3 - Request deduplication and caching
-   * 
+   *
    * @param metrics Current health metrics (steps, sleep, HRV)
    * @param goals User's health goals
    * @returns AI analysis result with emotional state
    */
-  async analyzeHealthData(
-    metrics: HealthMetrics,
-    goals: HealthGoals
-  ): Promise<AIAnalysisResult> {
+  async analyzeHealthData(metrics: HealthMetrics, goals: HealthGoals): Promise<AIAnalysisResult> {
     // Check cache first (24-hour cache as per requirement 8.3)
     const cachedResult = await this.getCachedAnalysis(metrics);
     if (cachedResult) {
@@ -73,15 +73,15 @@ export class AIBrainService {
         try {
           console.log(`AI analysis attempt ${attempt}/${AIBrainService.MAX_RETRIES}`);
           const result = await this.performAnalysis(metrics, goals);
-          
+
           // Cache successful result (24 hours as per requirement 8.3)
           await this.cacheAnalysis(metrics, result);
-          
+
           return result;
         } catch (error) {
           lastError = error as Error;
           console.error(`AI analysis attempt ${attempt} failed:`, error);
-          
+
           // Don't retry on the last attempt
           if (attempt < AIBrainService.MAX_RETRIES) {
             // Wait before retrying (exponential backoff)
@@ -91,16 +91,18 @@ export class AIBrainService {
       }
 
       // All retries failed
-      throw new Error(`AI analysis failed after ${AIBrainService.MAX_RETRIES} attempts: ${lastError?.message}`);
+      throw new Error(
+        `AI analysis failed after ${AIBrainService.MAX_RETRIES} attempts: ${lastError?.message}`
+      );
     });
   }
 
   /**
    * Generate an evolved appearance for the Symbi using Gemini Image API
    * Implements retry logic (up to 3 attempts), request deduplication, and caching
-   * 
+   *
    * Requirements: 8.2, 8.3 - Progressive image loading and request deduplication
-   * 
+   *
    * @param context Evolution context with level and dominant states
    * @returns Data URL of the generated image (base64 encoded)
    */
@@ -108,7 +110,7 @@ export class AIBrainService {
     // Check if image is already cached
     const cacheKey = `evolution_${context.daysActive}`;
     const cachedImage = ImageCacheManager.getCachedImage(cacheKey);
-    
+
     if (cachedImage) {
       console.log('Using cached evolution image');
       return cachedImage;
@@ -128,21 +130,21 @@ export class AIBrainService {
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           console.log(`Evolution image generation attempt ${attempt}/${maxRetries}`);
-          
+
           const response = await this.callGeminiImageAPI(prompt);
-          
+
           // Extract image data from response
           const imageUrl = this.extractImageUrl(response);
-          
+
           // Cache the image locally
           await this.cacheEvolutionImage(context, imageUrl);
-          
+
           console.log('Evolution image generated successfully');
           return imageUrl;
         } catch (error) {
           lastError = error as Error;
           console.error(`Evolution image generation attempt ${attempt} failed:`, error);
-          
+
           // Don't retry on the last attempt
           if (attempt < maxRetries) {
             // Wait before retrying (exponential backoff: 2s, 4s)
@@ -152,7 +154,9 @@ export class AIBrainService {
       }
 
       // All retries failed
-      throw new Error(`Evolution image generation failed after ${maxRetries} attempts: ${lastError?.message}`);
+      throw new Error(
+        `Evolution image generation failed after ${maxRetries} attempts: ${lastError?.message}`
+      );
     });
   }
 
@@ -166,7 +170,7 @@ export class AIBrainService {
     const prompt = this.constructAnalysisPrompt(metrics, goals);
 
     const response = await this.callGeminiAPI(prompt);
-    
+
     return this.parseAnalysisResponse(response);
   }
 
@@ -206,7 +210,7 @@ Respond with ONLY ONE WORD from the list above. No explanation, just the emotion
       'Brighter colors, larger wings, sparkles',
       'Crown or halo, multiple tails, energy aura',
       'Ethereal armor, magical symbols',
-      'Fully transcendent form, cosmic elements'
+      'Fully transcendent form, cosmic elements',
     ];
 
     const level = Math.min(context.daysActive / 30, 5);
@@ -240,30 +244,31 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
 
     try {
       const requestBody = JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
         generationConfig: {
           temperature: 0.3,
           maxOutputTokens: 10,
-        }
+        },
       });
 
-      const response = await fetch(
-        `${AIBrainService.GEMINI_API_URL}?key=${this.apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // Request compression support (server may compress response)
-            'Accept-Encoding': 'gzip, deflate, br',
-          },
-          body: requestBody,
-          signal: controller.signal,
-        }
-      );
+      const response = await fetch(`${AIBrainService.GEMINI_API_URL}?key=${this.apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Request compression support (server may compress response)
+          'Accept-Encoding': 'gzip, deflate, br',
+        },
+        body: requestBody,
+        signal: controller.signal,
+      });
 
       clearTimeout(timeoutId);
 
@@ -274,11 +279,11 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('Gemini API request timed out');
       }
-      
+
       throw error;
     }
   }
@@ -293,29 +298,30 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
 
     try {
       const requestBody = JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
         generationConfig: {
           temperature: 0.7,
-        }
+        },
       });
 
-      const response = await fetch(
-        `${AIBrainService.GEMINI_IMAGE_API_URL}?key=${this.apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // Request compression support
-            'Accept-Encoding': 'gzip, deflate, br',
-          },
-          body: requestBody,
-          signal: controller.signal,
-        }
-      );
+      const response = await fetch(`${AIBrainService.GEMINI_IMAGE_API_URL}?key=${this.apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Request compression support
+          'Accept-Encoding': 'gzip, deflate, br',
+        },
+        body: requestBody,
+        signal: controller.signal,
+      });
 
       clearTimeout(timeoutId);
 
@@ -326,11 +332,11 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('Gemini Image API request timed out');
       }
-      
+
       throw error;
     }
   }
@@ -342,26 +348,26 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
     try {
       // Extract text from Gemini response
       const text = response.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toLowerCase();
-      
+
       if (!text) {
         throw new Error('No text in Gemini response');
       }
 
       // Map response to EmotionalState enum
       const stateMap: Record<string, EmotionalState> = {
-        'vibrant': EmotionalState.VIBRANT,
-        'calm': EmotionalState.CALM,
-        'tired': EmotionalState.TIRED,
-        'stressed': EmotionalState.STRESSED,
-        'anxious': EmotionalState.ANXIOUS,
-        'rested': EmotionalState.RESTED,
-        'active': EmotionalState.ACTIVE,
-        'sad': EmotionalState.SAD,
-        'resting': EmotionalState.RESTING,
+        vibrant: EmotionalState.VIBRANT,
+        calm: EmotionalState.CALM,
+        tired: EmotionalState.TIRED,
+        stressed: EmotionalState.STRESSED,
+        anxious: EmotionalState.ANXIOUS,
+        rested: EmotionalState.RESTED,
+        active: EmotionalState.ACTIVE,
+        sad: EmotionalState.SAD,
+        resting: EmotionalState.RESTING,
       };
 
       const emotionalState = stateMap[text];
-      
+
       if (!emotionalState) {
         throw new Error(`Invalid emotional state from AI: ${text}`);
       }
@@ -384,12 +390,12 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
     // Note: This is a placeholder implementation
     // Actual implementation depends on Gemini Image API response format
     const imageData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-    
+
     if (imageData) {
       // Convert base64 to data URL
       return `data:${imageData.mimeType};base64,${imageData.data}`;
     }
-    
+
     throw new Error('No image data in response');
   }
 
@@ -399,13 +405,13 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
   private async getCachedAnalysis(metrics: HealthMetrics): Promise<AIAnalysisResult | null> {
     try {
       const cache = await StorageService.get<any>(AIBrainService.CACHE_KEY);
-      
+
       if (!cache) {
         return null;
       }
 
       const cacheAge = Date.now() - cache.timestamp;
-      
+
       // Check if cache is expired
       if (cacheAge > AIBrainService.CACHE_DURATION_MS) {
         return null;
@@ -451,17 +457,17 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
     try {
       const cacheKey = `evolution_${context.daysActive}`;
       const evolutionLevel = Math.floor(context.daysActive / 30);
-      
+
       // Use ImageCacheManager for memory-efficient caching
       await ImageCacheManager.cacheImage(cacheKey, imageUrl, evolutionLevel);
-      
+
       // Also persist to storage for long-term caching
       await StorageService.set(`@symbi:${cacheKey}`, {
         imageUrl,
         context,
         timestamp: Date.now(),
       });
-      
+
       console.log('Evolution image cached successfully');
     } catch (error) {
       console.error('Error caching evolution image:', error);

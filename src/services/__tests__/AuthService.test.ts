@@ -1,6 +1,6 @@
 /**
  * AuthService Tests
- * 
+ *
  * Tests authentication functionality for cloud sync.
  */
 

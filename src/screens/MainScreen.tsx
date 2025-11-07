@@ -9,7 +9,6 @@ import {
   RefreshControl,
   ActivityIndicator,
   Animated,
-  Platform,
   Modal,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
@@ -21,30 +20,41 @@ import { useSymbiStateStore } from '../stores/symbiStateStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { HealthDataUpdateService } from '../services/HealthDataUpdateService';
 import { getBackgroundSyncService } from '../services/BackgroundSyncService';
-import { InteractiveSessionManager, SessionType, SessionResult, createHealthDataService, EvolutionSystem, EvolutionEligibility, EvolutionResult, AIBrainService } from '../services';
+import {
+  InteractiveSessionManager,
+  SessionType,
+  SessionResult,
+  createHealthDataService,
+  EvolutionSystem,
+  EvolutionEligibility,
+  EvolutionResult,
+  AIBrainService,
+} from '../services';
 import { EmotionalState, HealthDataType } from '../types';
 
 /**
  * MainScreen Component
- * 
+ *
  * The primary screen showing the Symbi creature, health metrics, and emotional state.
  * Displays step count, progress bar, and provides access to threshold configuration.
- * 
+ *
  * Requirements: 4.1, 4.2, 4.3, 4.4
  */
 
 interface MainScreenProps {
-  navigation: any;
+  navigation: {
+    navigate: (screen: string) => void;
+  };
 }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
-  const { 
-    emotionalState, 
-    healthMetrics, 
-    lastUpdated, 
-    isLoading, 
+  const {
+    emotionalState,
+    healthMetrics,
+    lastUpdated,
+    isLoading,
     error,
     setLoading,
     setError,
@@ -58,7 +68,9 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const [isOffline, setIsOffline] = useState(false);
   const [hasNoData, setHasNoData] = useState(false);
   const [showBreathingExercise, setShowBreathingExercise] = useState(false);
-  const [evolutionEligibility, setEvolutionEligibility] = useState<EvolutionEligibility | null>(null);
+  const [evolutionEligibility, setEvolutionEligibility] = useState<EvolutionEligibility | null>(
+    null
+  );
   const [showEvolutionNotification, setShowEvolutionNotification] = useState(false);
   const [isEvolutionInProgress, setIsEvolutionInProgress] = useState(false);
   const [showEvolutionCelebration, setShowEvolutionCelebration] = useState(false);
@@ -67,7 +79,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
     const healthService = createHealthDataService(profile?.preferences.dataSource);
     return new InteractiveSessionManager(healthService);
   });
-  
+
   // Animation for state change notification
   const notificationOpacity = useRef(new Animated.Value(0)).current;
   const previousStateRef = useRef<EmotionalState>(emotionalState);
@@ -102,7 +114,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       EvolutionSystem.trackDailyState(emotionalState).catch(err => {
         console.error('Error tracking daily state:', err);
       });
-      
+
       // Check evolution eligibility
       checkEvolutionProgress();
     }
@@ -141,11 +153,11 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
 
       setIsInitializing(false);
       setLoading(false);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error initializing health data:', err);
       setIsInitializing(false);
       setLoading(false);
-      
+
       // Try to load cached data as fallback
       const cachedData = await HealthDataUpdateService.getTodayHealthData();
       if (cachedData) {
@@ -168,7 +180,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
     try {
       const eligibility = await EvolutionSystem.checkEvolutionEligibility();
       setEvolutionEligibility(eligibility);
-      
+
       // Show notification if evolution is available
       if (eligibility.eligible && !showEvolutionNotification) {
         setShowEvolutionNotification(true);
@@ -189,7 +201,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
 
       // Get Gemini API key from environment or config
       // TODO: Replace with actual API key from secure storage
-      const apiKey = process.env.GEMINI_API_KEY || 'YOUR_API_KEY_HERE';
+      const apiKey = (process.env.GEMINI_API_KEY as string) || 'YOUR_API_KEY_HERE';
       const aiService = new AIBrainService(apiKey);
 
       // Trigger evolution
@@ -230,24 +242,25 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   /**
    * Get user-friendly error message based on error type
    */
-  const getErrorMessage = (err: any): string => {
-    const errorString = err?.message || err?.toString() || '';
-    
+  const getErrorMessage = (err: unknown): string => {
+    const error = err as Error;
+    const errorString = error?.message || error?.toString() || '';
+
     // Permission errors
     if (errorString.includes('permission') || errorString.includes('authorized')) {
       return 'Health data permissions not granted. Please enable in Settings.';
     }
-    
+
     // No data available
     if (errorString.includes('no data') || errorString.includes('not available')) {
       return 'No health data available yet. Try walking a bit!';
     }
-    
+
     // Network errors
     if (errorString.includes('network') || errorString.includes('connection')) {
       return 'Network error. Using cached data if available.';
     }
-    
+
     // Generic error
     return 'Unable to load health data. Please try again.';
   };
@@ -258,7 +271,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const setupNetworkListener = () => {
     const unsubscribe = NetInfo.addEventListener(state => {
       setIsOffline(!state.isConnected);
-      
+
       // If we come back online, try to refresh data
       if (state.isConnected && !isInitializing) {
         console.log('Network restored, refreshing data...');
@@ -278,18 +291,15 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const startBackgroundSync = async () => {
     try {
       const backgroundSync = getBackgroundSyncService();
-      
+
       // Start syncing step count data
-      await backgroundSync.startBackgroundSync(
-        [HealthDataType.STEPS],
-        async (dataType, data) => {
-          console.log('Background update received:', dataType, data);
-          
-          // Update health data when new data arrives
-          await HealthDataUpdateService.updateDailyHealthData();
-        }
-      );
-      
+      await backgroundSync.startBackgroundSync([HealthDataType.STEPS], async (dataType, data) => {
+        console.log('Background update received:', dataType, data);
+
+        // Update health data when new data arrives
+        await HealthDataUpdateService.updateDailyHealthData();
+      });
+
       console.log('Background sync started');
     } catch (err) {
       console.error('Error starting background sync:', err);
@@ -315,9 +325,9 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const showStateChangeNotification = (oldState: EmotionalState, newState: EmotionalState) => {
     const oldName = oldState.charAt(0).toUpperCase() + oldState.slice(1);
     const newName = newState.charAt(0).toUpperCase() + newState.slice(1);
-    
+
     setStateChangeNotification(`${oldName} → ${newName}`);
-    
+
     // Fade in
     Animated.sequence([
       Animated.timing(notificationOpacity, {
@@ -343,15 +353,15 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
    */
   const calculateProgress = (): number => {
     const steps = healthMetrics.steps;
-    
+
     if (steps >= thresholds.activeThreshold) {
       return 100;
     }
-    
+
     if (steps <= 0) {
       return 0;
     }
-    
+
     // Calculate progress between 0 and activeThreshold
     return Math.min(100, (steps / thresholds.activeThreshold) * 100);
   };
@@ -461,14 +471,14 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
    */
   const handleBreathingComplete = async (result: SessionResult) => {
     setShowBreathingExercise(false);
-    
+
     if (result.success) {
       // Update emotional state to Calm (interactive session overrides AI/rule-based)
       useHealthDataStore.getState().setEmotionalState(EmotionalState.CALM, 'rule-based');
-      
+
       // Show success notification
       showStateChangeNotification(emotionalState, EmotionalState.CALM);
-      
+
       // Refresh health data to reflect the mindful minutes
       await HealthDataUpdateService.refreshHealthData();
     }
@@ -486,10 +496,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
    * Requirements: 7.1
    */
   const shouldShowCalmButton = (): boolean => {
-    return (
-      emotionalState === EmotionalState.STRESSED ||
-      emotionalState === EmotionalState.ANXIOUS
-    );
+    return emotionalState === EmotionalState.STRESSED || emotionalState === EmotionalState.ANXIOUS;
   };
 
   /**
@@ -497,17 +504,17 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
    */
   const formatLastUpdated = (): string => {
     if (!lastUpdated) return 'Never';
-    
+
     const now = new Date();
     const diff = now.getTime() - lastUpdated.getTime();
     const minutes = Math.floor(diff / 60000);
-    
+
     if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
-    
+
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;
-    
+
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
   };
@@ -526,8 +533,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           tintColor="#9333EA"
           colors={['#9333EA']}
         />
-      }
-    >
+      }>
       {/* Header with settings button */}
       <View style={styles.header}>
         <View style={styles.titleContainer}>
@@ -541,8 +547,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={handleOpenSettings}
-          accessibilityLabel="Open settings"
-        >
+          accessibilityLabel="Open settings">
           <Text style={styles.settingsIcon}>⚙️</Text>
         </TouchableOpacity>
       </View>
@@ -556,15 +561,8 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
 
       {/* State change notification */}
       {stateChangeNotification && (
-        <Animated.View
-          style={[
-            styles.notificationContainer,
-            { opacity: notificationOpacity },
-          ]}
-        >
-          <Text style={styles.notificationText}>
-            ✨ {stateChangeNotification}
-          </Text>
+        <Animated.View style={[styles.notificationContainer, { opacity: notificationOpacity }]}>
+          <Text style={styles.notificationText}>✨ {stateChangeNotification}</Text>
         </Animated.View>
       )}
 
@@ -587,8 +585,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
             {profile?.preferences.dataSource === 'manual' && (
               <TouchableOpacity
                 style={styles.manualEntryButton}
-                onPress={() => navigation.navigate('ManualEntry')}
-              >
+                onPress={() => navigation.navigate('ManualEntry')}>
                 <Text style={styles.manualEntryButtonText}>Enter Steps</Text>
               </TouchableOpacity>
             )}
@@ -613,9 +610,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       <View style={styles.metricsContainer}>
         <View style={styles.metricCard}>
           <Text style={styles.metricLabel}>Steps Today</Text>
-          <Text style={styles.metricValue}>
-            {healthMetrics.steps.toLocaleString()}
-          </Text>
+          <Text style={styles.metricValue}>{healthMetrics.steps.toLocaleString()}</Text>
           <Text style={styles.metricSubtext}>
             Goal: {thresholds.activeThreshold.toLocaleString()}
           </Text>
@@ -628,19 +623,15 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
               <View style={styles.smallMetricCard}>
                 <Text style={styles.smallMetricIcon}>😴</Text>
                 <Text style={styles.smallMetricLabel}>Sleep</Text>
-                <Text style={styles.smallMetricValue}>
-                  {healthMetrics.sleepHours.toFixed(1)}h
-                </Text>
+                <Text style={styles.smallMetricValue}>{healthMetrics.sleepHours.toFixed(1)}h</Text>
               </View>
             )}
-            
+
             {healthMetrics.hrv !== undefined && (
               <View style={styles.smallMetricCard}>
                 <Text style={styles.smallMetricIcon}>❤️</Text>
                 <Text style={styles.smallMetricLabel}>HRV</Text>
-                <Text style={styles.smallMetricValue}>
-                  {Math.round(healthMetrics.hrv)}ms
-                </Text>
+                <Text style={styles.smallMetricValue}>{Math.round(healthMetrics.hrv)}ms</Text>
               </View>
             )}
           </View>
@@ -667,14 +658,13 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       <View style={styles.thresholdsContainer}>
         <View style={styles.thresholdItem}>
           <Text style={styles.thresholdLabel}>Sad</Text>
-          <Text style={styles.thresholdValue}>
-            &lt; {thresholds.sadThreshold.toLocaleString()}
-          </Text>
+          <Text style={styles.thresholdValue}>&lt; {thresholds.sadThreshold.toLocaleString()}</Text>
         </View>
         <View style={styles.thresholdItem}>
           <Text style={styles.thresholdLabel}>Resting</Text>
           <Text style={styles.thresholdValue}>
-            {thresholds.sadThreshold.toLocaleString()} - {thresholds.activeThreshold.toLocaleString()}
+            {thresholds.sadThreshold.toLocaleString()} -{' '}
+            {thresholds.activeThreshold.toLocaleString()}
           </Text>
         </View>
         <View style={styles.thresholdItem}>
@@ -689,16 +679,14 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       {evolutionEligibility && (
         <View style={styles.evolutionProgressContainer}>
           <View style={styles.evolutionProgressHeader}>
-            <Text style={styles.evolutionProgressTitle}>
-              ✨ Evolution Progress
-            </Text>
+            <Text style={styles.evolutionProgressTitle}>✨ Evolution Progress</Text>
             {showEvolutionNotification && evolutionEligibility.eligible && (
               <View style={styles.evolutionReadyBadge}>
                 <Text style={styles.evolutionReadyText}>Ready!</Text>
               </View>
             )}
           </View>
-          
+
           <View style={styles.evolutionProgressBar}>
             <View
               style={[
@@ -709,11 +697,11 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
               ]}
             />
           </View>
-          
+
           <Text style={styles.evolutionProgressText}>
             {evolutionEligibility.daysInPositiveState} / {evolutionEligibility.daysRequired} days
-            {evolutionEligibility.eligible 
-              ? ' - Evolution available!' 
+            {evolutionEligibility.eligible
+              ? ' - Evolution available!'
               : ' in Active or Vibrant state'}
           </Text>
 
@@ -723,14 +711,11 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
               style={styles.evolutionButton}
               onPress={handleTriggerEvolution}
               disabled={isEvolutionInProgress}
-              accessibilityLabel="Trigger evolution"
-            >
+              accessibilityLabel="Trigger evolution">
               {isEvolutionInProgress ? (
                 <ActivityIndicator size="small" color="#ffffff" />
               ) : (
-                <Text style={styles.evolutionButtonText}>
-                  🌟 Evolve Your Symbi!
-                </Text>
+                <Text style={styles.evolutionButtonText}>🌟 Evolve Your Symbi!</Text>
               )}
             </TouchableOpacity>
           )}
@@ -742,8 +727,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         <TouchableOpacity
           style={styles.calmButton}
           onPress={handleStartBreathingExercise}
-          accessibilityLabel="Calm your Symbi"
-        >
+          accessibilityLabel="Calm your Symbi">
           <Text style={styles.calmButtonText}>🧘 Calm your Symbi</Text>
         </TouchableOpacity>
       )}
@@ -752,22 +736,15 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       <TouchableOpacity
         style={styles.configureButton}
         onPress={handleConfigureThresholds}
-        accessibilityLabel="Configure thresholds"
-      >
+        accessibilityLabel="Configure thresholds">
         <Text style={styles.configureButtonText}>⚡ Configure Thresholds</Text>
       </TouchableOpacity>
 
       {/* Last Updated */}
-      <Text style={styles.lastUpdated}>
-        Last updated: {formatLastUpdated()}
-      </Text>
+      <Text style={styles.lastUpdated}>Last updated: {formatLastUpdated()}</Text>
 
       {/* Breathing Exercise Modal */}
-      <Modal
-        visible={showBreathingExercise}
-        animationType="slide"
-        presentationStyle="fullScreen"
-      >
+      <Modal visible={showBreathingExercise} animationType="slide" presentationStyle="fullScreen">
         <BreathingExercise
           sessionManager={sessionManager}
           duration={5}

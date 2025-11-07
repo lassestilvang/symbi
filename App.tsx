@@ -31,7 +31,7 @@ export default function App() {
         isFatal,
         context: 'global_error_handler',
       });
-      
+
       // Call original handler
       if (originalHandler) {
         originalHandler(error, isFatal);
@@ -40,13 +40,12 @@ export default function App() {
 
     // Log unhandled promise rejections
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      errorReporting.captureException(
-        new Error(`Unhandled Promise Rejection: ${event.reason}`),
-        { context: 'unhandled_promise_rejection' }
-      );
+      errorReporting.captureException(new Error(`Unhandled Promise Rejection: ${event.reason}`), {
+        context: 'unhandled_promise_rejection',
+      });
     };
 
-    // @ts-ignore - addEventListener exists in React Native
+    // @ts-expect-error - addEventListener exists in React Native
     if (typeof window !== 'undefined') {
       window.addEventListener('unhandledrejection', handleUnhandledRejection);
     }
@@ -54,7 +53,7 @@ export default function App() {
     return () => {
       // Cleanup
       if (typeof window !== 'undefined') {
-        // @ts-ignore
+        // @ts-expect-error - removeEventListener exists in React Native
         window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       }
     };

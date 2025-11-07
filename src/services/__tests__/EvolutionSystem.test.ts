@@ -27,9 +27,7 @@ describe('EvolutionSystem', () => {
 
     it('should update existing state for the same day', async () => {
       const today = new Date().toISOString().split('T')[0];
-      const mockGet = jest.fn().mockResolvedValue([
-        { date: today, state: EmotionalState.RESTING }
-      ]);
+      const mockGet = jest.fn().mockResolvedValue([{ date: today, state: EmotionalState.RESTING }]);
       const mockSet = jest.fn().mockResolvedValue(true);
       (StorageService.get as jest.Mock) = mockGet;
       (StorageService.set as jest.Mock) = mockSet;
@@ -47,12 +45,12 @@ describe('EvolutionSystem', () => {
     it('should return eligible when 30 days in positive states', async () => {
       const mockStates = Array.from({ length: 30 }, (_, i) => ({
         date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        state: EmotionalState.ACTIVE
+        state: EmotionalState.ACTIVE,
       }));
 
       const mockGet = jest.fn().mockResolvedValue(mockStates);
       const mockGetUserProfile = jest.fn().mockResolvedValue({
-        evolutionLevel: 0
+        evolutionLevel: 0,
       });
       (StorageService.get as jest.Mock) = mockGet;
       (StorageService.getUserProfile as jest.Mock) = mockGetUserProfile;
@@ -67,12 +65,12 @@ describe('EvolutionSystem', () => {
     it('should return not eligible when less than 30 days', async () => {
       const mockStates = Array.from({ length: 15 }, (_, i) => ({
         date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        state: EmotionalState.ACTIVE
+        state: EmotionalState.ACTIVE,
       }));
 
       const mockGet = jest.fn().mockResolvedValue(mockStates);
       const mockGetUserProfile = jest.fn().mockResolvedValue({
-        evolutionLevel: 0
+        evolutionLevel: 0,
       });
       (StorageService.get as jest.Mock) = mockGet;
       (StorageService.getUserProfile as jest.Mock) = mockGetUserProfile;
@@ -86,12 +84,12 @@ describe('EvolutionSystem', () => {
     it('should not be eligible if max evolution level reached', async () => {
       const mockStates = Array.from({ length: 30 }, (_, i) => ({
         date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        state: EmotionalState.VIBRANT
+        state: EmotionalState.VIBRANT,
       }));
 
       const mockGet = jest.fn().mockResolvedValue(mockStates);
       const mockGetUserProfile = jest.fn().mockResolvedValue({
-        evolutionLevel: 5 // Max level
+        evolutionLevel: 5, // Max level
       });
       (StorageService.get as jest.Mock) = mockGet;
       (StorageService.getUserProfile as jest.Mock) = mockGetUserProfile;
@@ -111,7 +109,7 @@ describe('EvolutionSystem', () => {
           evolutionLevel: 1,
           appearanceUrl: 'url1',
           daysInPositiveState: 30,
-          dominantStates: [EmotionalState.ACTIVE]
+          dominantStates: [EmotionalState.ACTIVE],
         },
         {
           id: '2',
@@ -119,8 +117,8 @@ describe('EvolutionSystem', () => {
           evolutionLevel: 2,
           appearanceUrl: 'url2',
           daysInPositiveState: 30,
-          dominantStates: [EmotionalState.VIBRANT]
-        }
+          dominantStates: [EmotionalState.VIBRANT],
+        },
       ];
 
       const mockGetEvolutionRecords = jest.fn().mockResolvedValue(mockRecords);
@@ -138,18 +136,18 @@ describe('EvolutionSystem', () => {
   describe('getDominantStates', () => {
     it('should return top 3 most frequent states', async () => {
       const mockStates = [
-        ...Array.from({ length: 15 }, (_, i) => ({ 
-          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
-          state: EmotionalState.ACTIVE 
+        ...Array.from({ length: 15 }, (_, i) => ({
+          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          state: EmotionalState.ACTIVE,
         })),
-        ...Array.from({ length: 10 }, (_, i) => ({ 
-          date: new Date(Date.now() - (i + 15) * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
-          state: EmotionalState.VIBRANT 
+        ...Array.from({ length: 10 }, (_, i) => ({
+          date: new Date(Date.now() - (i + 15) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          state: EmotionalState.VIBRANT,
         })),
-        ...Array.from({ length: 5 }, (_, i) => ({ 
-          date: new Date(Date.now() - (i + 25) * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
-          state: EmotionalState.CALM 
-        }))
+        ...Array.from({ length: 5 }, (_, i) => ({
+          date: new Date(Date.now() - (i + 25) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          state: EmotionalState.CALM,
+        })),
       ];
 
       const mockGet = jest.fn().mockResolvedValue(mockStates);
@@ -167,13 +165,13 @@ describe('EvolutionSystem', () => {
   describe('triggerEvolution', () => {
     it('should trigger evolution when eligible', async () => {
       const mockAIService = {
-        generateEvolvedAppearance: jest.fn().mockResolvedValue('data:image/png;base64,test')
+        generateEvolvedAppearance: jest.fn().mockResolvedValue('data:image/png;base64,test'),
       };
 
       const mockGet = jest.fn().mockResolvedValue(
         Array.from({ length: 30 }, (_, i) => ({
           date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          state: EmotionalState.ACTIVE
+          state: EmotionalState.ACTIVE,
         }))
       );
       const mockGetUserProfile = jest.fn().mockResolvedValue({
@@ -183,7 +181,7 @@ describe('EvolutionSystem', () => {
         preferences: {},
         thresholds: {},
         goals: {},
-        totalDaysActive: 30
+        totalDaysActive: 30,
       });
       const mockSetUserProfile = jest.fn().mockResolvedValue(true);
       const mockAddEvolutionRecord = jest.fn().mockResolvedValue(true);
@@ -207,12 +205,12 @@ describe('EvolutionSystem', () => {
 
     it('should not trigger evolution when not eligible', async () => {
       const mockAIService = {
-        generateEvolvedAppearance: jest.fn()
+        generateEvolvedAppearance: jest.fn(),
       };
 
       const mockGet = jest.fn().mockResolvedValue([]);
       const mockGetUserProfile = jest.fn().mockResolvedValue({
-        evolutionLevel: 0
+        evolutionLevel: 0,
       });
 
       (StorageService.get as jest.Mock) = mockGet;

@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * RequestDeduplicator
- * 
+ *
  * Prevents duplicate API requests from being sent simultaneously.
  * If multiple components request the same data, only one request is made
  * and all callers receive the same response.
- * 
+ *
  * Requirement 6.3: Implement request deduplication for Gemini API
  */
 
@@ -21,10 +22,7 @@ export class RequestDeduplicator {
    * Execute a request with deduplication
    * If the same request is already in progress, return the existing promise
    */
-  static async deduplicate<T>(
-    key: string,
-    requestFn: () => Promise<T>
-  ): Promise<T> {
+  static async deduplicate<T>(key: string, requestFn: () => Promise<T>): Promise<T> {
     // Check if request is already pending
     const pending = this.pendingRequests.get(key);
 
@@ -45,12 +43,12 @@ export class RequestDeduplicator {
     // Create new request
     console.log(`Creating new request: ${key}`);
     const promise = requestFn()
-      .then((result) => {
+      .then(result => {
         // Remove from pending after completion
         this.pendingRequests.delete(key);
         return result;
       })
-      .catch((error) => {
+      .catch(error => {
         // Remove from pending after error
         this.pendingRequests.delete(key);
         throw error;

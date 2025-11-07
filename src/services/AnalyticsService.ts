@@ -1,6 +1,6 @@
 /**
  * Analytics Service
- * 
+ *
  * Privacy-preserving analytics that tracks aggregate metrics without PII.
  * Requirements: 11.3
  */
@@ -16,34 +16,34 @@ export enum AnalyticsEvent {
   // App lifecycle
   APP_OPENED = 'app_opened',
   APP_CLOSED = 'app_closed',
-  
+
   // Onboarding
   ONBOARDING_STARTED = 'onboarding_started',
   ONBOARDING_COMPLETED = 'onboarding_completed',
   ONBOARDING_SKIPPED = 'onboarding_skipped',
-  
+
   // Permissions
   PERMISSION_GRANTED = 'permission_granted',
   PERMISSION_DENIED = 'permission_denied',
   MANUAL_ENTRY_SELECTED = 'manual_entry_selected',
-  
+
   // Health data
   HEALTH_DATA_SYNCED = 'health_data_synced',
   EMOTIONAL_STATE_CHANGED = 'emotional_state_changed',
-  
+
   // Interactive sessions
   SESSION_STARTED = 'session_started',
   SESSION_COMPLETED = 'session_completed',
   SESSION_CANCELLED = 'session_cancelled',
-  
+
   // Evolution
   EVOLUTION_TRIGGERED = 'evolution_triggered',
   EVOLUTION_COMPLETED = 'evolution_completed',
-  
+
   // Settings
   THRESHOLD_CONFIGURED = 'threshold_configured',
   DATA_SOURCE_CHANGED = 'data_source_changed',
-  
+
   // Privacy
   DATA_EXPORTED = 'data_exported',
   DATA_DELETED = 'data_deleted',
@@ -57,19 +57,19 @@ export enum AnalyticsEvent {
 export interface AnalyticsProperties {
   // Platform info
   platform?: 'ios' | 'android';
-  
+
   // Feature flags
   dataSource?: 'healthkit' | 'googlefit' | 'manual';
-  
+
   // Aggregate metrics
   emotionalState?: EmotionalState;
   sessionType?: string;
   sessionDuration?: number;
   evolutionLevel?: number;
-  
+
   // Counts (no specific values)
   stepCountRange?: 'low' | 'medium' | 'high'; // <2000, 2000-8000, >8000
-  
+
   // Success/failure
   success?: boolean;
   errorType?: string;
@@ -77,7 +77,7 @@ export interface AnalyticsProperties {
 
 /**
  * AnalyticsService provides privacy-preserving analytics.
- * 
+ *
  * Privacy Features:
  * - Anonymous device IDs only (no user IDs, emails, or names)
  * - No health data values sent (only ranges/categories)
@@ -89,7 +89,7 @@ export class AnalyticsService {
   private static readonly ANALYTICS_ENABLED_KEY = '@symbi:analytics_enabled';
   private static readonly DEVICE_ID_KEY = '@symbi:device_id';
   private static readonly SESSION_START_KEY = '@symbi:session_start';
-  
+
   private static isEnabled: boolean | null = null;
   private static deviceId: string | null = null;
   private static sessionStartTime: number | null = null;
@@ -148,7 +148,7 @@ export class AnalyticsService {
    */
   static async trackEmotionalStateChange(
     newState: EmotionalState,
-    previousState?: EmotionalState
+    _previousState?: EmotionalState
   ): Promise<void> {
     await this.trackEvent(AnalyticsEvent.EMOTIONAL_STATE_CHANGED, {
       emotionalState: newState,
@@ -158,11 +158,11 @@ export class AnalyticsService {
   /**
    * Track permission grant/denial
    */
-  static async trackPermissionResult(granted: boolean, dataSource: string): Promise<void> {
+  static async trackPermissionResult(granted: boolean, dataSource: 'healthkit' | 'googlefit' | 'manual'): Promise<void> {
     await this.trackEvent(
       granted ? AnalyticsEvent.PERMISSION_GRANTED : AnalyticsEvent.PERMISSION_DENIED,
       {
-        dataSource: dataSource as any,
+        dataSource,
       }
     );
   }
@@ -170,14 +170,8 @@ export class AnalyticsService {
   /**
    * Track interactive session
    */
-  static async trackSession(
-    type: string,
-    completed: boolean,
-    duration?: number
-  ): Promise<void> {
-    const event = completed
-      ? AnalyticsEvent.SESSION_COMPLETED
-      : AnalyticsEvent.SESSION_CANCELLED;
+  static async trackSession(type: string, completed: boolean, duration?: number): Promise<void> {
+    const event = completed ? AnalyticsEvent.SESSION_COMPLETED : AnalyticsEvent.SESSION_CANCELLED;
 
     await this.trackEvent(event, {
       sessionType: type,
@@ -189,9 +183,7 @@ export class AnalyticsService {
    * Track evolution event
    */
   static async trackEvolution(level: number, success: boolean): Promise<void> {
-    const event = success
-      ? AnalyticsEvent.EVOLUTION_COMPLETED
-      : AnalyticsEvent.EVOLUTION_TRIGGERED;
+    const event = success ? AnalyticsEvent.EVOLUTION_COMPLETED : AnalyticsEvent.EVOLUTION_TRIGGERED;
 
     await this.trackEvent(event, {
       evolutionLevel: level,
@@ -244,7 +236,7 @@ export class AnalyticsService {
   static async disableAnalytics(): Promise<void> {
     // Track opt-out before disabling
     await this.trackEvent(AnalyticsEvent.ANALYTICS_OPTED_OUT);
-    
+
     this.isEnabled = false;
     await AsyncStorage.setItem(this.ANALYTICS_ENABLED_KEY, 'false');
   }
@@ -254,7 +246,7 @@ export class AnalyticsService {
    */
   private static async getOrCreateDeviceId(): Promise<string> {
     let deviceId = await AsyncStorage.getItem(this.DEVICE_ID_KEY);
-    
+
     if (!deviceId) {
       // Generate anonymous device ID (not tied to user identity)
       deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -266,9 +258,9 @@ export class AnalyticsService {
 
   /**
    * Send event to analytics backend
-   * 
+   *
    * In production, implement one of these options:
-   * 
+   *
    * 1. Plausible Analytics (privacy-focused, GDPR compliant):
    *    POST https://plausible.io/api/event
    *    {
@@ -277,7 +269,7 @@ export class AnalyticsService {
    *      "domain": "symbi.app",
    *      "props": properties
    *    }
-   * 
+   *
    * 2. Self-hosted Matomo:
    *    POST https://your-matomo.com/matomo.php
    *    {
@@ -288,7 +280,7 @@ export class AnalyticsService {
    *      "_id": deviceId,
    *      ...properties
    *    }
-   * 
+   *
    * 3. Custom backend:
    *    POST https://your-api.com/analytics
    *    {
@@ -304,7 +296,7 @@ export class AnalyticsService {
   ): Promise<void> {
     // Placeholder for production implementation
     // In production, send to your chosen analytics service
-    
+
     // Example: Plausible Analytics
     /*
     const response = await fetch('https://plausible.io/api/event', {
@@ -365,7 +357,7 @@ export class AnalyticsService {
       AsyncStorage.removeItem(this.DEVICE_ID_KEY),
       AsyncStorage.removeItem(this.SESSION_START_KEY),
     ]);
-    
+
     this.deviceId = null;
     this.sessionStartTime = null;
   }
@@ -373,36 +365,36 @@ export class AnalyticsService {
 
 /**
  * Production Implementation Notes:
- * 
+ *
  * 1. Choose a Privacy-Preserving Analytics Service:
- * 
+ *
  *    a) Plausible Analytics (Recommended):
  *       - GDPR, CCPA, PECR compliant
  *       - No cookies, no personal data collection
  *       - Open source, can self-host
  *       - Simple API
  *       npm install plausible-tracker
- * 
+ *
  *    b) Self-hosted Matomo:
  *       - Full control over data
  *       - GDPR compliant with proper configuration
  *       - More features but more complex
- * 
+ *
  *    c) Custom Backend:
  *       - Maximum control and privacy
  *       - Store only aggregate metrics
  *       - Implement data retention policies
- * 
+ *
  * 2. Configure Analytics Opt-Out:
  *    - Add toggle in settings
  *    - Respect user choice immediately
  *    - Don't track after opt-out
- * 
+ *
  * 3. Data Retention:
  *    - Keep analytics data for 90 days max
  *    - Automatically delete old data
  *    - Provide data export for transparency
- * 
+ *
  * 4. Metrics to Track (Privacy-Safe):
  *    ✅ Daily Active Users (DAU)
  *    ✅ Permission grant rate
@@ -410,7 +402,7 @@ export class AnalyticsService {
  *    ✅ Feature usage (sessions, evolutions)
  *    ✅ Error rates
  *    ✅ Platform distribution (iOS vs Android)
- *    
+ *
  *    ❌ Individual health data values
  *    ❌ User identifiers (email, name)
  *    ❌ Location data

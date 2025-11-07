@@ -1,9 +1,9 @@
 /**
  * BackgroundTaskConfig
- * 
+ *
  * Configuration for background tasks and battery optimization.
  * Centralizes all timing and performance settings.
- * 
+ *
  * Requirements: 10.1, 10.2, 10.3
  */
 

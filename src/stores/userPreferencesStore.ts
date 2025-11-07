@@ -4,7 +4,7 @@ import { StorageService } from '../services/StorageService';
 
 /**
  * User Preferences Store
- * 
+ *
  * Manages user profile, preferences, thresholds, and goals with persistence.
  * Automatically syncs changes to AsyncStorage.
  */
@@ -13,7 +13,7 @@ interface UserPreferencesState {
   // User data
   profile: UserProfile | null;
   isInitialized: boolean;
-  
+
   // Actions
   initializeProfile: () => Promise<void>;
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
@@ -61,13 +61,13 @@ export const useUserPreferencesStore = create<UserPreferencesState>((set, get) =
   initializeProfile: async () => {
     try {
       let profile = await StorageService.getUserProfile();
-      
+
       if (!profile) {
         // Create new profile for first-time user
         profile = createDefaultProfile();
         await StorageService.setUserProfile(profile);
       }
-      
+
       set({ profile, isInitialized: true });
     } catch (error) {
       console.error('Error initializing profile:', error);

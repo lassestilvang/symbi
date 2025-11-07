@@ -45,7 +45,8 @@ export const PermissionRequestScreen: React.FC<PermissionRequestScreenProps> = (
           <Text style={styles.permissionIcon}>❤️</Text>
           <Text style={styles.permissionTitle}>Heart Rate Variability</Text>
           <Text style={styles.permissionDescription}>
-            We use your heart rate variability to understand your stress levels and overall wellbeing.
+            We use your heart rate variability to understand your stress levels and overall
+            wellbeing.
           </Text>
         </View>
 
@@ -53,17 +54,17 @@ export const PermissionRequestScreen: React.FC<PermissionRequestScreenProps> = (
           <Text style={styles.permissionIcon}>🧘</Text>
           <Text style={styles.permissionTitle}>Mindful Minutes (Write)</Text>
           <Text style={styles.permissionDescription}>
-            When you complete breathing exercises with Symbi, we'll record mindful minutes to your health data.
+            When you complete breathing exercises with Symbi, we'll record mindful minutes to your
+            health data.
           </Text>
         </View>
 
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>🔒 Your Privacy Matters</Text>
           <Text style={styles.infoText}>
-            • Your health data stays on your device{'\n'}
-            • We never share your data with third parties{'\n'}
-            • You can disconnect at any time{'\n'}
-            • Only daily summaries are used, not minute-by-minute data
+            • Your health data stays on your device{'\n'}• We never share your data with third
+            parties{'\n'}• You can disconnect at any time{'\n'}• Only daily summaries are used, not
+            minute-by-minute data
           </Text>
         </View>
 
