@@ -32,3 +32,16 @@ export { CloudAPIService } from './CloudAPIService';
 export type { CloudSyncData, SyncResult } from './CloudAPIService';
 export { firebaseConfig, isFirebaseConfigured } from './FirebaseConfig';
 export type { FirebaseConfig } from './FirebaseConfig';
+
+// Security Services
+export { EncryptionService } from './EncryptionService';
+export { SecureStorageService } from './SecureStorageService';
+export { SecureAPIService } from './SecureAPIService';
+
+// Data Management
+export { DataManagementService } from './DataManagementService';
+export type { ExportData, DeletionResult } from './DataManagementService';
+
+// Analytics
+export { AnalyticsService, AnalyticsEvent } from './AnalyticsService';
+export type { AnalyticsProperties } from './AnalyticsService';

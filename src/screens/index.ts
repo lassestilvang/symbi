@@ -7,3 +7,4 @@ export { ManualEntryScreen } from './ManualEntryScreen';
 export { SettingsScreen } from './SettingsScreen';
 export { EvolutionGalleryScreen } from './EvolutionGalleryScreen';
 export { AccountScreen } from './AccountScreen';
+export { PrivacyPolicyScreen } from './PrivacyPolicyScreen';

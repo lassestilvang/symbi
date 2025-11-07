@@ -19,6 +19,7 @@ import {
 import { AuthService, AuthUser } from '../services/AuthService';
 import { CloudSyncService, SyncStatus } from '../services/CloudSyncService';
 import { StorageService } from '../services/StorageService';
+import { DataManagementService } from '../services/DataManagementService';
 
 interface AccountScreenProps {
   onClose?: () => void;
@@ -173,52 +174,29 @@ export const AccountScreen: React.FC<AccountScreenProps> = ({ onClose }) => {
   };
 
   const handleExportData = async () => {
-    Alert.alert(
-      'Export Data',
-      'This will export all your data as a JSON file.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Export',
-          onPress: async () => {
-            const jsonData = await StorageService.exportAllData();
-            if (jsonData) {
-              // In production, save to file system or share
-              console.log('Exported data:', jsonData);
-              Alert.alert('Success', 'Data exported successfully!');
-            } else {
-              Alert.alert('Error', 'Failed to export data');
-            }
-          },
-        },
-      ]
-    );
+    const success = await DataManagementService.shareExportedData();
+    if (success) {
+      Alert.alert('Success', 'Data exported successfully!');
+    }
   };
 
   const handleDeleteAccount = async () => {
-    Alert.alert(
-      'Delete Account',
-      'This will permanently delete your account and all cloud data. Local data will be removed after 7 days. This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setIsLoading(true);
-            const success = await AuthService.deleteAccount();
-            setIsLoading(false);
+    DataManagementService.showDeleteAccountConfirmation(async () => {
+      setIsLoading(true);
+      const result = await DataManagementService.deleteAccount();
+      setIsLoading(false);
 
-            if (success) {
-              setCurrentUser(null);
-              Alert.alert('Account Deleted', 'Your account has been deleted.');
-            } else {
-              Alert.alert('Error', 'Failed to delete account');
-            }
-          },
-        },
-      ]
-    );
+      if (result.success) {
+        setCurrentUser(null);
+        Alert.alert(
+          'Account Deleted',
+          `Successfully deleted:\n${result.deletedItems.join('\n')}\n\nCloud data will be removed within 7 days.`,
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert('Error', result.error || 'Failed to delete account');
+      }
+    });
   };
 
   const renderSignInForm = () => (

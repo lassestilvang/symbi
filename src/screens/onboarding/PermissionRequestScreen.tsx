@@ -5,12 +5,14 @@ interface PermissionRequestScreenProps {
   onRequestPermissions: () => void;
   onUseManualEntry: () => void;
   onBack: () => void;
+  onViewPrivacyPolicy?: () => void;
 }
 
 export const PermissionRequestScreen: React.FC<PermissionRequestScreenProps> = ({
   onRequestPermissions,
   onUseManualEntry,
   onBack,
+  onViewPrivacyPolicy,
 }) => {
   const platformName = Platform.OS === 'ios' ? 'Apple Health' : 'Google Fit';
 
@@ -68,6 +70,12 @@ export const PermissionRequestScreen: React.FC<PermissionRequestScreenProps> = (
         <Text style={styles.platformNote}>
           This will open {platformName} to request permissions
         </Text>
+
+        {onViewPrivacyPolicy && (
+          <TouchableOpacity style={styles.privacyLink} onPress={onViewPrivacyPolicy}>
+            <Text style={styles.privacyLinkText}>📄 View Privacy Policy</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       <View style={styles.footer}>
@@ -160,6 +168,16 @@ const styles = StyleSheet.create({
     color: '#a78bfa',
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  privacyLink: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  privacyLinkText: {
+    fontSize: 14,
+    color: '#9333ea',
+    textDecorationLine: 'underline',
   },
   footer: {
     paddingHorizontal: 32,

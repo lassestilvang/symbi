@@ -30,6 +30,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   hapticFeedbackEnabled: true,
   soundEnabled: true,
   theme: 'auto',
+  analyticsEnabled: true,
 };
 
 const DEFAULT_THRESHOLDS: StepThresholds = {

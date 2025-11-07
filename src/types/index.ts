@@ -70,6 +70,7 @@ export interface UserPreferences {
   hapticFeedbackEnabled: boolean;
   soundEnabled: boolean;
   theme: 'light' | 'dark' | 'auto';
+  analyticsEnabled: boolean;
 }
 
 /**

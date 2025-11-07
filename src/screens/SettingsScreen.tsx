@@ -12,6 +12,8 @@ import {
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
 import { StorageService } from '../services/StorageService';
+import { DataManagementService } from '../services/DataManagementService';
+import { AnalyticsService } from '../services/AnalyticsService';
 
 interface SettingsScreenProps {
   onReplayOnboarding: () => void;
@@ -19,6 +21,7 @@ interface SettingsScreenProps {
   onNavigateToManualEntry?: () => void;
   onNavigateToEvolutionGallery?: () => void;
   onNavigateToAccount?: () => void;
+  onNavigateToPrivacyPolicy?: () => void;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
@@ -27,6 +30,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onNavigateToManualEntry,
   onNavigateToEvolutionGallery,
   onNavigateToAccount,
+  onNavigateToPrivacyPolicy,
 }) => {
   const { profile, updatePreferences, setDataSource } = useUserPreferencesStore();
   const [isChangingDataSource, setIsChangingDataSource] = useState(false);
@@ -49,6 +53,16 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   const handleToggleSound = async (value: boolean) => {
     await updatePreferences({ soundEnabled: value });
+  };
+
+  const handleToggleAnalytics = async (value: boolean) => {
+    await updatePreferences({ analyticsEnabled: value });
+    
+    if (value) {
+      await AnalyticsService.enableAnalytics();
+    } else {
+      await AnalyticsService.disableAnalytics();
+    }
   };
 
   const handleChangeDataSource = async (newSource: 'healthkit' | 'googlefit' | 'manual') => {
@@ -99,57 +113,37 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   };
 
   const handleExportData = async () => {
-    Alert.alert(
-      'Export Data',
-      'This will export all your health data and Symbi history as a JSON file.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Export',
-          onPress: async () => {
-            const jsonData = await StorageService.exportAllData();
-            if (jsonData) {
-              // In production, this would save to file system or share via native share dialog
-              console.log('Exported data:', jsonData);
-              Alert.alert('Success', 'Data exported successfully! Check console for JSON output.');
-            } else {
-              Alert.alert('Error', 'Failed to export data. Please try again.');
-            }
-          },
-        },
-      ]
-    );
+    const success = await DataManagementService.shareExportedData();
+    if (success) {
+      Alert.alert('Success', 'Data exported successfully!');
+    }
   };
 
   const handleDeleteData = () => {
-    Alert.alert(
-      'Delete All Data',
-      'This will permanently delete all your health data, preferences, and Symbi history. This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            const success = await StorageService.clearAllSymbiData();
-            if (success) {
-              Alert.alert('Success', 'All data has been deleted.');
-            } else {
-              Alert.alert('Error', 'Failed to delete data. Please try again.');
-            }
-          },
-        },
-      ]
-    );
+    DataManagementService.showDeleteDataConfirmation(async () => {
+      const result = await DataManagementService.deleteAllLocalData();
+      if (result.success) {
+        Alert.alert(
+          'Data Deleted',
+          `Successfully deleted:\n${result.deletedItems.join('\n')}`,
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert('Error', result.error || 'Failed to delete data. Please try again.');
+      }
+    });
   };
 
   const handleOpenPrivacyPolicy = () => {
-    // TODO: Replace with actual privacy policy URL
-    Alert.alert(
-      'Privacy Policy',
-      'Your privacy is important to us. All health data stays on your device and is never shared with third parties.',
-      [{ text: 'OK' }]
-    );
+    if (onNavigateToPrivacyPolicy) {
+      onNavigateToPrivacyPolicy();
+    } else {
+      Alert.alert(
+        'Privacy Policy',
+        'Your privacy is important to us. All health data stays on your device and is never shared with third parties.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const getDataSourceLabel = () => {
@@ -271,6 +265,21 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             thumbColor="#ffffff"
           />
         </View>
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingLabel}>Anonymous Analytics</Text>
+            <Text style={styles.settingDescription}>
+              Help improve Symbi by sharing anonymous usage data. No health data is collected.
+            </Text>
+          </View>
+          <Switch
+            value={profile.preferences.analyticsEnabled}
+            onValueChange={handleToggleAnalytics}
+            trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
+            thumbColor="#ffffff"
+          />
+        </View>
       </View>
 
       {/* Tutorial Section */}
@@ -360,6 +369,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#d8b4fe',
     marginBottom: 4,
+  },
+  settingDescription: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginTop: 4,
+    lineHeight: 16,
   },
   settingValue: {
     fontSize: 14,
