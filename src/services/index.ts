@@ -10,4 +10,5 @@ export { ManualHealthDataService } from './ManualHealthDataService';
 // Other Services
 export { StorageService } from './StorageService';
 export { EmotionalStateCalculator } from './EmotionalStateCalculator';
+export { HealthDataUpdateService } from './HealthDataUpdateService';
 export { BackgroundSyncService, getBackgroundSyncService } from './BackgroundSyncService';

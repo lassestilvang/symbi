@@ -73,29 +73,29 @@
   - Export all types from central types file
   - _Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.4, 8.4_
 
-- [ ] 4. Build emotional state calculation system (Phase 1)
-- [ ] 4.1 Implement rule-based emotional state calculator
+- [x] 4. Build emotional state calculation system (Phase 1)
+- [x] 4.1 Implement rule-based emotional state calculator
   - Create EmotionalStateCalculator class
   - Implement calculateStateFromSteps() method with threshold logic
   - Add default thresholds (2000 for Sad, 8000 for Active)
   - Return EmotionalState enum value based on step count
   - _Requirements: 3.1, 4.1, 4.2, 4.3_
 
-- [ ] 4.2 Implement threshold configuration manager
+- [x] 4.2 Implement threshold configuration manager
   - Create UI component for threshold configuration screen
   - Implement validation logic (lower threshold < higher threshold)
   - Save custom thresholds to AsyncStorage via StorageService
   - Load thresholds on app launch and apply to calculator
   - _Requirements: 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 4.3 Create health data polling and state update logic
+- [x] 4.3 Create health data polling and state update logic
   - Implement daily health data fetch at app launch
   - Calculate emotional state using EmotionalStateCalculator
   - Update Zustand store with new emotional state
   - Cache health data and emotional state in AsyncStorage
   - _Requirements: 1.5, 4.1, 4.2, 4.3, 14.1, 14.3_
 
-- [ ] 4.4 Write unit tests for emotional state calculator
+- [x] 4.4 Write unit tests for emotional state calculator
   - Test threshold logic with various step counts (0, 1000, 5000, 10000)
   - Test edge cases (negative steps, extremely high steps)
   - Test custom threshold configuration
