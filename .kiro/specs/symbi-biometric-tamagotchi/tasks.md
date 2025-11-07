@@ -139,8 +139,8 @@
   - Test memory usage during rapid state changes
   - _Requirements: 4.4, 4.5, 9.4_
 
-- [ ] 6. Build onboarding flow and permission handling
-- [ ] 6.1 Create onboarding screen components
+- [x] 6. Build onboarding flow and permission handling
+- [x] 6.1 Create onboarding screen components
   - Design 3-5 onboarding screens explaining Symbi concept
   - Create screen 1: Welcome and introduction to Symbi
   - Create screen 2: Explain health data connection and emotional states
@@ -149,21 +149,21 @@
   - Add skip button and progress indicators
   - _Requirements: 13.1, 13.2, 13.4_
 
-- [ ] 6.2 Implement permission request flow
+- [x] 6.2 Implement permission request flow
   - Create permission request UI with specific explanations per data type
   - Implement HealthKit permission request for iOS (step count read)
   - Implement Google Fit permission request for Android (step count read)
   - Handle permission grant, denial, and "ask later" scenarios
   - _Requirements: 1.1, 13.3, 11.1_
 
-- [ ] 6.3 Implement manual entry mode selection
+- [x] 6.3 Implement manual entry mode selection
   - Add "Use Manual Entry" option during onboarding
   - Save data source preference to UserPreferences
   - Show manual entry form if user declines permissions
   - Allow switching between modes in settings
   - _Requirements: 1.4, 2.1, 2.4_
 
-- [ ] 6.4 Create settings screen with onboarding replay
+- [x] 6.4 Create settings screen with onboarding replay
   - Build settings UI with sections for data source, thresholds, preferences
   - Add "Replay Tutorial" button that launches onboarding flow
   - Implement toggle for notifications, haptics, and sound
