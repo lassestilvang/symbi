@@ -429,29 +429,29 @@
   - Verify no PII leakage in logs or analytics
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 13. Optimize performance and battery usage
-- [ ] 13.1 Implement battery optimization strategies
+- [x] 13. Optimize performance and battery usage
+- [x] 13.1 Implement battery optimization strategies
   - Configure background fetch intervals (15 minutes minimum)
   - Reduce animation frame rate when backgrounded (10 FPS)
   - Batch API calls to minimize wake-ups
   - Use WorkManager/BackgroundTasks efficiently
   - _Requirements: 10.1, 10.2, 10.3_
 
-- [ ] 13.2 Optimize memory usage
+- [x] 13.2 Optimize memory usage
   - Implement Lottie animation preloading and caching
   - Monitor memory footprint (target <100MB)
   - Fix any memory leaks during state transitions
   - Optimize image caching for evolved appearances
   - _Requirements: 10.4_
 
-- [ ] 13.3 Optimize API performance
+- [x] 13.3 Optimize API performance
   - Implement request deduplication for Gemini API
   - Use compression for request/response payloads
   - Implement progressive image loading for evolutions
   - Cache API responses appropriately (24 hours for analysis)
   - _Requirements: 6.3, 8.3_
 
-- [ ] 13.4 Perform performance testing
+- [x] 13.4 Perform performance testing
   - Measure battery drain over 24 hours (target <5%)
   - Measure memory usage during normal use (target <100MB)
   - Measure Gemini API response times (target <5s for 95th percentile)

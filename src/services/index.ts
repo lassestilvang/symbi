@@ -45,3 +45,13 @@ export type { ExportData, DeletionResult } from './DataManagementService';
 // Analytics
 export { AnalyticsService, AnalyticsEvent } from './AnalyticsService';
 export type { AnalyticsProperties } from './AnalyticsService';
+
+// Performance Monitoring
+export { PerformanceMonitor } from './PerformanceMonitor';
+export type { PerformanceMetrics, APICallMetric, AnimationMetric } from './PerformanceMonitor';
+export { MemoryMonitor, useMemoryMonitor } from './MemoryMonitor';
+export type { MemoryStats } from './MemoryMonitor';
+export { ImageCacheManager } from './ImageCacheManager';
+export type { CachedImage } from './ImageCacheManager';
+export { RequestDeduplicator } from './RequestDeduplicator';
+export { BackgroundTaskConfig, getAnimationSpeed, getNextAnalysisTime, getMillisecondsUntilNextAnalysis, shouldSync } from './BackgroundTaskConfig';

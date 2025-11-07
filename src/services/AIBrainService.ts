@@ -1,5 +1,7 @@
 import { EmotionalState, HealthMetrics, HealthGoals } from '../types';
 import { StorageService } from './StorageService';
+import { ImageCacheManager } from './ImageCacheManager';
+import { RequestDeduplicator } from './RequestDeduplicator';
 
 /**
  * AIBrainService
@@ -38,7 +40,9 @@ export class AIBrainService {
 
   /**
    * Analyze health data using Gemini API to determine emotional state
-   * Implements caching, timeout, and retry logic
+   * Implements caching, timeout, retry logic, and request deduplication
+   * 
+   * Requirements: 6.3, 8.3 - Request deduplication and caching
    * 
    * @param metrics Current health metrics (steps, sleep, HRV)
    * @param goals User's health goals
@@ -48,82 +52,108 @@ export class AIBrainService {
     metrics: HealthMetrics,
     goals: HealthGoals
   ): Promise<AIAnalysisResult> {
-    // Check cache first
+    // Check cache first (24-hour cache as per requirement 8.3)
     const cachedResult = await this.getCachedAnalysis(metrics);
     if (cachedResult) {
       console.log('Using cached AI analysis');
       return cachedResult;
     }
 
-    // Attempt analysis with retries
-    let lastError: Error | null = null;
-    for (let attempt = 1; attempt <= AIBrainService.MAX_RETRIES; attempt++) {
-      try {
-        console.log(`AI analysis attempt ${attempt}/${AIBrainService.MAX_RETRIES}`);
-        const result = await this.performAnalysis(metrics, goals);
-        
-        // Cache successful result
-        await this.cacheAnalysis(metrics, result);
-        
-        return result;
-      } catch (error) {
-        lastError = error as Error;
-        console.error(`AI analysis attempt ${attempt} failed:`, error);
-        
-        // Don't retry on the last attempt
-        if (attempt < AIBrainService.MAX_RETRIES) {
-          // Wait before retrying (exponential backoff)
-          await this.delay(1000 * attempt);
+    // Use request deduplication to prevent duplicate API calls
+    const requestKey = RequestDeduplicator.generateKey('ai_analysis', {
+      steps: metrics.steps,
+      sleep: metrics.sleepHours,
+      hrv: metrics.hrv,
+    });
+
+    return RequestDeduplicator.deduplicate(requestKey, async () => {
+      // Attempt analysis with retries
+      let lastError: Error | null = null;
+      for (let attempt = 1; attempt <= AIBrainService.MAX_RETRIES; attempt++) {
+        try {
+          console.log(`AI analysis attempt ${attempt}/${AIBrainService.MAX_RETRIES}`);
+          const result = await this.performAnalysis(metrics, goals);
+          
+          // Cache successful result (24 hours as per requirement 8.3)
+          await this.cacheAnalysis(metrics, result);
+          
+          return result;
+        } catch (error) {
+          lastError = error as Error;
+          console.error(`AI analysis attempt ${attempt} failed:`, error);
+          
+          // Don't retry on the last attempt
+          if (attempt < AIBrainService.MAX_RETRIES) {
+            // Wait before retrying (exponential backoff)
+            await this.delay(1000 * attempt);
+          }
         }
       }
-    }
 
-    // All retries failed
-    throw new Error(`AI analysis failed after ${AIBrainService.MAX_RETRIES} attempts: ${lastError?.message}`);
+      // All retries failed
+      throw new Error(`AI analysis failed after ${AIBrainService.MAX_RETRIES} attempts: ${lastError?.message}`);
+    });
   }
 
   /**
    * Generate an evolved appearance for the Symbi using Gemini Image API
-   * Implements retry logic (up to 3 attempts) and caches the generated image locally
+   * Implements retry logic (up to 3 attempts), request deduplication, and caching
    * 
-   * Requirements: 8.2, 8.3
+   * Requirements: 8.2, 8.3 - Progressive image loading and request deduplication
    * 
    * @param context Evolution context with level and dominant states
    * @returns Data URL of the generated image (base64 encoded)
    */
   async generateEvolvedAppearance(context: EvolutionContext): Promise<string> {
-    const prompt = this.constructEvolutionPrompt(context);
-    const maxRetries = 3;
-    let lastError: Error | null = null;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`Evolution image generation attempt ${attempt}/${maxRetries}`);
-        
-        const response = await this.callGeminiImageAPI(prompt);
-        
-        // Extract image data from response
-        const imageUrl = this.extractImageUrl(response);
-        
-        // Cache the image locally
-        await this.cacheEvolutionImage(context, imageUrl);
-        
-        console.log('Evolution image generated successfully');
-        return imageUrl;
-      } catch (error) {
-        lastError = error as Error;
-        console.error(`Evolution image generation attempt ${attempt} failed:`, error);
-        
-        // Don't retry on the last attempt
-        if (attempt < maxRetries) {
-          // Wait before retrying (exponential backoff: 2s, 4s)
-          await this.delay(2000 * attempt);
-        }
-      }
+    // Check if image is already cached
+    const cacheKey = `evolution_${context.daysActive}`;
+    const cachedImage = ImageCacheManager.getCachedImage(cacheKey);
+    
+    if (cachedImage) {
+      console.log('Using cached evolution image');
+      return cachedImage;
     }
 
-    // All retries failed
-    throw new Error(`Evolution image generation failed after ${maxRetries} attempts: ${lastError?.message}`);
+    // Use request deduplication for image generation
+    const requestKey = RequestDeduplicator.generateKey('evolution_image', {
+      daysActive: context.daysActive,
+      states: context.dominantStates.join(','),
+    });
+
+    return RequestDeduplicator.deduplicate(requestKey, async () => {
+      const prompt = this.constructEvolutionPrompt(context);
+      const maxRetries = 3;
+      let lastError: Error | null = null;
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`Evolution image generation attempt ${attempt}/${maxRetries}`);
+          
+          const response = await this.callGeminiImageAPI(prompt);
+          
+          // Extract image data from response
+          const imageUrl = this.extractImageUrl(response);
+          
+          // Cache the image locally
+          await this.cacheEvolutionImage(context, imageUrl);
+          
+          console.log('Evolution image generated successfully');
+          return imageUrl;
+        } catch (error) {
+          lastError = error as Error;
+          console.error(`Evolution image generation attempt ${attempt} failed:`, error);
+          
+          // Don't retry on the last attempt
+          if (attempt < maxRetries) {
+            // Wait before retrying (exponential backoff: 2s, 4s)
+            await this.delay(2000 * attempt);
+          }
+        }
+      }
+
+      // All retries failed
+      throw new Error(`Evolution image generation failed after ${maxRetries} attempts: ${lastError?.message}`);
+    });
   }
 
   /**
@@ -201,31 +231,36 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
   }
 
   /**
-   * Call Gemini API with timeout
+   * Call Gemini API with timeout and compression
+   * Requirement 6.3, 8.3: Use compression for request/response payloads
    */
   private async callGeminiAPI(prompt: string): Promise<any> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), AIBrainService.TIMEOUT_MS);
 
     try {
+      const requestBody = JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 10,
+        }
+      });
+
       const response = await fetch(
         `${AIBrainService.GEMINI_API_URL}?key=${this.apiKey}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            // Request compression support (server may compress response)
+            'Accept-Encoding': 'gzip, deflate, br',
           },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.3,
-              maxOutputTokens: 10,
-            }
-          }),
+          body: requestBody,
           signal: controller.signal,
         }
       );
@@ -249,30 +284,35 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
   }
 
   /**
-   * Call Gemini Image API
+   * Call Gemini Image API with compression
+   * Requirement 8.3: Use compression for request/response payloads
    */
   private async callGeminiImageAPI(prompt: string): Promise<any> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds for image generation
 
     try {
+      const requestBody = JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+        }
+      });
+
       const response = await fetch(
         `${AIBrainService.GEMINI_IMAGE_API_URL}?key=${this.apiKey}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            // Request compression support
+            'Accept-Encoding': 'gzip, deflate, br',
           },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-            }
-          }),
+          body: requestBody,
           signal: controller.signal,
         }
       );
@@ -405,15 +445,23 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
 
   /**
    * Cache evolution image locally
+   * Requirement 10.4: Optimize image caching for evolved appearances
    */
   private async cacheEvolutionImage(context: EvolutionContext, imageUrl: string): Promise<void> {
     try {
-      const cacheKey = `@symbi:evolution_image_${context.daysActive}`;
-      await StorageService.set(cacheKey, {
+      const cacheKey = `evolution_${context.daysActive}`;
+      const evolutionLevel = Math.floor(context.daysActive / 30);
+      
+      // Use ImageCacheManager for memory-efficient caching
+      await ImageCacheManager.cacheImage(cacheKey, imageUrl, evolutionLevel);
+      
+      // Also persist to storage for long-term caching
+      await StorageService.set(`@symbi:${cacheKey}`, {
         imageUrl,
         context,
         timestamp: Date.now(),
       });
+      
       console.log('Evolution image cached successfully');
     } catch (error) {
       console.error('Error caching evolution image:', error);

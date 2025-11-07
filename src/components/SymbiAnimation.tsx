@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ViewStyle, Animated, AppState, AppStateStatus } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { EmotionalState } from '../types';
+import { getAnimationSpeed } from '../services/BackgroundTaskConfig';
 
 /**
  * SymbiAnimation Component
@@ -62,6 +63,12 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
   // Preload animations on component mount
   useEffect(() => {
     preloadAnimations();
+    
+    // Cleanup on unmount to prevent memory leaks
+    return () => {
+      // Clear frame cache
+      frameCache.current.clear();
+    };
   }, []);
 
   // Monitor app state for performance optimization
@@ -75,15 +82,21 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
 
   /**
    * Handle app state changes to optimize performance
+   * Requirement 10.3: Reduce animation frame rate when backgrounded (10 FPS)
    * Reduces frame rate when app is backgrounded to save battery
    */
   const handleAppStateChange = (nextAppState: AppStateStatus) => {
-    if (appState.match(/active/) && nextAppState === 'background') {
+    const isBackground = nextAppState === 'background' || nextAppState === 'inactive';
+    const newSpeed = getAnimationSpeed(isBackground);
+    
+    if (appState.match(/active/) && isBackground) {
       // App moved to background - throttle to 10 FPS
-      setSpeed(0.33); // 10 FPS = 30 FPS * 0.33
+      setSpeed(newSpeed);
+      console.log('Animation throttled to 10 FPS for battery saving');
     } else if (appState.match(/inactive|background/) && nextAppState === 'active') {
       // App moved to foreground - restore normal speed
-      setSpeed(1.0);
+      setSpeed(newSpeed);
+      console.log('Animation restored to normal speed');
     }
     
     setAppState(nextAppState);
@@ -99,17 +112,20 @@ export const SymbiAnimation: React.FC<SymbiAnimationProps> = ({
 
   /**
    * Preload all animations to improve performance
+   * Requirement 10.4: Implement Lottie animation preloading and caching
    * This ensures smooth transitions without loading delays
    * Also initializes frame cache for frequently used states
    */
   const preloadAnimations = () => {
     // In React Native, requiring the animations already loads them
     // Initialize cache for Phase 1 states (most frequently used)
+    // Limit cache to 3 most common states to keep memory usage low
     frameCache.current.set(EmotionalState.SAD, ANIMATION_SOURCES[EmotionalState.SAD]);
     frameCache.current.set(EmotionalState.RESTING, ANIMATION_SOURCES[EmotionalState.RESTING]);
     frameCache.current.set(EmotionalState.ACTIVE, ANIMATION_SOURCES[EmotionalState.ACTIVE]);
     
     setIsPreloaded(true);
+    console.log('Animations preloaded and cached (3 states)');
   };
 
   /**

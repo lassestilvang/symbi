@@ -1,6 +1,7 @@
 import { Platform, AppState, AppStateStatus } from 'react-native';
 import { HealthDataType } from '../types';
 import { createHealthDataService } from './HealthDataService';
+import { BackgroundTaskConfig, shouldSync } from './BackgroundTaskConfig';
 
 /**
  * BackgroundSyncService manages background data synchronization
@@ -12,9 +13,11 @@ export class BackgroundSyncService {
   private syncInterval: NodeJS.Timeout | null = null;
   private appStateSubscription: any = null;
   private isActive = false;
-
-  // Minimum interval between syncs (15 minutes in milliseconds)
-  private static readonly MIN_SYNC_INTERVAL = 15 * 60 * 1000;
+  private lastSyncTime = 0;
+  
+  // Battery optimization: Batch API calls to minimize wake-ups
+  private pendingUpdates: Map<HealthDataType, any> = new Map();
+  private batchTimer: NodeJS.Timeout | null = null;
 
   private constructor() {
     this.setupAppStateListener();
@@ -29,6 +32,7 @@ export class BackgroundSyncService {
 
   /**
    * Start background sync for health data
+   * Requirement 10.1, 10.2: Efficient background fetch with batching
    */
   async startBackgroundSync(
     dataTypes: HealthDataType[],
@@ -41,17 +45,18 @@ export class BackgroundSyncService {
 
     this.isActive = true;
 
-    // Subscribe to updates for each data type
+    // Subscribe to updates for each data type with batching
     dataTypes.forEach((dataType) => {
       this.healthService.subscribeToUpdates(dataType, (data) => {
-        onUpdate(dataType, data);
+        // Batch updates to minimize wake-ups (Requirement 10.2)
+        this.batchUpdate(dataType, data, onUpdate);
       });
     });
 
     // Set up periodic sync
     this.setupPeriodicSync(dataTypes, onUpdate);
 
-    console.log('Background sync started');
+    console.log('Background sync started with battery optimization');
   }
 
   /**
@@ -68,12 +73,19 @@ export class BackgroundSyncService {
       this.syncInterval = null;
     }
 
+    // Clear batch timer
+    if (this.batchTimer) {
+      clearTimeout(this.batchTimer);
+      this.batchTimer = null;
+    }
+
     // Unsubscribe from all updates
     Object.values(HealthDataType).forEach((dataType) => {
       this.healthService.unsubscribeFromUpdates(dataType);
     });
 
     this.isActive = false;
+    this.pendingUpdates.clear();
 
     console.log('Background sync stopped');
   }
@@ -142,6 +154,7 @@ export class BackgroundSyncService {
 
   /**
    * Set up periodic sync using JavaScript interval
+   * Requirement 10.1: Configure background fetch intervals (15 minutes minimum)
    * Note: This only works when app is in foreground or background (not terminated)
    */
   private setupPeriodicSync(
@@ -153,13 +166,20 @@ export class BackgroundSyncService {
       clearInterval(this.syncInterval);
     }
 
-    // Set up new interval
+    // Set up new interval with minimum 15-minute interval
     this.syncInterval = setInterval(async () => {
+      // Check if enough time has passed since last sync
+      if (!shouldSync(this.lastSyncTime)) {
+        console.log('Skipping sync - minimum interval not reached');
+        return;
+      }
+
       if (AppState.currentState !== 'active') {
         // Only sync when app is not in foreground to save battery
         await this.triggerSync(dataTypes, onUpdate);
+        this.lastSyncTime = Date.now();
       }
-    }, BackgroundSyncService.MIN_SYNC_INTERVAL);
+    }, BackgroundTaskConfig.MIN_FETCH_INTERVAL_MS);
 
     // Configure platform-specific background fetch
     this.configureIOSBackgroundFetch();
@@ -187,6 +207,43 @@ export class BackgroundSyncService {
       // App went to background
       console.log('App went to background');
     }
+  }
+
+  /**
+   * Batch updates to minimize wake-ups and API calls
+   * Requirement 10.2: Batch API calls to minimize wake-ups
+   */
+  private batchUpdate(
+    dataType: HealthDataType,
+    data: any,
+    onUpdate: (dataType: HealthDataType, data: any) => void
+  ): void {
+    // Store the update
+    this.pendingUpdates.set(dataType, data);
+
+    // Clear existing timer
+    if (this.batchTimer) {
+      clearTimeout(this.batchTimer);
+    }
+
+    // Set new timer to process batched updates
+    this.batchTimer = setTimeout(() => {
+      this.processBatchedUpdates(onUpdate);
+    }, BackgroundTaskConfig.BATCH_DELAY_MS);
+  }
+
+  /**
+   * Process all batched updates at once
+   */
+  private processBatchedUpdates(onUpdate: (dataType: HealthDataType, data: any) => void): void {
+    console.log(`Processing ${this.pendingUpdates.size} batched updates`);
+    
+    this.pendingUpdates.forEach((data, dataType) => {
+      onUpdate(dataType, data);
+    });
+
+    this.pendingUpdates.clear();
+    this.batchTimer = null;
   }
 
   /**
