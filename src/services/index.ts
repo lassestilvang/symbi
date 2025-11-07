@@ -22,3 +22,13 @@ export { InteractiveSessionManager, SessionType } from './InteractiveSessionMana
 export type { SessionResult } from './InteractiveSessionManager';
 export { EvolutionSystem } from './EvolutionSystem';
 export type { EvolutionEligibility, EvolutionResult } from './EvolutionSystem';
+
+// Cloud Sync Services
+export { AuthService } from './AuthService';
+export type { AuthUser, AuthResult } from './AuthService';
+export { CloudSyncService } from './CloudSyncService';
+export type { SyncStatus, SyncOptions } from './CloudSyncService';
+export { CloudAPIService } from './CloudAPIService';
+export type { CloudSyncData, SyncResult } from './CloudAPIService';
+export { firebaseConfig, isFirebaseConfigured } from './FirebaseConfig';
+export type { FirebaseConfig } from './FirebaseConfig';

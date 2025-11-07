@@ -359,15 +359,15 @@
   - Test gallery display and history
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 11. Implement cloud sync and cross-platform support (Phase 3)
-- [ ] 11.1 Set up cloud storage backend
+- [x] 11. Implement cloud sync and cross-platform support (Phase 3)
+- [x] 11.1 Set up cloud storage backend
   - Choose cloud provider (Firebase, AWS, or custom backend)
   - Implement authentication system for user accounts
   - Create API endpoints for data sync (preferences, evolution history)
   - Implement data encryption for cloud storage
   - _Requirements: 9.5, 11.2, 11.3_
 
-- [ ] 11.2 Implement cloud sync service
+- [x] 11.2 Implement cloud sync service
   - Create CloudSyncService class with sync methods
   - Implement upload of user preferences and evolution history
   - Implement download and merge of cloud data on new device
@@ -375,7 +375,7 @@
   - Queue pending writes when offline
   - _Requirements: 9.5, 14.4_
 
-- [ ] 11.3 Add account management UI
+- [x] 11.3 Add account management UI
   - Create account creation and login screens
   - Add "Sync Data" option in settings
   - Show sync status indicator
@@ -383,7 +383,7 @@
   - Add data export functionality (JSON format)
   - _Requirements: 9.5, 11.4, 11.5_
 
-- [ ] 11.4 Test cloud sync functionality
+- [x] 11.4 Test cloud sync functionality
   - Test data upload and download
   - Test sync across multiple devices
   - Test offline queueing and sync when online

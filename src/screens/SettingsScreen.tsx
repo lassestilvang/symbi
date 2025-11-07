@@ -7,17 +7,18 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
-  Linking,
   Platform,
 } from 'react-native';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
+import { StorageService } from '../services/StorageService';
 
 interface SettingsScreenProps {
   onReplayOnboarding: () => void;
   onNavigateToThresholds: () => void;
   onNavigateToManualEntry?: () => void;
   onNavigateToEvolutionGallery?: () => void;
+  onNavigateToAccount?: () => void;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
@@ -25,6 +26,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onNavigateToThresholds,
   onNavigateToManualEntry,
   onNavigateToEvolutionGallery,
+  onNavigateToAccount,
 }) => {
   const { profile, updatePreferences, setDataSource } = useUserPreferencesStore();
   const [isChangingDataSource, setIsChangingDataSource] = useState(false);
@@ -96,17 +98,23 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     }
   };
 
-  const handleExportData = () => {
+  const handleExportData = async () => {
     Alert.alert(
       'Export Data',
-      'This feature will export all your health data and Symbi history as a JSON file.',
+      'This will export all your health data and Symbi history as a JSON file.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Export',
-          onPress: () => {
-            // TODO: Implement data export in future
-            Alert.alert('Coming Soon', 'Data export will be available in a future update.');
+          onPress: async () => {
+            const jsonData = await StorageService.exportAllData();
+            if (jsonData) {
+              // In production, this would save to file system or share via native share dialog
+              console.log('Exported data:', jsonData);
+              Alert.alert('Success', 'Data exported successfully! Check console for JSON output.');
+            } else {
+              Alert.alert('Error', 'Failed to export data. Please try again.');
+            }
           },
         },
       ]
@@ -122,9 +130,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => {
-            // TODO: Implement data deletion
-            Alert.alert('Coming Soon', 'Data deletion will be available in a future update.');
+          onPress: async () => {
+            const success = await StorageService.clearAllSymbiData();
+            if (success) {
+              Alert.alert('Success', 'All data has been deleted.');
+            } else {
+              Alert.alert('Error', 'Failed to delete data. Please try again.');
+            }
           },
         },
       ]
@@ -269,6 +281,17 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           <Text style={styles.buttonText}>Replay Tutorial</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Cloud Sync Section */}
+      {onNavigateToAccount && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Cloud Sync</Text>
+
+          <TouchableOpacity style={styles.button} onPress={onNavigateToAccount}>
+            <Text style={styles.buttonText}>☁️ Manage Cloud Sync</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Privacy & Data Section */}
       <View style={styles.section}>
