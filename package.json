@@ -12,13 +12,15 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "pre-submit": "bash scripts/pre-submission-tests.sh"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/native": "^7.1.19",
     "@react-navigation/native-stack": "^7.6.2",
+    "@sentry/react-native": "^7.5.0",
     "expo": "~54.0.22",
     "expo-crypto": "^15.0.7",
     "expo-file-system": "^19.0.17",

@@ -458,8 +458,8 @@
   - Test animation frame rates on low-end devices
   - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-- [ ] 14. Prepare for app store submission
-- [ ] 14.1 Configure iOS App Store metadata
+- [x] 14. Prepare for app store submission
+- [x] 14.1 Configure iOS App Store metadata
   - Add HealthKit entitlement to app capabilities
   - Prepare app screenshots showing health data usage
   - Write app description highlighting privacy and features
@@ -467,7 +467,7 @@
   - Add privacy policy URL to App Store Connect
   - _Requirements: 11.1, 13.1, 13.2_
 
-- [ ] 14.2 Configure Google Play Store metadata
+- [x] 14.2 Configure Google Play Store metadata
   - Integrate Health Connect for Android 14+
   - Complete Data Safety section in Play Console
   - Prepare app screenshots and feature graphic
@@ -476,7 +476,7 @@
   - Add privacy policy URL to Play Console
   - _Requirements: 11.1, 13.1, 13.2_
 
-- [ ] 14.3 Set up crash reporting and monitoring
+- [x] 14.3 Set up crash reporting and monitoring
   - Integrate Sentry or Firebase Crashlytics
   - Configure automatic crash reporting
   - Implement breadcrumb logging for debugging
@@ -484,14 +484,14 @@
   - Set up alerts for critical errors (>1% crash rate)
   - _Requirements: 14.5_
 
-- [ ] 14.4 Create app store preview materials
+- [x] 14.4 Create app store preview materials
   - Record demo video showing onboarding and core features
   - Design app icon with Symbi ghost character
   - Create promotional graphics for app stores
   - Write release notes for initial version
   - _Requirements: 13.1, 13.2_
 
-- [ ] 14.5 Perform final QA and testing
+- [x] 14.5 Perform final QA and testing
   - Test complete user journey from install to evolution
   - Test on multiple iOS devices (iPhone 12+, various iOS versions)
   - Test on multiple Android devices (Pixel, Samsung, various Android versions)

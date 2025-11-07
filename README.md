@@ -60,6 +60,22 @@ npm run lint
 
 # Format code
 npm run format
+
+# Run pre-submission tests
+npm run pre-submit
+```
+
+### Testing
+
+```bash
+# Run unit tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
 ```
 
 ### Tech Stack
@@ -91,6 +107,38 @@ npm run format
 - Guided wellness activities
 - Generative evolution system
 - Cloud sync and cross-platform support
+
+## App Store Submission
+
+Symbi is ready for submission to the Apple App Store and Google Play Store. See the comprehensive documentation in `docs/app-store/`:
+
+- **Quick Start**: [docs/app-store/QUICK-REFERENCE.md](docs/app-store/QUICK-REFERENCE.md)
+- **Full Guide**: [docs/app-store/submission-guide.md](docs/app-store/submission-guide.md)
+- **iOS Metadata**: [docs/app-store/ios-metadata.md](docs/app-store/ios-metadata.md)
+- **Android Metadata**: [docs/app-store/android-metadata.md](docs/app-store/android-metadata.md)
+- **QA Checklist**: [docs/qa-testing-checklist.md](docs/qa-testing-checklist.md)
+
+### Pre-Submission
+
+Before submitting, run the automated checks:
+
+```bash
+npm run pre-submit
+```
+
+### Key Requirements
+
+- **iOS**: HealthKit entitlement, privacy policy, screenshots
+- **Android**: Health Connect/Google Fit permissions, Data Safety section, feature graphic
+- **Both**: Privacy policy hosted at https://symbi.app/privacy-policy
+
+## Monitoring
+
+Crash reporting and monitoring is configured with Sentry:
+
+- **Setup Guide**: [docs/crash-reporting-setup.md](docs/crash-reporting-setup.md)
+- **Service**: `src/services/ErrorReportingService.ts`
+- **Privacy**: Health data is automatically sanitized from error reports
 
 ## License
 
