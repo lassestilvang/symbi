@@ -4,22 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingFlow } from '../screens/onboarding';
 import { ManualEntryScreen } from '../screens/ManualEntryScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { MainScreen } from '../screens/MainScreen';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { ThresholdConfigScreen } from '../components/ThresholdConfigScreen';
 
 const Stack = createNativeStackNavigator();
-
-// Placeholder for main screen (will be implemented in task 7)
-const MainScreen = () => {
-  return (
-    <View style={styles.placeholder}>
-      <Text style={styles.placeholderText}>🎃 Symbi</Text>
-      <Text style={styles.placeholderSubtext}>Main screen coming soon...</Text>
-    </View>
-  );
-};
 
 export const AppNavigator: React.FC = () => {
   const { profile, isInitialized, initializeProfile, setDataSource } = useUserPreferencesStore();
@@ -136,22 +127,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 16,
-    color: '#a78bfa',
-  },
-  placeholder: {
-    flex: 1,
-    backgroundColor: '#1a1a2e',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderText: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#9333ea',
-    marginBottom: 8,
-  },
-  placeholderSubtext: {
     fontSize: 16,
     color: '#a78bfa',
   },

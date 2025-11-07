@@ -170,8 +170,8 @@
   - Add privacy policy and data export links
   - _Requirements: 2.4, 3.5, 13.5, 11.5_
 
-- [ ] 7. Implement main app screen and daily update flow
-- [ ] 7.1 Create main Symbi screen UI
+- [x] 7. Implement main app screen and daily update flow
+- [x] 7.1 Create main Symbi screen UI
   - Design main screen layout with Symbi animation centered
   - Add step count display and progress bar
   - Add current emotional state label
@@ -179,7 +179,7 @@
   - Implement responsive layout for various screen sizes
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 7.2 Implement daily health data update cycle
+- [x] 7.2 Implement daily health data update cycle
   - Fetch step count on app launch
   - Calculate emotional state using EmotionalStateCalculator
   - Update UI with new state and trigger animation transition
@@ -187,21 +187,21 @@
   - Handle errors gracefully with fallback to cached data
   - _Requirements: 1.5, 4.1, 4.2, 4.3, 14.1, 14.2_
 
-- [ ] 7.3 Implement background update handling
+- [x] 7.3 Implement background update handling
   - Listen for health data update callbacks from HealthDataService
   - Update emotional state when new data arrives
   - Show subtle notification or animation when state changes
   - Ensure updates don't drain battery (max 5% per 24 hours)
   - _Requirements: 1.5, 10.2, 10.4_
 
-- [ ] 7.4 Add error handling and offline support
+- [x] 7.4 Add error handling and offline support
   - Display friendly error messages for permission issues
   - Show "Waiting for today's data" when no data available
   - Use cached data when health data fetch fails
   - Display offline indicator when no internet connection
   - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
-- [ ] 7.5 Perform end-to-end testing of Phase 1 MVP
+- [x] 7.5 Perform end-to-end testing of Phase 1 MVP
   - Test fresh install through onboarding to main screen
   - Test permission grant and denial flows
   - Test manual entry mode

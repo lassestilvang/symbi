@@ -3,7 +3,8 @@ import { EmotionalStateCalculator } from './EmotionalStateCalculator';
 import { StorageService } from './StorageService';
 import { useSymbiStateStore } from '../stores/symbiStateStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
-import { EmotionalState, HealthDataCache, HealthDataType } from '../types';
+import { useHealthDataStore } from '../stores/healthDataStore';
+import { EmotionalState, HealthDataCache, HealthDataType, HealthMetrics } from '../types';
 
 /**
  * HealthDataUpdateService
@@ -44,8 +45,12 @@ export class HealthDataUpdateService {
 
       if (!this.healthDataService) {
         console.error('Health data service not initialized');
-        return;
+        throw new Error('Health data service not initialized');
       }
+
+      // Set loading state
+      const healthStore = useHealthDataStore.getState();
+      healthStore.setLoading(true);
 
       // Get today's date range
       const today = new Date();
@@ -68,42 +73,35 @@ export class HealthDataUpdateService {
         thresholds
       );
 
-      // Update Zustand store
+      // Create health metrics
+      const metrics: HealthMetrics = { steps };
+
+      // Update health data store
+      await healthStore.updateHealthData(metrics, emotionalState, 'rule-based');
+
+      // Update Symbi state store with transition animation
       const symbiStore = useSymbiStateStore.getState();
       await symbiStore.transitionToState(emotionalState);
 
-      // Cache health data and emotional state
-      await this.cacheHealthData(today, steps, emotionalState);
+      // Clear loading state
+      healthStore.setLoading(false);
 
       console.log(`Health data updated: ${steps} steps → ${emotionalState} state`);
     } catch (error) {
       console.error('Error updating daily health data:', error);
       
+      // Set error state
+      const healthStore = useHealthDataStore.getState();
+      healthStore.setLoading(false);
+      
       // Fallback to cached data
       await this.loadCachedHealthData();
+      
+      throw error;
     }
   }
 
-  /**
-   * Cache health data and emotional state to AsyncStorage
-   */
-  private static async cacheHealthData(
-    date: Date,
-    steps: number,
-    emotionalState: EmotionalState
-  ): Promise<void> {
-    const dateKey = this.getDateKey(date);
-    
-    const cacheEntry: HealthDataCache = {
-      date: dateKey,
-      steps,
-      emotionalState,
-      calculationMethod: 'rule-based',
-      lastUpdated: new Date(),
-    };
 
-    await StorageService.addHealthDataEntry(dateKey, cacheEntry);
-  }
 
   /**
    * Load cached health data when fresh data is unavailable
@@ -111,7 +109,10 @@ export class HealthDataUpdateService {
   private static async loadCachedHealthData(): Promise<void> {
     try {
       const cache = await StorageService.getHealthDataCache();
-      if (!cache) return;
+      if (!cache) {
+        console.log('No cached health data available');
+        return;
+      }
 
       // Get today's or most recent cached data
       const today = this.getDateKey(new Date());
@@ -126,11 +127,22 @@ export class HealthDataUpdateService {
       }
 
       if (cacheEntry) {
-        // Update store with cached state
+        // Update health data store with cached data
+        const healthStore = useHealthDataStore.getState();
+        const metrics: HealthMetrics = {
+          steps: cacheEntry.steps,
+          sleepHours: cacheEntry.sleepHours,
+          hrv: cacheEntry.hrv,
+        };
+        
+        healthStore.setHealthMetrics(metrics);
+        healthStore.setEmotionalState(cacheEntry.emotionalState, cacheEntry.calculationMethod);
+        
+        // Update Symbi state store
         const symbiStore = useSymbiStateStore.getState();
         symbiStore.setEmotionalState(cacheEntry.emotionalState);
         
-        console.log(`Loaded cached health data: ${cacheEntry.emotionalState} state`);
+        console.log(`Loaded cached health data: ${cacheEntry.steps} steps → ${cacheEntry.emotionalState} state`);
       }
     } catch (error) {
       console.error('Error loading cached health data:', error);
