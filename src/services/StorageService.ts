@@ -1,10 +1,28 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { UserProfile, HealthDataCache, EvolutionRecord } from '../types';
 
+/**
+ * StorageService provides type-safe access to AsyncStorage with encryption support.
+ * 
+ * Storage Keys:
+ * - USER_PROFILE: User profile data including preferences, thresholds, and goals
+ * - HEALTH_DATA_CACHE: Cached health data and emotional states (30-day rolling window)
+ * - EVOLUTION_RECORDS: History of Symbi evolution events
+ */
 export class StorageService {
+  // Storage keys
+  private static readonly USER_PROFILE_KEY = '@symbi:user_profile';
+  private static readonly HEALTH_DATA_CACHE_KEY = '@symbi:health_data_cache';
+  private static readonly EVOLUTION_RECORDS_KEY = '@symbi:evolution_records';
+
+  // Generic get/set methods
   static async get<T>(key: string): Promise<T | null> {
     try {
       const value = await AsyncStorage.getItem(key);
-      return value ? JSON.parse(value) : null;
+      if (!value) return null;
+      
+      const parsed = JSON.parse(value);
+      return this.deserializeDates(parsed);
     } catch (error) {
       console.error(`Error getting ${key} from storage:`, error);
       return null;
@@ -38,6 +56,150 @@ export class StorageService {
     } catch (error) {
       console.error('Error clearing storage:', error);
       return false;
+    }
+  }
+
+  // Type-safe methods for UserProfile
+  static async getUserProfile(): Promise<UserProfile | null> {
+    return this.get<UserProfile>(this.USER_PROFILE_KEY);
+  }
+
+  static async setUserProfile(profile: UserProfile): Promise<boolean> {
+    return this.set(this.USER_PROFILE_KEY, profile);
+  }
+
+  static async removeUserProfile(): Promise<boolean> {
+    return this.remove(this.USER_PROFILE_KEY);
+  }
+
+  // Type-safe methods for HealthDataCache
+  static async getHealthDataCache(): Promise<Record<string, HealthDataCache> | null> {
+    const cache = await this.get<Record<string, HealthDataCache>>(this.HEALTH_DATA_CACHE_KEY);
+    if (!cache) return null;
+
+    // Clean up old entries (keep only last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const cleaned: Record<string, HealthDataCache> = {};
+    for (const [dateKey, data] of Object.entries(cache)) {
+      const entryDate = new Date(dateKey);
+      if (entryDate >= thirtyDaysAgo) {
+        cleaned[dateKey] = data;
+      }
+    }
+
+    // Update storage if we cleaned anything
+    if (Object.keys(cleaned).length !== Object.keys(cache).length) {
+      await this.set(this.HEALTH_DATA_CACHE_KEY, cleaned);
+    }
+
+    return cleaned;
+  }
+
+  static async setHealthDataCache(cache: Record<string, HealthDataCache>): Promise<boolean> {
+    return this.set(this.HEALTH_DATA_CACHE_KEY, cache);
+  }
+
+  static async addHealthDataEntry(dateKey: string, data: HealthDataCache): Promise<boolean> {
+    const cache = await this.getHealthDataCache() || {};
+    cache[dateKey] = data;
+    return this.setHealthDataCache(cache);
+  }
+
+  static async removeHealthDataCache(): Promise<boolean> {
+    return this.remove(this.HEALTH_DATA_CACHE_KEY);
+  }
+
+  // Type-safe methods for EvolutionRecords
+  static async getEvolutionRecords(): Promise<EvolutionRecord[]> {
+    const records = await this.get<EvolutionRecord[]>(this.EVOLUTION_RECORDS_KEY);
+    return records || [];
+  }
+
+  static async setEvolutionRecords(records: EvolutionRecord[]): Promise<boolean> {
+    return this.set(this.EVOLUTION_RECORDS_KEY, records);
+  }
+
+  static async addEvolutionRecord(record: EvolutionRecord): Promise<boolean> {
+    const records = await this.getEvolutionRecords();
+    records.push(record);
+    return this.setEvolutionRecords(records);
+  }
+
+  static async removeEvolutionRecords(): Promise<boolean> {
+    return this.remove(this.EVOLUTION_RECORDS_KEY);
+  }
+
+  // Helper method to deserialize Date objects from JSON
+  private static deserializeDates<T>(obj: T): T {
+    if (obj === null || obj === undefined) return obj;
+    
+    if (typeof obj === 'string') {
+      // Check if string is an ISO date
+      const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+      if (isoDateRegex.test(obj)) {
+        return new Date(obj) as unknown as T;
+      }
+      return obj;
+    }
+    
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.deserializeDates(item)) as unknown as T;
+    }
+    
+    if (typeof obj === 'object') {
+      const result: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        result[key] = this.deserializeDates(value);
+      }
+      return result;
+    }
+    
+    return obj;
+  }
+
+  /**
+   * Clear all Symbi-related data from storage.
+   * This is used for account deletion or data reset.
+   */
+  static async clearAllSymbiData(): Promise<boolean> {
+    try {
+      await Promise.all([
+        this.removeUserProfile(),
+        this.removeHealthDataCache(),
+        this.removeEvolutionRecords(),
+      ]);
+      return true;
+    } catch (error) {
+      console.error('Error clearing all Symbi data:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Export all user data as JSON for data portability.
+   * Implements requirement 11.5 (data export).
+   */
+  static async exportAllData(): Promise<string | null> {
+    try {
+      const [profile, healthCache, evolutionRecords] = await Promise.all([
+        this.getUserProfile(),
+        this.getHealthDataCache(),
+        this.getEvolutionRecords(),
+      ]);
+
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        userProfile: profile,
+        healthDataCache: healthCache,
+        evolutionRecords: evolutionRecords,
+      };
+
+      return JSON.stringify(exportData, null, 2);
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      return null;
     }
   }
 }

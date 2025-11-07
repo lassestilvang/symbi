@@ -5,7 +5,7 @@ A Halloween-themed digital pet application that reflects your real-world health 
 ## Project Structure
 
 ```
-Symbi/
+/
 ├── src/
 │   ├── components/     # React components
 │   ├── services/       # Business logic and API services

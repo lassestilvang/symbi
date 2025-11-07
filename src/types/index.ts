@@ -1,5 +1,19 @@
-// Core type definitions for Symbi
+/**
+ * Core Type Definitions for Symbi
+ * 
+ * This file contains all TypeScript interfaces and enums used throughout the application.
+ * Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.4, 8.4
+ */
 
+// ============================================================================
+// Enums
+// ============================================================================
+
+/**
+ * EmotionalState represents the Symbi's current mood/state
+ * Phase 1: SAD, RESTING, ACTIVE
+ * Phase 2: VIBRANT, CALM, TIRED, STRESSED, ANXIOUS, RESTED
+ */
 export enum EmotionalState {
   // Phase 1 states
   SAD = 'sad',
@@ -15,6 +29,9 @@ export enum EmotionalState {
   RESTED = 'rested',
 }
 
+/**
+ * HealthDataType represents the types of health data we track
+ */
 export enum HealthDataType {
   STEPS = 'steps',
   SLEEP = 'sleep',
@@ -22,23 +39,31 @@ export enum HealthDataType {
   MINDFUL_MINUTES = 'mindful_minutes',
 }
 
+// ============================================================================
+// User Configuration Types
+// ============================================================================
+
+/**
+ * StepThresholds defines the step count boundaries for emotional state transitions
+ * Default: sadThreshold = 2000, activeThreshold = 8000
+ */
 export interface StepThresholds {
-  sadThreshold: number;
-  activeThreshold: number;
+  sadThreshold: number;      // Steps below this = SAD state
+  activeThreshold: number;   // Steps above this = ACTIVE state
 }
 
-export interface HealthMetrics {
-  steps: number;
-  sleepHours?: number;
-  hrv?: number;
-}
-
+/**
+ * HealthGoals defines the user's target health metrics
+ */
 export interface HealthGoals {
   targetSteps: number;
   targetSleepHours: number;
   targetHRV?: number;
 }
 
+/**
+ * UserPreferences stores user settings and preferences
+ */
 export interface UserPreferences {
   dataSource: 'healthkit' | 'googlefit' | 'manual';
   notificationsEnabled: boolean;
@@ -47,6 +72,9 @@ export interface UserPreferences {
   theme: 'light' | 'dark' | 'auto';
 }
 
+/**
+ * UserProfile is the complete user profile including preferences, thresholds, and goals
+ */
 export interface UserProfile {
   id: string;
   createdAt: Date;
@@ -57,8 +85,25 @@ export interface UserProfile {
   totalDaysActive: number;
 }
 
+// ============================================================================
+// Health Data Types
+// ============================================================================
+
+/**
+ * HealthMetrics represents the current health data values
+ */
+export interface HealthMetrics {
+  steps: number;
+  sleepHours?: number;
+  hrv?: number;
+}
+
+/**
+ * HealthDataCache stores daily health data with emotional state
+ * Cached for 30 days rolling window
+ */
 export interface HealthDataCache {
-  date: string;
+  date: string;              // ISO date string (YYYY-MM-DD)
   steps: number;
   sleepHours?: number;
   hrv?: number;
@@ -67,6 +112,13 @@ export interface HealthDataCache {
   lastUpdated: Date;
 }
 
+// ============================================================================
+// Evolution Types
+// ============================================================================
+
+/**
+ * EvolutionRecord tracks a single evolution event
+ */
 export interface EvolutionRecord {
   id: string;
   timestamp: Date;
@@ -75,3 +127,22 @@ export interface EvolutionRecord {
   daysInPositiveState: number;
   dominantStates: EmotionalState[];
 }
+
+// ============================================================================
+// Utility Types
+// ============================================================================
+
+/**
+ * DataSource type for health data providers
+ */
+export type DataSource = 'healthkit' | 'googlefit' | 'manual';
+
+/**
+ * CalculationMethod indicates how emotional state was determined
+ */
+export type CalculationMethod = 'rule-based' | 'ai';
+
+/**
+ * Theme options for the app
+ */
+export type Theme = 'light' | 'dark' | 'auto';
