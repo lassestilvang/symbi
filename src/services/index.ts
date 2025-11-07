@@ -14,3 +14,7 @@ export { HealthDataUpdateService } from './HealthDataUpdateService';
 export { BackgroundSyncService, getBackgroundSyncService } from './BackgroundSyncService';
 export { PermissionService } from './PermissionService';
 export type { PermissionResult } from './PermissionService';
+export { AIBrainService } from './AIBrainService';
+export type { AIAnalysisResult, EvolutionContext } from './AIBrainService';
+export { DailyAIAnalysisService, getDailyAIAnalysisService } from './DailyAIAnalysisService';
+export type { DailyAnalysisResult } from './DailyAIAnalysisService';

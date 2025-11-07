@@ -20,6 +20,8 @@ interface ManualEntryScreenProps {
 
 export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete }) => {
   const [stepCount, setStepCount] = useState('');
+  const [sleepHours, setSleepHours] = useState('');
+  const [hrv, setHrv] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { updateHealthData } = useHealthDataStore();
@@ -27,8 +29,10 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
 
   const handleSubmit = async () => {
     const steps = parseInt(stepCount, 10);
+    const sleep = sleepHours ? parseFloat(sleepHours) : undefined;
+    const hrvValue = hrv ? parseFloat(hrv) : undefined;
 
-    // Validate input
+    // Validate step count
     if (isNaN(steps)) {
       Alert.alert('Invalid Input', 'Please enter a valid number for step count.');
       return;
@@ -42,6 +46,24 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
       return;
     }
 
+    // Validate sleep hours if provided
+    if (sleep !== undefined && (isNaN(sleep) || sleep < 0 || sleep > 24)) {
+      Alert.alert(
+        'Invalid Range',
+        'Sleep hours must be between 0 and 24. Please enter a valid value.'
+      );
+      return;
+    }
+
+    // Validate HRV if provided
+    if (hrvValue !== undefined && (isNaN(hrvValue) || hrvValue < 0 || hrvValue > 200)) {
+      Alert.alert(
+        'Invalid Range',
+        'HRV must be between 0 and 200. Please enter a valid value.'
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -49,8 +71,14 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
       const manualService = new ManualHealthDataService();
       const today = new Date();
 
-      // Store the step count
+      // Store the health data
       await manualService.saveStepCount(steps, today);
+      if (sleep !== undefined) {
+        await manualService.saveSleepDuration(sleep, today);
+      }
+      if (hrvValue !== undefined) {
+        await manualService.saveHRV(hrvValue, today);
+      }
 
       // Calculate emotional state
       const thresholds = profile?.thresholds || {
@@ -60,13 +88,19 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
       const emotionalState = EmotionalStateCalculator.calculateStateFromSteps(steps, thresholds);
 
       // Update the health data store
-      await updateHealthData({ steps }, emotionalState, 'rule-based');
+      await updateHealthData(
+        { steps, sleepHours: sleep, hrv: hrvValue },
+        emotionalState,
+        'rule-based'
+      );
 
-      Alert.alert('Success', 'Your step count has been saved!', [
+      Alert.alert('Success', 'Your health data has been saved!', [
         {
           text: 'OK',
           onPress: () => {
             setStepCount('');
+            setSleepHours('');
+            setHrv('');
             if (onComplete) {
               onComplete();
             }
@@ -74,8 +108,8 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
         },
       ]);
     } catch (error) {
-      console.error('Error saving step count:', error);
-      Alert.alert('Error', 'Failed to save step count. Please try again.');
+      console.error('Error saving health data:', error);
+      Alert.alert('Error', 'Failed to save health data. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -87,25 +121,61 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Enter Your Steps</Text>
-        <Text style={styles.subtitle}>How many steps did you take today?</Text>
+        <Text style={styles.title}>Enter Your Health Data</Text>
+        <Text style={styles.subtitle}>Track your daily health metrics</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={stepCount}
-            onChangeText={setStepCount}
-            placeholder="0"
-            placeholderTextColor="#6b7280"
-            keyboardType="number-pad"
-            maxLength={6}
-            editable={!isSubmitting}
-          />
-          <Text style={styles.inputLabel}>steps</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputGroupLabel}>👟 Step Count (Required)</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={stepCount}
+              onChangeText={setStepCount}
+              placeholder="0"
+              placeholderTextColor="#6b7280"
+              keyboardType="number-pad"
+              maxLength={6}
+              editable={!isSubmitting}
+            />
+            <Text style={styles.inputLabel}>steps</Text>
+          </View>
+          <Text style={styles.rangeText}>Valid range: 0 - 100,000 steps</Text>
         </View>
 
-        <View style={styles.rangeInfo}>
-          <Text style={styles.rangeText}>Valid range: 0 - 100,000 steps</Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputGroupLabel}>😴 Sleep Duration (Optional)</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={sleepHours}
+              onChangeText={setSleepHours}
+              placeholder="0"
+              placeholderTextColor="#6b7280"
+              keyboardType="decimal-pad"
+              maxLength={4}
+              editable={!isSubmitting}
+            />
+            <Text style={styles.inputLabel}>hours</Text>
+          </View>
+          <Text style={styles.rangeText}>Valid range: 0 - 24 hours</Text>
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputGroupLabel}>❤️ Heart Rate Variability (Optional)</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={hrv}
+              onChangeText={setHrv}
+              placeholder="0"
+              placeholderTextColor="#6b7280"
+              keyboardType="decimal-pad"
+              maxLength={5}
+              editable={!isSubmitting}
+            />
+            <Text style={styles.inputLabel}>ms</Text>
+          </View>
+          <Text style={styles.rangeText}>Valid range: 0 - 200 ms</Text>
         </View>
 
         <TouchableOpacity
@@ -114,15 +184,15 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
           disabled={isSubmitting || !stepCount}
         >
           <Text style={styles.submitText}>
-            {isSubmitting ? 'Saving...' : 'Save Step Count'}
+            {isSubmitting ? 'Saving...' : 'Save Health Data'}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.tipBox}>
           <Text style={styles.tipTitle}>💡 Tip</Text>
           <Text style={styles.tipText}>
-            Check your phone's built-in health app to find your daily step count. Most smartphones
-            track steps automatically!
+            Check your phone's built-in health app to find your daily metrics. Most smartphones
+            track steps automatically, and some track sleep and HRV too!
           </Text>
         </View>
       </View>
@@ -151,38 +221,44 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#a78bfa',
-    marginBottom: 48,
+    marginBottom: 32,
     textAlign: 'center',
+  },
+  inputGroup: {
+    marginBottom: 24,
+  },
+  inputGroupLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#9333ea',
+    marginBottom: 12,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   input: {
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#9333ea',
     backgroundColor: '#2d2d44',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderRadius: 16,
-    minWidth: 200,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    minWidth: 150,
     textAlign: 'center',
   },
   inputLabel: {
-    fontSize: 20,
+    fontSize: 18,
     color: '#a78bfa',
     marginLeft: 12,
   },
-  rangeInfo: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
   rangeText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6b7280',
+    textAlign: 'center',
   },
   submitButton: {
     backgroundColor: '#9333ea',

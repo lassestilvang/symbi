@@ -461,7 +461,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         <Text style={styles.stateName}>{getStateName()}</Text>
       </View>
 
-      {/* Step Count Display */}
+      {/* Health Metrics Display */}
       <View style={styles.metricsContainer}>
         <View style={styles.metricCard}>
           <Text style={styles.metricLabel}>Steps Today</Text>
@@ -472,6 +472,31 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
             Goal: {thresholds.activeThreshold.toLocaleString()}
           </Text>
         </View>
+
+        {/* Phase 2: Sleep and HRV metrics */}
+        {(healthMetrics.sleepHours !== undefined || healthMetrics.hrv !== undefined) && (
+          <View style={styles.additionalMetricsRow}>
+            {healthMetrics.sleepHours !== undefined && (
+              <View style={styles.smallMetricCard}>
+                <Text style={styles.smallMetricIcon}>😴</Text>
+                <Text style={styles.smallMetricLabel}>Sleep</Text>
+                <Text style={styles.smallMetricValue}>
+                  {healthMetrics.sleepHours.toFixed(1)}h
+                </Text>
+              </View>
+            )}
+            
+            {healthMetrics.hrv !== undefined && (
+              <View style={styles.smallMetricCard}>
+                <Text style={styles.smallMetricIcon}>❤️</Text>
+                <Text style={styles.smallMetricLabel}>HRV</Text>
+                <Text style={styles.smallMetricValue}>
+                  {Math.round(healthMetrics.hrv)}ms
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </View>
 
       {/* Progress Bar */}
@@ -704,6 +729,36 @@ const styles = StyleSheet.create({
   metricSubtext: {
     fontSize: 14,
     color: '#6b7280',
+  },
+  additionalMetricsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
+  },
+  smallMetricCard: {
+    flex: 1,
+    backgroundColor: '#16213e',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#374151',
+  },
+  smallMetricIcon: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  smallMetricLabel: {
+    fontSize: 11,
+    color: '#a78bfa',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  smallMetricValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#9333EA',
   },
   progressContainer: {
     paddingHorizontal: 20,

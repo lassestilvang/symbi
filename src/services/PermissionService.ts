@@ -21,6 +21,7 @@ export interface PermissionResult {
 export class PermissionService {
   /**
    * Request health data permissions from the platform-specific health service
+   * Now includes Phase 2 permissions (sleep and HRV) by default
    * 
    * @returns PermissionResult indicating whether permissions were granted
    */
@@ -32,10 +33,10 @@ export class PermissionService {
       // Create the appropriate health data service
       const healthService = createHealthDataService(dataSource);
       
-      // Define the permissions we need
+      // Define the permissions we need (Phase 2: includes sleep and HRV)
       const permissions: HealthPermissions = {
-        read: [HealthDataType.STEPS],
-        write: [], // Phase 1 only needs read permissions
+        read: [HealthDataType.STEPS, HealthDataType.SLEEP, HealthDataType.HRV],
+        write: [], // Phase 2 only needs read permissions
       };
       
       // Initialize the service and request permissions
@@ -65,6 +66,7 @@ export class PermissionService {
 
   /**
    * Check if health data permissions have been granted
+   * Now checks Phase 2 permissions (sleep and HRV)
    * 
    * @returns AuthStatus indicating the current authorization state
    */
@@ -74,7 +76,7 @@ export class PermissionService {
       const healthService = createHealthDataService(dataSource);
       
       const permissions: HealthPermissions = {
-        read: [HealthDataType.STEPS],
+        read: [HealthDataType.STEPS, HealthDataType.SLEEP, HealthDataType.HRV],
         write: [],
       };
       

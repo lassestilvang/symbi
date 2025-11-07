@@ -31,6 +31,22 @@ export const PermissionRequestScreen: React.FC<PermissionRequestScreenProps> = (
           </Text>
         </View>
 
+        <View style={styles.permissionCard}>
+          <Text style={styles.permissionIcon}>😴</Text>
+          <Text style={styles.permissionTitle}>Sleep Data</Text>
+          <Text style={styles.permissionDescription}>
+            We use your sleep data to know if your Symbi is well-rested and energized.
+          </Text>
+        </View>
+
+        <View style={styles.permissionCard}>
+          <Text style={styles.permissionIcon}>❤️</Text>
+          <Text style={styles.permissionTitle}>Heart Rate Variability</Text>
+          <Text style={styles.permissionDescription}>
+            We use your heart rate variability to understand your stress levels and overall wellbeing.
+          </Text>
+        </View>
+
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>🔒 Your Privacy Matters</Text>
           <Text style={styles.infoText}>

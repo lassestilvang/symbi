@@ -43,9 +43,17 @@ export const HealthDataExplanationScreen: React.FC<HealthDataExplanationScreenPr
         </View>
 
         <Text style={styles.infoText}>
-          Symbi uses your daily step count to determine its emotional state. The more you move,
-          the happier your Symbi becomes!
+          Symbi uses your daily step count, sleep quality, and heart rate variability to determine 
+          its emotional state. The healthier your habits, the happier your Symbi becomes!
         </Text>
+
+        <View style={styles.phase2Info}>
+          <Text style={styles.phase2Title}>✨ Enhanced with AI</Text>
+          <Text style={styles.phase2Text}>
+            With multiple health metrics, Symbi can show more nuanced emotions like Vibrant, Calm, 
+            Tired, Stressed, Anxious, and Rested.
+          </Text>
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -118,6 +126,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginTop: 16,
+  },
+  phase2Info: {
+    backgroundColor: '#2d2d44',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 24,
+    borderWidth: 1,
+    borderColor: '#9333ea',
+  },
+  phase2Title: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#9333ea',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  phase2Text: {
+    fontSize: 13,
+    color: '#d8b4fe',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   footer: {
     flexDirection: 'row',
