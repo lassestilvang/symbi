@@ -13,7 +13,16 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "Symbi uses your step count, sleep data, and heart rate variability to reflect your activity in your digital pet's mood and appearance.",
+        "NSHealthUpdateUsageDescription": "Symbi writes mindful minutes when you complete wellness activities with your pet.",
+        "UIBackgroundModes": ["fetch", "processing"]
+      },
+      "entitlements": {
+        "com.apple.developer.healthkit": true,
+        "com.apple.developer.healthkit.access": []
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +30,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACTIVITY_RECOGNITION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.symbi.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

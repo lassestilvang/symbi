@@ -1,0 +1,13 @@
+// Health Data Services
+export { HealthDataService, createHealthDataService } from './HealthDataService';
+export type { HealthPermissions, InitResult } from './HealthDataService';
+export { AuthStatus } from './HealthDataService';
+
+export { HealthKitService } from './HealthKitService';
+export { GoogleFitService } from './GoogleFitService';
+export { ManualHealthDataService } from './ManualHealthDataService';
+
+// Other Services
+export { StorageService } from './StorageService';
+export { EmotionalStateCalculator } from './EmotionalStateCalculator';
+export { BackgroundSyncService, getBackgroundSyncService } from './BackgroundSyncService';
