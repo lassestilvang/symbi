@@ -312,22 +312,22 @@
   - Test session cancellation
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 10. Implement Phase 3 evolution system
-- [ ] 10.1 Create EvolutionSystem service
+- [x] 10. Implement Phase 3 evolution system
+- [x] 10.1 Create EvolutionSystem service
   - Implement trackDailyState() method to record daily emotional states
   - Implement checkEvolutionEligibility() method to check 30-day criteria
   - Implement getEvolutionHistory() method to retrieve past evolutions
   - Store evolution data in AsyncStorage using StorageService
   - _Requirements: 8.1, 8.4_
 
-- [ ] 10.2 Implement evolution eligibility tracking
+- [x] 10.2 Implement evolution eligibility tracking
   - Count cumulative days in Active or Vibrant states
   - Check if count reaches 30 days threshold
   - Display progress indicator on main screen
   - Show notification when evolution is available
   - _Requirements: 8.1_
 
-- [ ] 10.3 Integrate Gemini Image API for evolution generation
+- [x] 10.3 Integrate Gemini Image API for evolution generation
   - Add generateEvolvedAppearance() method to AIBrainService
   - Construct evolution prompt with level and dominant states
   - Call Gemini Image API (gemini-2.5-flash-image-preview)
@@ -335,7 +335,7 @@
   - Implement retry logic (up to 3 attempts)
   - _Requirements: 8.2, 8.3_
 
-- [ ] 10.4 Implement evolution trigger and celebration UI
+- [x] 10.4 Implement evolution trigger and celebration UI
   - Create triggerEvolution() method in EvolutionSystem
   - Show "Evolution Available!" modal when eligible
   - Display loading state during image generation
@@ -344,14 +344,14 @@
   - Save evolution record to history
   - _Requirements: 8.2, 8.3, 8.4_
 
-- [ ] 10.5 Create evolution gallery UI
+- [x] 10.5 Create evolution gallery UI
   - Build gallery screen showing all past evolution forms
   - Display evolution level, date, and appearance for each record
   - Allow users to view full-size evolved images
   - Add share functionality for evolution milestones
   - _Requirements: 8.5_
 
-- [ ] 10.6 Test evolution system
+- [x] 10.6 Test evolution system
   - Test daily state tracking over 30+ days
   - Test eligibility calculation
   - Test image generation with Gemini API

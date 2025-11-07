@@ -20,3 +20,5 @@ export { DailyAIAnalysisService, getDailyAIAnalysisService } from './DailyAIAnal
 export type { DailyAnalysisResult } from './DailyAIAnalysisService';
 export { InteractiveSessionManager, SessionType } from './InteractiveSessionManager';
 export type { SessionResult } from './InteractiveSessionManager';
+export { EvolutionSystem } from './EvolutionSystem';
+export type { EvolutionEligibility, EvolutionResult } from './EvolutionSystem';

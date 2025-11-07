@@ -5,6 +5,7 @@ import { OnboardingFlow } from '../screens/onboarding';
 import { ManualEntryScreen } from '../screens/ManualEntryScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { MainScreen } from '../screens/MainScreen';
+import { EvolutionGalleryScreen } from '../screens/EvolutionGalleryScreen';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
@@ -101,6 +102,7 @@ export const AppNavigator: React.FC = () => {
               onReplayOnboarding={handleReplayOnboarding}
               onNavigateToThresholds={() => props.navigation.navigate('Thresholds')}
               onNavigateToManualEntry={() => props.navigation.navigate('ManualEntry')}
+              onNavigateToEvolutionGallery={() => props.navigation.navigate('EvolutionGallery')}
             />
           )}
         </Stack.Screen>
@@ -113,6 +115,11 @@ export const AppNavigator: React.FC = () => {
           name="ManualEntry"
           component={ManualEntryScreen}
           options={{ title: 'Enter Steps' }}
+        />
+        <Stack.Screen
+          name="EvolutionGallery"
+          component={EvolutionGalleryScreen}
+          options={{ title: 'Evolution Gallery', headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

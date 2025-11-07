@@ -84,25 +84,46 @@ export class AIBrainService {
 
   /**
    * Generate an evolved appearance for the Symbi using Gemini Image API
+   * Implements retry logic (up to 3 attempts) and caches the generated image locally
+   * 
+   * Requirements: 8.2, 8.3
    * 
    * @param context Evolution context with level and dominant states
-   * @returns URL to the generated image
+   * @returns Data URL of the generated image (base64 encoded)
    */
   async generateEvolvedAppearance(context: EvolutionContext): Promise<string> {
     const prompt = this.constructEvolutionPrompt(context);
+    const maxRetries = 3;
+    let lastError: Error | null = null;
 
-    try {
-      const response = await this.callGeminiImageAPI(prompt);
-      
-      // Extract image URL from response
-      // Note: Actual implementation depends on Gemini Image API response format
-      const imageUrl = this.extractImageUrl(response);
-      
-      return imageUrl;
-    } catch (error) {
-      console.error('Error generating evolved appearance:', error);
-      throw error;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Evolution image generation attempt ${attempt}/${maxRetries}`);
+        
+        const response = await this.callGeminiImageAPI(prompt);
+        
+        // Extract image data from response
+        const imageUrl = this.extractImageUrl(response);
+        
+        // Cache the image locally
+        await this.cacheEvolutionImage(context, imageUrl);
+        
+        console.log('Evolution image generated successfully');
+        return imageUrl;
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`Evolution image generation attempt ${attempt} failed:`, error);
+        
+        // Don't retry on the last attempt
+        if (attempt < maxRetries) {
+          // Wait before retrying (exponential backoff: 2s, 4s)
+          await this.delay(2000 * attempt);
+        }
+      }
     }
+
+    // All retries failed
+    throw new Error(`Evolution image generation failed after ${maxRetries} attempts: ${lastError?.message}`);
   }
 
   /**
@@ -378,6 +399,24 @@ Style: Digital art, vibrant colors, Halloween theme, cute but powerful`;
       });
     } catch (error) {
       console.error('Error caching analysis:', error);
+      // Don't throw - caching failure shouldn't break the flow
+    }
+  }
+
+  /**
+   * Cache evolution image locally
+   */
+  private async cacheEvolutionImage(context: EvolutionContext, imageUrl: string): Promise<void> {
+    try {
+      const cacheKey = `@symbi:evolution_image_${context.daysActive}`;
+      await StorageService.set(cacheKey, {
+        imageUrl,
+        context,
+        timestamp: Date.now(),
+      });
+      console.log('Evolution image cached successfully');
+    } catch (error) {
+      console.error('Error caching evolution image:', error);
       // Don't throw - caching failure shouldn't break the flow
     }
   }

@@ -17,12 +17,14 @@ interface SettingsScreenProps {
   onReplayOnboarding: () => void;
   onNavigateToThresholds: () => void;
   onNavigateToManualEntry?: () => void;
+  onNavigateToEvolutionGallery?: () => void;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onReplayOnboarding,
   onNavigateToThresholds,
   onNavigateToManualEntry,
+  onNavigateToEvolutionGallery,
 }) => {
   const { profile, updatePreferences, setDataSource } = useUserPreferencesStore();
   const [isChangingDataSource, setIsChangingDataSource] = useState(false);
@@ -212,6 +214,17 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           <Text style={styles.buttonText}>Configure Thresholds</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Evolution Gallery Section */}
+      {onNavigateToEvolutionGallery && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Evolution History</Text>
+          
+          <TouchableOpacity style={styles.button} onPress={onNavigateToEvolutionGallery}>
+            <Text style={styles.buttonText}>✨ View Evolution Gallery</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Preferences Section */}
       <View style={styles.section}>

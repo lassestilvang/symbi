@@ -15,12 +15,13 @@ import {
 import NetInfo from '@react-native-community/netinfo';
 import { SymbiAnimation } from '../components/SymbiAnimation';
 import { BreathingExercise } from '../components/BreathingExercise';
+import { EvolutionCelebration } from '../components/EvolutionCelebration';
 import { useHealthDataStore } from '../stores/healthDataStore';
 import { useSymbiStateStore } from '../stores/symbiStateStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { HealthDataUpdateService } from '../services/HealthDataUpdateService';
 import { getBackgroundSyncService } from '../services/BackgroundSyncService';
-import { InteractiveSessionManager, SessionType, SessionResult, createHealthDataService } from '../services';
+import { InteractiveSessionManager, SessionType, SessionResult, createHealthDataService, EvolutionSystem, EvolutionEligibility, EvolutionResult, AIBrainService } from '../services';
 import { EmotionalState, HealthDataType } from '../types';
 
 /**
@@ -57,6 +58,11 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const [isOffline, setIsOffline] = useState(false);
   const [hasNoData, setHasNoData] = useState(false);
   const [showBreathingExercise, setShowBreathingExercise] = useState(false);
+  const [evolutionEligibility, setEvolutionEligibility] = useState<EvolutionEligibility | null>(null);
+  const [showEvolutionNotification, setShowEvolutionNotification] = useState(false);
+  const [isEvolutionInProgress, setIsEvolutionInProgress] = useState(false);
+  const [showEvolutionCelebration, setShowEvolutionCelebration] = useState(false);
+  const [evolutionResult, setEvolutionResult] = useState<EvolutionResult | null>(null);
   const [sessionManager] = useState(() => {
     const healthService = createHealthDataService(profile?.preferences.dataSource);
     return new InteractiveSessionManager(healthService);
@@ -79,12 +85,28 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
     initializeHealthData();
     startBackgroundSync();
     setupNetworkListener();
+    checkEvolutionProgress();
 
     // Cleanup on unmount
     return () => {
       stopBackgroundSync();
     };
   }, []);
+
+  /**
+   * Track daily emotional state and check evolution progress
+   */
+  useEffect(() => {
+    if (!isInitializing && emotionalState) {
+      // Track today's emotional state
+      EvolutionSystem.trackDailyState(emotionalState).catch(err => {
+        console.error('Error tracking daily state:', err);
+      });
+      
+      // Check evolution eligibility
+      checkEvolutionProgress();
+    }
+  }, [emotionalState, isInitializing]);
 
   /**
    * Monitor emotional state changes and show notification
@@ -136,6 +158,73 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         setHasNoData(true);
       }
     }
+  };
+
+  /**
+   * Check evolution progress and eligibility
+   * Requirements: 8.1
+   */
+  const checkEvolutionProgress = async () => {
+    try {
+      const eligibility = await EvolutionSystem.checkEvolutionEligibility();
+      setEvolutionEligibility(eligibility);
+      
+      // Show notification if evolution is available
+      if (eligibility.eligible && !showEvolutionNotification) {
+        setShowEvolutionNotification(true);
+      }
+    } catch (error) {
+      console.error('Error checking evolution progress:', error);
+    }
+  };
+
+  /**
+   * Trigger evolution event
+   * Requirements: 8.2, 8.3, 8.4
+   */
+  const handleTriggerEvolution = async () => {
+    try {
+      setIsEvolutionInProgress(true);
+      setError(null);
+
+      // Get Gemini API key from environment or config
+      // TODO: Replace with actual API key from secure storage
+      const apiKey = process.env.GEMINI_API_KEY || 'YOUR_API_KEY_HERE';
+      const aiService = new AIBrainService(apiKey);
+
+      // Trigger evolution
+      const result = await EvolutionSystem.triggerEvolution(aiService);
+
+      if (result.success) {
+        // Update Symbi state with new appearance
+        useSymbiStateStore.getState().setEvolutionLevel(result.evolutionLevel);
+        useSymbiStateStore.getState().setCustomAppearance(result.newAppearanceUrl);
+
+        // Show celebration modal
+        setEvolutionResult(result);
+        setShowEvolutionCelebration(true);
+        setShowEvolutionNotification(false);
+
+        // Refresh evolution progress
+        await checkEvolutionProgress();
+      } else {
+        setError('Evolution failed. Please try again later.');
+      }
+
+      setIsEvolutionInProgress(false);
+    } catch (error) {
+      console.error('Error triggering evolution:', error);
+      setError('Failed to trigger evolution. Please try again.');
+      setIsEvolutionInProgress(false);
+    }
+  };
+
+  /**
+   * Handle evolution celebration close
+   */
+  const handleEvolutionCelebrationClose = () => {
+    setShowEvolutionCelebration(false);
+    setEvolutionResult(null);
   };
 
   /**
@@ -596,6 +685,58 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         </View>
       </View>
 
+      {/* Evolution Progress Indicator (Phase 3) */}
+      {evolutionEligibility && (
+        <View style={styles.evolutionProgressContainer}>
+          <View style={styles.evolutionProgressHeader}>
+            <Text style={styles.evolutionProgressTitle}>
+              ✨ Evolution Progress
+            </Text>
+            {showEvolutionNotification && evolutionEligibility.eligible && (
+              <View style={styles.evolutionReadyBadge}>
+                <Text style={styles.evolutionReadyText}>Ready!</Text>
+              </View>
+            )}
+          </View>
+          
+          <View style={styles.evolutionProgressBar}>
+            <View
+              style={[
+                styles.evolutionProgressFill,
+                {
+                  width: `${Math.min(100, (evolutionEligibility.daysInPositiveState / evolutionEligibility.daysRequired) * 100)}%`,
+                },
+              ]}
+            />
+          </View>
+          
+          <Text style={styles.evolutionProgressText}>
+            {evolutionEligibility.daysInPositiveState} / {evolutionEligibility.daysRequired} days
+            {evolutionEligibility.eligible 
+              ? ' - Evolution available!' 
+              : ' in Active or Vibrant state'}
+          </Text>
+
+          {/* Evolution Trigger Button */}
+          {evolutionEligibility.eligible && (
+            <TouchableOpacity
+              style={styles.evolutionButton}
+              onPress={handleTriggerEvolution}
+              disabled={isEvolutionInProgress}
+              accessibilityLabel="Trigger evolution"
+            >
+              {isEvolutionInProgress ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : (
+                <Text style={styles.evolutionButtonText}>
+                  🌟 Evolve Your Symbi!
+                </Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
       {/* Calm your Symbi Button (Phase 3) */}
       {shouldShowCalmButton() && (
         <TouchableOpacity
@@ -634,6 +775,16 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           onCancel={handleBreathingCancel}
         />
       </Modal>
+
+      {/* Evolution Celebration Modal */}
+      {evolutionResult && (
+        <EvolutionCelebration
+          visible={showEvolutionCelebration}
+          evolutionLevel={evolutionResult.evolutionLevel}
+          appearanceUrl={evolutionResult.newAppearanceUrl}
+          onClose={handleEvolutionCelebrationClose}
+        />
+      )}
     </ScrollView>
   );
 };
@@ -889,6 +1040,72 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#6b7280',
     textAlign: 'center',
+  },
+  evolutionProgressContainer: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    backgroundColor: '#16213e',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#7C3AED',
+  },
+  evolutionProgressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  evolutionProgressTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#9333EA',
+  },
+  evolutionReadyBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  evolutionReadyText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  evolutionProgressBar: {
+    height: 12,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  evolutionProgressFill: {
+    height: '100%',
+    backgroundColor: '#9333EA',
+    borderRadius: 6,
+  },
+  evolutionProgressText: {
+    fontSize: 13,
+    color: '#a78bfa',
+    textAlign: 'center',
+  },
+  evolutionButton: {
+    marginTop: 12,
+    backgroundColor: '#9333EA',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    shadowColor: '#9333EA',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  evolutionButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
   },
   calmButton: {
     marginHorizontal: 20,
