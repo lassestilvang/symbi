@@ -10,14 +10,17 @@ import {
   ActivityIndicator,
   Animated,
   Platform,
+  Modal,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { SymbiAnimation } from '../components/SymbiAnimation';
+import { BreathingExercise } from '../components/BreathingExercise';
 import { useHealthDataStore } from '../stores/healthDataStore';
 import { useSymbiStateStore } from '../stores/symbiStateStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { HealthDataUpdateService } from '../services/HealthDataUpdateService';
 import { getBackgroundSyncService } from '../services/BackgroundSyncService';
+import { InteractiveSessionManager, SessionType, SessionResult, createHealthDataService } from '../services';
 import { EmotionalState, HealthDataType } from '../types';
 
 /**
@@ -53,6 +56,11 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const [stateChangeNotification, setStateChangeNotification] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState(false);
   const [hasNoData, setHasNoData] = useState(false);
+  const [showBreathingExercise, setShowBreathingExercise] = useState(false);
+  const [sessionManager] = useState(() => {
+    const healthService = createHealthDataService(profile?.preferences.dataSource);
+    return new InteractiveSessionManager(healthService);
+  });
   
   // Animation for state change notification
   const notificationOpacity = useRef(new Animated.Value(0)).current;
@@ -345,6 +353,57 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   };
 
   /**
+   * Start breathing exercise session
+   * Requirements: 7.1, 7.2
+   */
+  const handleStartBreathingExercise = async () => {
+    try {
+      await sessionManager.startSession(SessionType.BREATHING_EXERCISE, 5);
+      setShowBreathingExercise(true);
+    } catch (error) {
+      console.error('Error starting breathing exercise:', error);
+      setError('Failed to start breathing exercise');
+    }
+  };
+
+  /**
+   * Handle breathing exercise completion
+   * Requirements: 7.3, 7.4, 7.5
+   */
+  const handleBreathingComplete = async (result: SessionResult) => {
+    setShowBreathingExercise(false);
+    
+    if (result.success) {
+      // Update emotional state to Calm (interactive session overrides AI/rule-based)
+      useHealthDataStore.getState().setEmotionalState(EmotionalState.CALM, 'rule-based');
+      
+      // Show success notification
+      showStateChangeNotification(emotionalState, EmotionalState.CALM);
+      
+      // Refresh health data to reflect the mindful minutes
+      await HealthDataUpdateService.refreshHealthData();
+    }
+  };
+
+  /**
+   * Handle breathing exercise cancellation
+   */
+  const handleBreathingCancel = () => {
+    setShowBreathingExercise(false);
+  };
+
+  /**
+   * Check if "Calm your Symbi" button should be shown
+   * Requirements: 7.1
+   */
+  const shouldShowCalmButton = (): boolean => {
+    return (
+      emotionalState === EmotionalState.STRESSED ||
+      emotionalState === EmotionalState.ANXIOUS
+    );
+  };
+
+  /**
    * Format last updated time
    */
   const formatLastUpdated = (): string => {
@@ -537,6 +596,17 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         </View>
       </View>
 
+      {/* Calm your Symbi Button (Phase 3) */}
+      {shouldShowCalmButton() && (
+        <TouchableOpacity
+          style={styles.calmButton}
+          onPress={handleStartBreathingExercise}
+          accessibilityLabel="Calm your Symbi"
+        >
+          <Text style={styles.calmButtonText}>🧘 Calm your Symbi</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Configure Thresholds Button */}
       <TouchableOpacity
         style={styles.configureButton}
@@ -550,6 +620,20 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       <Text style={styles.lastUpdated}>
         Last updated: {formatLastUpdated()}
       </Text>
+
+      {/* Breathing Exercise Modal */}
+      <Modal
+        visible={showBreathingExercise}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <BreathingExercise
+          sessionManager={sessionManager}
+          duration={5}
+          onComplete={handleBreathingComplete}
+          onCancel={handleBreathingCancel}
+        />
+      </Modal>
     </ScrollView>
   );
 };
@@ -805,6 +889,24 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#6b7280',
     textAlign: 'center',
+  },
+  calmButton: {
+    marginHorizontal: 20,
+    backgroundColor: '#10B981',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginBottom: 12,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  calmButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
   },
   configureButton: {
     marginHorizontal: 20,

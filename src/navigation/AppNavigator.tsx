@@ -42,7 +42,8 @@ export const AppNavigator: React.FC = () => {
   };
 
   const handleRequestPermissions = async (): Promise<boolean> => {
-    const result = await PermissionService.requestHealthPermissions();
+    // Request Phase 3 permissions (includes mindful minutes write)
+    const result = await PermissionService.requestPhase3Permissions();
     return result.granted;
   };
 

@@ -72,8 +72,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           ]
         );
       } else {
-        // Request permissions for automatic tracking
-        const result = await PermissionService.requestHealthPermissions();
+        // Request permissions for automatic tracking (Phase 3 includes mindful minutes write)
+        const result = await PermissionService.requestPhase3Permissions();
         
         if (result.granted) {
           await setDataSource(result.dataSource);

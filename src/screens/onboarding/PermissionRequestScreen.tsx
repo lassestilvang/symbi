@@ -47,6 +47,14 @@ export const PermissionRequestScreen: React.FC<PermissionRequestScreenProps> = (
           </Text>
         </View>
 
+        <View style={styles.permissionCard}>
+          <Text style={styles.permissionIcon}>🧘</Text>
+          <Text style={styles.permissionTitle}>Mindful Minutes (Write)</Text>
+          <Text style={styles.permissionDescription}>
+            When you complete breathing exercises with Symbi, we'll record mindful minutes to your health data.
+          </Text>
+        </View>
+
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>🔒 Your Privacy Matters</Text>
           <Text style={styles.infoText}>

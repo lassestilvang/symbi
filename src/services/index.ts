@@ -18,3 +18,5 @@ export { AIBrainService } from './AIBrainService';
 export type { AIAnalysisResult, EvolutionContext } from './AIBrainService';
 export { DailyAIAnalysisService, getDailyAIAnalysisService } from './DailyAIAnalysisService';
 export type { DailyAnalysisResult } from './DailyAIAnalysisService';
+export { InteractiveSessionManager, SessionType } from './InteractiveSessionManager';
+export type { SessionResult } from './InteractiveSessionManager';
