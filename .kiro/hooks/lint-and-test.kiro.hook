@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "name": "Lint and Test on Changes",
+  "description": "Automatically runs linting and tests when files are modified to ensure code quality and catch issues early",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "App.tsx",
+      "*.ts",
+      "*.tsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Files have been modified. Please run the linter to check for code quality issues and then run the test suite to ensure nothing is broken. Report the results of both operations."
+  }
+}
