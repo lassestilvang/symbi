@@ -836,8 +836,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   notificationContainer: {
-    marginHorizontal: 20,
-    marginTop: 10,
+    position: 'absolute',
+    top: 80,
+    left: 20,
+    right: 20,
     padding: 12,
     backgroundColor: '#7C3AED',
     borderRadius: 8,
@@ -848,6 +850,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 4,
+    zIndex: 1000,
   },
   notificationText: {
     color: '#ffffff',

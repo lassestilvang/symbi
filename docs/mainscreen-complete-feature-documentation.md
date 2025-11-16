@@ -113,6 +113,8 @@ MainScreen
 - **State Transitions**: Shows "Old State → New State" format
 - **Auto-Dismiss**: Automatically fades out after 2 seconds
 - **Visual Feedback**: Purple background with white text
+- **Positioning**: Absolutely positioned at top of screen (80px from top) with high z-index for visibility
+- **Overlay**: Floats above other content without disrupting layout
 
 ## State Management
 
@@ -261,6 +263,13 @@ Animated.sequence([
   }),
 ])
 ```
+
+**Positioning**: The notification container uses absolute positioning to overlay content:
+- `position: 'absolute'` - Floats above other elements
+- `top: 80` - Positioned 80px from top (below header)
+- `left: 20, right: 20` - 20px margins on both sides
+- `zIndex: 1000` - Ensures visibility above all other content
+- Shadow and elevation for depth perception
 
 ### Symbi Ghost
 - **State Transitions**: Smooth transitions between emotional states
