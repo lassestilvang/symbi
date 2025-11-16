@@ -119,15 +119,9 @@ const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
     backgroundColor: '#1a1a2e',
-    ...(Platform.OS === 'web' && {
-      alignItems: 'center',
-    }),
   },
   contentWrapper: {
     flex: 1,
     width: '100%',
-    ...(Platform.OS === 'web' && {
-      maxWidth: 600,
-    }),
   },
 });

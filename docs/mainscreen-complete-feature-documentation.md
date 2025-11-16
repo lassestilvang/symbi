@@ -285,6 +285,12 @@ Animated.sequence([
 4. **Background Throttling**: Reduces updates when app is backgrounded
 5. **Efficient Re-renders**: Zustand selectors minimize unnecessary re-renders
 
+### Responsive Layout
+- **Max Width Constraint**: Content container limited to 600px for optimal readability on tablets and large screens
+- **Centered Layout**: Content automatically centers on wide displays using `alignSelf: 'center'`
+- **Adaptive Sizing**: Maintains full width on mobile devices while preventing excessive stretching on tablets
+- **Consistent Experience**: Ensures comfortable viewing across all device sizes
+
 ### Memory Management
 - **Cleanup Functions**: Properly cleans up listeners on unmount
 - **Animation Cleanup**: Stops animations when component unmounts
@@ -384,6 +390,7 @@ Three test buttons for quick state changes:
 - **Test Coverage**: Component tests in `__tests__/MainScreen.test.tsx`
 
 ### Recent Improvements
+- Added responsive layout with max-width constraint (November 16, 2025)
 - Removed unused `Image` import (November 16, 2025)
 - Simplified header layout
 - Added comprehensive error handling

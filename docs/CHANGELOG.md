@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Improved MainScreen responsive layout for tablets and large screens (2025-11-16)
+  - Added 600px max-width constraint to content container
+  - Centered content on wide displays for better readability
+  - Maintains full-width on mobile devices
+  - See [docs/mainscreen-responsive-layout-update.md](mainscreen-responsive-layout-update.md)
 - Refactored `ManualHealthDataService` to eliminate code duplication and improve maintainability (2025-11-16)
   - Implemented Template Method Pattern for generic metric saving
   - Consolidated validation logic into configuration-driven approach

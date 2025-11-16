@@ -198,6 +198,7 @@ The `MainScreen` component is the primary user interface, integrating all three 
 - Interactive breathing exercises for stress relief
 - Offline support with cached data
 - Pull-to-refresh for manual updates
+- Responsive layout optimized for tablets and large screens (600px max-width, centered)
 
 **Documentation**:
 - **Complete Feature Guide**: [docs/mainscreen-complete-feature-documentation.md](docs/mainscreen-complete-feature-documentation.md)
