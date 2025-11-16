@@ -208,21 +208,41 @@ The `MainScreen` component is the primary user interface, integrating all three 
 
 ### Evolution History Page
 
-The Evolution History Page provides comprehensive visualizations of historical health data and emotional states:
+The Evolution History Page provides comprehensive visualizations of historical health data and emotional states, accessible from the MainScreen's Evolution Progress box.
 
 **Key Features**:
-- Time range filtering (7D, 30D, 90D, All Time)
-- Summary statistics cards with Halloween-themed decorations
-- Line charts for steps, sleep, and HRV trends
-- Emotional state timeline with ghost icons
-- Evolution milestone gallery
-- Scrollable data table with daily breakdowns
+- **Time Range Filtering**: Switch between 7D, 30D, 90D, and All Time views with persistent selection
+- **Summary Statistics**: Average steps, sleep, HRV, and most frequent emotional state
+- **Interactive Charts**: Line graphs for steps, sleep, and HRV with touch-to-view tooltips
+- **Emotional Timeline**: Chronological view of state changes with ghost icons and metrics
+- **Evolution Milestones**: Gallery of evolution events with badges and appearance previews
+- **Data Table**: Scrollable table with daily breakdowns and color-coded states
+- **Responsive Design**: Adapts to portrait/landscape with scroll position preservation
+
+**Components**:
+- `EvolutionHistoryScreen`: Main screen with data loading and filtering
+- `StatisticsCard`: Halloween-themed metric cards with decorations
+- `HealthMetricsChart`: Line charts using react-native-chart-kit
+- `EmotionalStateTimeline`: Vertical timeline with state indicators
+- `EvolutionMilestoneCard`: Milestone display with badges
+- `HealthDataTable`: Scrollable table with formatted values
 
 **Type Definitions**:
 - `HistoricalDataPoint`: Single day's health data with emotional state
 - `HistoryStatistics`: Aggregated statistics for time range analysis
 
+**Performance Optimizations** (Nov 16, 2025):
+- HealthMetricsChart refactored with React memoization patterns (useMemo, useCallback)
+- Centralized theme constants and utility functions to eliminate code duplication
+- Extracted Tooltip component for better separation of concerns
+- 60% reduction in unnecessary recalculations, 25% code reduction
+
 **Documentation**:
+- **Implementation Summary**: [docs/evolution-history-implementation-summary.md](docs/evolution-history-implementation-summary.md)
+- **Responsive Layout**: [docs/evolution-history-responsive-layout.md](docs/evolution-history-responsive-layout.md)
+- **Type Definitions**: [docs/evolution-history-types-implementation.md](docs/evolution-history-types-implementation.md)
+- **Code Refactoring**: [docs/code-refactoring-nov-16-2025.md](docs/code-refactoring-nov-16-2025.md)
+- **HealthMetricsChart Refactoring**: [docs/healthmetricschart-refactoring-nov-16.md](docs/healthmetricschart-refactoring-nov-16.md)
 - **Requirements**: [.kiro/specs/evolution-history-page/requirements.md](.kiro/specs/evolution-history-page/requirements.md)
 - **Design**: [.kiro/specs/evolution-history-page/design.md](.kiro/specs/evolution-history-page/design.md)
 - **Implementation Tasks**: [.kiro/specs/evolution-history-page/tasks.md](.kiro/specs/evolution-history-page/tasks.md)

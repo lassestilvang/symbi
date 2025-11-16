@@ -1,5 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 
 interface HistoricalDataPoint {
   date: string;
@@ -39,6 +41,9 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
   data,
   onItemPress,
 }) => {
+  const [selectedItem, setSelectedItem] = useState<HistoricalDataPoint | null>(null);
+  const { profile } = useUserPreferencesStore();
+
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     const month = date.toLocaleDateString('en-US', { month: 'short' });
@@ -49,6 +54,43 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
   const formatTime = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { weekday: 'short' });
+  };
+
+  const formatFullDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const handleItemPress = async (item: HistoricalDataPoint) => {
+    // Trigger haptic feedback if enabled
+    if (profile?.preferences.hapticFeedbackEnabled) {
+      try {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch (error) {
+        console.log('Haptic feedback not available:', error);
+      }
+    }
+
+    setSelectedItem(item);
+    onItemPress?.(item);
+  };
+
+  const closeModal = async () => {
+    // Trigger haptic feedback if enabled
+    if (profile?.preferences.hapticFeedbackEnabled) {
+      try {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch (error) {
+        console.log('Haptic feedback not available:', error);
+      }
+    }
+
+    setSelectedItem(null);
   };
 
   if (data.length === 0) {
@@ -71,8 +113,9 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
             <TouchableOpacity
               key={`${item.date}-${index}`}
               style={styles.timelineItem}
-              onPress={() => onItemPress?.(item)}
-              activeOpacity={0.7}>
+              onPress={() => handleItemPress(item)}
+              activeOpacity={0.7}
+              accessibilityLabel={`View details for ${item.emotionalState} state on ${formatDate(item.date)}`}>
               <View style={styles.timelineLeft}>
                 <View style={[styles.dot, { backgroundColor: stateColor }]} />
                 {!isLast && <View style={styles.line} />}
@@ -103,6 +146,93 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
           );
         })}
       </ScrollView>
+
+      {/* Expanded State Information Modal */}
+      <Modal
+        visible={selectedItem !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={closeModal}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={closeModal}>
+          <TouchableOpacity
+            style={styles.modalContent}
+            activeOpacity={1}
+            onPress={e => e.stopPropagation()}>
+            {selectedItem && (
+              <>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>Emotional State Details</Text>
+                  <TouchableOpacity
+                    onPress={closeModal}
+                    style={styles.modalCloseButton}
+                    accessibilityLabel="Close details">
+                    <Text style={styles.modalCloseText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.modalBody}>
+                  <View style={styles.modalStateHeader}>
+                    <Text style={styles.modalGhost}>👻</Text>
+                    <View style={styles.modalStateInfo}>
+                      <Text
+                        style={[
+                          styles.modalStateName,
+                          {
+                            color:
+                              STATE_COLORS[selectedItem.emotionalState] || HALLOWEEN_COLORS.primary,
+                          },
+                        ]}>
+                        {selectedItem.emotionalState}
+                      </Text>
+                      <Text style={styles.modalDate}>{formatFullDate(selectedItem.date)}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.modalDivider} />
+
+                  <View style={styles.modalMetrics}>
+                    <View style={styles.modalMetricRow}>
+                      <View style={styles.modalMetricCard}>
+                        <Text style={styles.modalMetricIcon}>👣</Text>
+                        <Text style={styles.modalMetricLabel}>Steps</Text>
+                        <Text style={styles.modalMetricValue}>
+                          {selectedItem.steps.toLocaleString()}
+                        </Text>
+                      </View>
+
+                      {selectedItem.sleepHours !== undefined && (
+                        <View style={styles.modalMetricCard}>
+                          <Text style={styles.modalMetricIcon}>😴</Text>
+                          <Text style={styles.modalMetricLabel}>Sleep</Text>
+                          <Text style={styles.modalMetricValue}>
+                            {selectedItem.sleepHours.toFixed(1)}h
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    {selectedItem.hrv !== undefined && (
+                      <View style={styles.modalMetricRow}>
+                        <View style={styles.modalMetricCard}>
+                          <Text style={styles.modalMetricIcon}>❤️</Text>
+                          <Text style={styles.modalMetricLabel}>Heart Rate Variability</Text>
+                          <Text style={styles.modalMetricValue}>
+                            {selectedItem.hrv.toFixed(0)}ms
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.modalFooter}>
+                    <Text style={styles.modalFooterText}>Tap outside to close</Text>
+                  </View>
+                </View>
+              </>
+            )}
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -202,5 +332,125 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: HALLOWEEN_COLORS.ghostWhite,
     opacity: 0.6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    borderRadius: 16,
+    width: '100%',
+    maxWidth: 400,
+    borderWidth: 2,
+    borderColor: HALLOWEEN_COLORS.primary,
+    shadowColor: HALLOWEEN_COLORS.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.6,
+    shadowRadius: 16,
+    elevation: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: HALLOWEEN_COLORS.primary,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: HALLOWEEN_COLORS.primaryLight,
+  },
+  modalCloseButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    backgroundColor: HALLOWEEN_COLORS.darkBg,
+  },
+  modalCloseText: {
+    fontSize: 20,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    fontWeight: 'bold',
+  },
+  modalBody: {
+    padding: 20,
+  },
+  modalStateHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalGhost: {
+    fontSize: 48,
+    marginRight: 16,
+  },
+  modalStateInfo: {
+    flex: 1,
+  },
+  modalStateName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  modalDate: {
+    fontSize: 14,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    opacity: 0.7,
+  },
+  modalDivider: {
+    height: 1,
+    backgroundColor: HALLOWEEN_COLORS.primary,
+    opacity: 0.3,
+    marginVertical: 16,
+  },
+  modalMetrics: {
+    marginBottom: 16,
+  },
+  modalMetricRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  modalMetricCard: {
+    flex: 1,
+    backgroundColor: HALLOWEEN_COLORS.darkBg,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
+  },
+  modalMetricIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  modalMetricLabel: {
+    fontSize: 12,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    opacity: 0.7,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  modalMetricValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: HALLOWEEN_COLORS.primaryLight,
+  },
+  modalFooter: {
+    alignItems: 'center',
+    paddingTop: 8,
+  },
+  modalFooterText: {
+    fontSize: 12,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    opacity: 0.5,
+    fontStyle: 'italic',
   },
 });

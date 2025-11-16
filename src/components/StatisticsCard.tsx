@@ -7,6 +7,7 @@ interface StatisticsCardProps {
   value: string | number;
   subtitle?: string;
   halloweenDecoration: 'ghost' | 'pumpkin' | 'tombstone' | 'bat';
+  width?: number;
 }
 
 const DECORATION_ICONS = {
@@ -30,9 +31,10 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
   value,
   subtitle,
   halloweenDecoration,
+  width,
 }) => {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, width ? { width, minWidth: width } : undefined]}>
       <View style={styles.decorationContainer}>
         <Text style={styles.decoration}>{DECORATION_ICONS[halloweenDecoration]}</Text>
       </View>

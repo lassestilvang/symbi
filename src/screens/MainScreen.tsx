@@ -693,11 +693,18 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         <View style={styles.evolutionProgressContainer}>
           <View style={styles.evolutionProgressHeader}>
             <Text style={styles.evolutionProgressTitle}>✨ Evolution Progress</Text>
-            {showEvolutionNotification && evolutionEligibility.eligible && (
-              <View style={styles.evolutionReadyBadge}>
-                <Text style={styles.evolutionReadyText}>Ready!</Text>
-              </View>
-            )}
+            <View style={styles.evolutionProgressHeaderRight}>
+              {showEvolutionNotification && evolutionEligibility.eligible && (
+                <View style={styles.evolutionReadyBadge}>
+                  <Text style={styles.evolutionReadyText}>Ready!</Text>
+                </View>
+              )}
+              <TouchableOpacity
+                onPress={() => navigation.navigate('EvolutionHistory')}
+                accessibilityLabel="View evolution history">
+                <Text style={styles.viewHistoryLink}>📊 View History</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.evolutionProgressBar}>
@@ -1104,6 +1111,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#9333EA',
   },
+  evolutionProgressHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   evolutionReadyBadge: {
     backgroundColor: '#10B981',
     paddingHorizontal: 12,
@@ -1114,6 +1126,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: '#ffffff',
+  },
+  viewHistoryLink: {
+    fontSize: 14,
+    color: '#9333EA',
+    fontWeight: 'bold',
   },
   evolutionProgressBar: {
     height: 12,

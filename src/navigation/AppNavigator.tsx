@@ -6,6 +6,7 @@ import { ManualEntryScreen } from '../screens/ManualEntryScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { MainScreen } from '../screens/MainScreen';
 import { EvolutionGalleryScreen } from '../screens/EvolutionGalleryScreen';
+import { EvolutionHistoryScreen } from '../screens/EvolutionHistoryScreen';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
@@ -112,6 +113,11 @@ export const AppNavigator: React.FC = () => {
           name="EvolutionGallery"
           component={EvolutionGalleryScreen}
           options={{ title: 'Evolution Gallery', headerShown: false }}
+        />
+        <Stack.Screen
+          name="EvolutionHistory"
+          component={EvolutionHistoryScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

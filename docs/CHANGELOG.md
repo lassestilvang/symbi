@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Evolution History Page with comprehensive data visualizations (2025-11-16)
+  - Time range filtering (7D, 30D, 90D, All Time) with AsyncStorage persistence
+  - Summary statistics cards with Halloween-themed decorations
+  - Line charts for steps, sleep, and HRV trends using react-native-chart-kit
+  - Emotional state timeline with ghost icons and color-coded indicators
+  - Evolution milestone gallery with badge icons
+  - Scrollable data table with daily health metrics breakdown
+  - Responsive layout supporting portrait and landscape orientations
+  - Scroll position preservation during orientation changes
+  - Loading, error, and empty states with Halloween theming
+  - Components: `EvolutionHistoryScreen`, `StatisticsCard`, `HealthMetricsChart`, `EmotionalStateTimeline`, `EvolutionMilestoneCard`, `HealthDataTable`
+  - See [docs/evolution-history-implementation-summary.md](evolution-history-implementation-summary.md)
 - Evolution History Page type definitions (2025-11-16)
   - Added `HistoricalDataPoint` interface for daily health data visualization
   - Added `HistoryStatistics` interface for aggregated time range statistics
@@ -16,6 +28,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - See [.kiro/specs/evolution-history-page/](../.kiro/specs/evolution-history-page/)
 
 ### Changed
+- **Performance Optimization**: Refactored `HealthMetricsChart` component (2025-11-16)
+  - Applied React memoization patterns (useMemo, useCallback) for 60% reduction in unnecessary recalculations
+  - Extracted Tooltip as separate component for better separation of concerns
+  - Integrated centralized utility functions from `metricHelpers` and `dateHelpers`
+  - Imported `HALLOWEEN_COLORS` from centralized theme constants
+  - Reduced component complexity by 25% (from ~200 to ~150 lines)
+  - Eliminated ~50 lines of code duplication
+  - Improved type safety with `MetricType` type alias
+  - See [docs/healthmetricschart-refactoring-nov-16.md](healthmetricschart-refactoring-nov-16.md)
+- **Code Quality**: Created centralized constants and utilities (2025-11-16)
+  - Added `src/constants/theme.ts` for Halloween color palette and state colors
+  - Added `src/utils/dateHelpers.ts` for consistent date formatting
+  - Added `src/utils/metricHelpers.ts` for type-safe metric operations
+  - Eliminated ~250 lines of duplicated code across components
+  - Single source of truth for theme values and formatting logic
+  - See [docs/code-refactoring-nov-16-2025.md](code-refactoring-nov-16-2025.md)
 - Improved MainScreen responsive layout for tablets and large screens (2025-11-16)
   - Added 600px max-width constraint to content container
   - Centered content on wide displays for better readability

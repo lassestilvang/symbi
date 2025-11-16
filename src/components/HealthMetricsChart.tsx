@@ -1,51 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { LineChart } from 'react-native-chart-kit';
-
-interface HistoricalDataPoint {
-  date: string;
-  steps: number;
-  sleepHours?: number;
-  hrv?: number;
-  emotionalState: string;
-}
+import { HistoricalDataPoint } from '../types';
+import { useUserPreferencesStore } from '../stores/userPreferencesStore';
+import { HALLOWEEN_COLORS } from '../constants/theme';
+import {
+  MetricType,
+  getMetricValue,
+  filterByMetric,
+  formatMetricValue,
+  getMetricConfig,
+} from '../utils/metricHelpers';
+import { formatShortDate, formatDisplayDate } from '../utils/dateHelpers';
 
 interface HealthMetricsChartProps {
   data: HistoricalDataPoint[];
-  metricType: 'steps' | 'sleep' | 'hrv';
+  metricType: MetricType;
   color: string;
   onDataPointPress?: (point: HistoricalDataPoint) => void;
 }
-
-const HALLOWEEN_COLORS = {
-  primary: '#7C3AED',
-  orange: '#F97316',
-  green: '#10B981',
-  darkBg: '#1a1a2e',
-  cardBg: '#16213e',
-  ghostWhite: '#F3F4F6',
-};
-
-const METRIC_CONFIG = {
-  steps: {
-    label: 'Steps',
-    color: HALLOWEEN_COLORS.primary,
-    suffix: '',
-    decimals: 0,
-  },
-  sleep: {
-    label: 'Sleep (hours)',
-    color: HALLOWEEN_COLORS.orange,
-    suffix: 'h',
-    decimals: 1,
-  },
-  hrv: {
-    label: 'HRV (ms)',
-    color: HALLOWEEN_COLORS.green,
-    suffix: 'ms',
-    decimals: 0,
-  },
-};
 
 export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
   data,
@@ -55,7 +29,30 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
 }) => {
   const [selectedPoint, setSelectedPoint] = useState<HistoricalDataPoint | null>(null);
   const [chartWidth, setChartWidth] = useState(Dimensions.get('window').width - 32);
+  const { profile } = useUserPreferencesStore();
 
+  // Memoize filtered data to prevent unnecessary recalculations
+  const filteredData = useMemo(() => filterByMetric(data, metricType), [data, metricType]);
+
+  // Memoize metric configuration
+  const config = useMemo(() => getMetricConfig(metricType), [metricType]);
+
+  // Memoize chart data transformation
+  const chartData = useMemo(
+    () => ({
+      labels: filteredData.map(point => formatShortDate(point.date)),
+      datasets: [
+        {
+          data: filteredData.map(point => getMetricValue(point, metricType)),
+          color: (_opacity = 1) => color || config.color,
+          strokeWidth: 3,
+        },
+      ],
+    }),
+    [filteredData, metricType, color, config.color]
+  );
+
+  // Handle dimension changes
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
       setChartWidth(window.width - 32);
@@ -64,24 +61,7 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
     return () => subscription?.remove();
   }, []);
 
-  const getMetricValue = (point: HistoricalDataPoint): number => {
-    switch (metricType) {
-      case 'steps':
-        return point.steps;
-      case 'sleep':
-        return point.sleepHours ?? 0;
-      case 'hrv':
-        return point.hrv ?? 0;
-      default:
-        return 0;
-    }
-  };
-
-  const filteredData = data.filter(point => {
-    const value = getMetricValue(point);
-    return value > 0;
-  });
-
+  // Early return for empty data
   if (filteredData.length === 0) {
     return (
       <View style={styles.emptyContainer}>
@@ -90,29 +70,35 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
     );
   }
 
-  const chartData = {
-    labels: filteredData.map(point => {
-      const date = new Date(point.date);
-      return `${date.getMonth() + 1}/${date.getDate()}`;
-    }),
-    datasets: [
-      {
-        data: filteredData.map(getMetricValue),
-        color: (_opacity = 1) => color || METRIC_CONFIG[metricType].color,
-        strokeWidth: 3,
-      },
-    ],
-  };
-
-  const config = METRIC_CONFIG[metricType];
-
-  const handleDataPointClick = (data: { index?: number }) => {
-    if (data.index !== undefined && filteredData[data.index]) {
-      const point = filteredData[data.index];
-      setSelectedPoint(point);
-      onDataPointPress?.(point);
+  // Memoize haptic feedback handler
+  const triggerHapticFeedback = useCallback(async () => {
+    if (profile?.preferences.hapticFeedbackEnabled) {
+      try {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch (error) {
+        console.log('Haptic feedback not available:', error);
+      }
     }
-  };
+  }, [profile?.preferences.hapticFeedbackEnabled]);
+
+  // Handle data point selection
+  const handleDataPointClick = useCallback(
+    async (data: { index?: number }) => {
+      if (data.index !== undefined && filteredData[data.index]) {
+        const point = filteredData[data.index];
+        await triggerHapticFeedback();
+        setSelectedPoint(point);
+        onDataPointPress?.(point);
+      }
+    },
+    [filteredData, triggerHapticFeedback, onDataPointPress]
+  );
+
+  // Handle tooltip close
+  const handleCloseTooltip = useCallback(async () => {
+    await triggerHapticFeedback();
+    setSelectedPoint(null);
+  }, [triggerHapticFeedback]);
 
   return (
     <View style={styles.container}>
@@ -153,19 +139,62 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
         withShadow={false}
       />
       {selectedPoint && (
-        <TouchableOpacity
-          style={styles.tooltip}
-          onPress={() => setSelectedPoint(null)}
-          activeOpacity={0.9}>
-          <Text style={styles.tooltipDate}>{selectedPoint.date}</Text>
-          <Text style={styles.tooltipValue}>
-            {getMetricValue(selectedPoint).toFixed(config.decimals)}
-            {config.suffix}
-          </Text>
-          <Text style={styles.tooltipState}>{selectedPoint.emotionalState}</Text>
-        </TouchableOpacity>
+        <Tooltip point={selectedPoint} metricType={metricType} onClose={handleCloseTooltip} />
       )}
     </View>
+  );
+};
+
+/**
+ * Tooltip Component - Extracted for better separation of concerns
+ */
+interface TooltipProps {
+  point: HistoricalDataPoint;
+  metricType: MetricType;
+  onClose: () => void;
+}
+
+const Tooltip: React.FC<TooltipProps> = ({ point, metricType, onClose }) => {
+  return (
+    <TouchableOpacity
+      style={styles.tooltip}
+      onPress={onClose}
+      activeOpacity={0.9}
+      accessibilityLabel="Close tooltip">
+      <View style={styles.tooltipHeader}>
+        <Text style={styles.tooltipDate}>{formatDisplayDate(new Date(point.date))}</Text>
+        <Text style={styles.tooltipClose}>✕</Text>
+      </View>
+      <Text style={styles.tooltipValue}>
+        {formatMetricValue(getMetricValue(point, metricType), metricType)}
+      </Text>
+      <View style={styles.tooltipDivider} />
+      <View style={styles.tooltipDetails}>
+        <Text style={styles.tooltipLabel}>Emotional State</Text>
+        <Text style={styles.tooltipState}>
+          👻 {point.emotionalState.charAt(0).toUpperCase() + point.emotionalState.slice(1)}
+        </Text>
+      </View>
+      {point.steps > 0 && metricType !== 'steps' && (
+        <View style={styles.tooltipDetails}>
+          <Text style={styles.tooltipLabel}>Steps</Text>
+          <Text style={styles.tooltipDetailValue}>👣 {point.steps.toLocaleString()}</Text>
+        </View>
+      )}
+      {point.sleepHours !== undefined && metricType !== 'sleep' && (
+        <View style={styles.tooltipDetails}>
+          <Text style={styles.tooltipLabel}>Sleep</Text>
+          <Text style={styles.tooltipDetailValue}>😴 {point.sleepHours.toFixed(1)}h</Text>
+        </View>
+      )}
+      {point.hrv !== undefined && metricType !== 'hrv' && (
+        <View style={styles.tooltipDetails}>
+          <Text style={styles.tooltipLabel}>HRV</Text>
+          <Text style={styles.tooltipDetailValue}>❤️ {point.hrv.toFixed(0)}ms</Text>
+        </View>
+      )}
+      <Text style={styles.tooltipHint}>Tap to close</Text>
+    </TouchableOpacity>
   );
 };
 
@@ -202,32 +231,76 @@ const styles = StyleSheet.create({
   tooltip: {
     position: 'absolute',
     bottom: 20,
+    left: 16,
+    right: 16,
     backgroundColor: HALLOWEEN_COLORS.primary,
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     shadowColor: HALLOWEEN_COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 8,
-    minWidth: 120,
+    borderWidth: 2,
+    borderColor: HALLOWEEN_COLORS.ghostWhite,
+  },
+  tooltipHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
   tooltipDate: {
-    fontSize: 12,
+    fontSize: 14,
     color: HALLOWEEN_COLORS.ghostWhite,
-    opacity: 0.8,
-    marginBottom: 4,
+    fontWeight: '600',
+  },
+  tooltipClose: {
+    fontSize: 18,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    fontWeight: 'bold',
   },
   tooltipValue: {
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.ghostWhite,
-    marginBottom: 4,
+    marginBottom: 12,
+    textAlign: 'center',
   },
-  tooltipState: {
+  tooltipDivider: {
+    height: 1,
+    backgroundColor: HALLOWEEN_COLORS.ghostWhite,
+    opacity: 0.3,
+    marginVertical: 8,
+  },
+  tooltipDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  tooltipLabel: {
     fontSize: 12,
     color: HALLOWEEN_COLORS.ghostWhite,
-    opacity: 0.8,
+    opacity: 0.7,
+    textTransform: 'uppercase',
+  },
+  tooltipState: {
+    fontSize: 14,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    fontWeight: '600',
+  },
+  tooltipDetailValue: {
+    fontSize: 14,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    fontWeight: '600',
+  },
+  tooltipHint: {
+    fontSize: 11,
+    color: HALLOWEEN_COLORS.ghostWhite,
+    opacity: 0.5,
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });
