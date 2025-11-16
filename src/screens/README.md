@@ -34,6 +34,47 @@ import { OnboardingFlow } from './screens/onboarding';
 
 ## Main Screens
 
+### MainScreen
+
+The primary app screen displaying the Symbi creature and health metrics.
+
+**Features:**
+- 8-bit pixel art Symbi ghost with emotional state animations
+- Real-time step count display with progress bar
+- Emotional state label (Sad, Resting, Active, etc.)
+- Threshold indicators showing state ranges
+- Pull-to-refresh for manual data updates
+- Background sync with automatic updates
+- Offline indicator when disconnected
+- Settings button (top right corner)
+- Configure thresholds button
+- Test buttons for quick state changes (development)
+- Evolution progress tracker (Phase 3)
+- "Calm your Symbi" breathing exercise button (Phase 3)
+- State change notifications with smooth animations
+
+**UI Layout:**
+- Clean top bar with offline indicator and settings button
+- Centered Symbi ghost (responsive sizing)
+- Emotional state label below ghost
+- Health metrics card with step count
+- Progress bar with color-coded fill
+- Threshold indicators showing ranges
+- Action buttons at bottom
+
+**Usage:**
+```tsx
+import { MainScreen } from './screens';
+
+<MainScreen
+  navigation={{
+    navigate: (screen) => {
+      // Handle navigation
+    }
+  }}
+/>
+```
+
 ### ManualEntryScreen
 
 Allows users to manually enter their daily step count when not using automatic health data tracking.

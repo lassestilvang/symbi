@@ -8,7 +8,27 @@ Added an alternative 8-bit pixel art implementation of the Symbi ghost (`Symbi8B
 
 November 16, 2025
 
-## Components Added
+## Files Added
+
+### src/components/symbi/pixelData.ts
+
+Pure data module containing all pixel coordinate definitions for the 8-bit ghost.
+
+**Key Exports:**
+- `PixelCoordinate` type: `[x: number, y: number]` tuple
+- `GhostColors` interface: Color scheme for body, eyes, mouth, blush
+- `GHOST_GRID_SIZE`: 32 (grid dimensions)
+- `GHOST_MIN_Y`, `GHOST_MAX_Y`: Y-axis boundaries (6, 25)
+- `ghostBodyPixels`: 400+ coordinates forming the ghost body
+- Eye variations: `normalEyes`, `sadEyes`, `happyEyes`, `stressedEyes`
+- Mouth variations: `smileMouth`, `frownMouth`, `neutralMouth`, `worriedMouth`
+- `blushPixels`: Cheek blush coordinates (8 pixels)
+
+**Design:**
+- Immutable const arrays
+- No business logic (pure data)
+- Taller ghost design for better proportions
+- Positioned for optimal facial feature placement
 
 ### Symbi8BitCanvas.tsx
 
@@ -44,9 +64,11 @@ Interactive demo component for testing the 8-bit ghost.
 ### Ghost Structure
 
 - **Body**: Rounded top, wavy bottom (classic ghost shape)
-- **Size**: 32x32 pixel grid, taller proportions for better visibility
-- **Colors**: Cream white base with state-dependent variations
+- **Size**: 32x32 pixel grid, taller proportions (20 rows, Y: 6-25)
+- **Dimensions**: 16 pixels wide (X: 8-23), 20 pixels tall
+- **Colors**: Cream white base (#F5F5F0) with state-dependent variations
 - **Features**: Eyes, mouth, optional blush on cheeks
+- **Pixel Count**: ~400 body pixels, varying facial features
 
 ### Emotional State Variations
 

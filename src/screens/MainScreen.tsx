@@ -543,18 +543,15 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         {isLoading ? (
           <ActivityIndicator size="large" color="#9333EA" />
         ) : (
-          <>
-            {console.log('📍 Rendering ghost with state:', emotionalState)}
-            <Symbi8BitCanvas
-              key={`ghost-${emotionalState}`}
-              emotionalState={emotionalState}
-              size={Math.min(SCREEN_WIDTH * 0.8, 350)}
-              onPoke={() => {
-                console.log('👻 Ghost poked! Current state:', emotionalState);
-                handleSymbiPoke();
-              }}
-            />
-          </>
+          <Symbi8BitCanvas
+            key={`ghost-${emotionalState}`}
+            emotionalState={emotionalState}
+            size={Math.min(SCREEN_WIDTH * 0.8, 350)}
+            onPoke={() => {
+              console.log('👻 Ghost poked! Current state:', emotionalState);
+              handleSymbiPoke();
+            }}
+          />
         )}
       </View>
 
@@ -874,18 +871,6 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     textAlign: 'center',
     lineHeight: 20,
-  },
-  manualEntryButton: {
-    marginTop: 20,
-    backgroundColor: '#7C3AED',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  manualEntryButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   animation: {
     width: Math.min(SCREEN_WIDTH * 0.8, 350),

@@ -86,7 +86,7 @@ export const AppNavigator: React.FC = () => {
             fontWeight: 'bold',
           },
         }}>
-        <Stack.Screen name="Main" component={MainScreen} options={{ title: 'Symbi' }} />
+        <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Settings" options={{ title: 'Settings' }}>
           {props => (
             <SettingsScreen

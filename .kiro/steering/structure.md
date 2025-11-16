@@ -6,9 +6,16 @@
 src/
 ├── components/          # Reusable UI components
 │   ├── SymbiAnimation.tsx          # Main Symbi creature animation
+│   ├── Symbi8BitCanvas.tsx         # 8-bit pixel art ghost renderer
+│   ├── Symbi8BitDemo.tsx           # Demo component for 8-bit ghost
 │   ├── BreathingExercise.tsx       # Interactive breathing UI
 │   ├── EvolutionCelebration.tsx    # Evolution event UI
 │   ├── ThresholdConfigScreen.tsx   # Threshold configuration
+│   ├── symbi/                      # 8-bit ghost rendering system
+│   │   ├── pixelData.ts            # Pixel coordinate definitions
+│   │   ├── ghostRenderer.ts        # Rendering logic and state mappings
+│   │   ├── README.md               # Module documentation
+│   │   └── __tests__/              # Unit tests for rendering system
 │   ├── __tests__/                  # Component tests
 │   └── index.ts                    # Barrel exports
 │
@@ -54,6 +61,9 @@ src/
 │   ├── userPreferencesStore.ts     # User settings and thresholds
 │   ├── symbiStateStore.ts          # Symbi creature state
 │   └── index.ts
+│
+├── hooks/               # Custom React hooks
+│   └── useSymbiAnimation.ts        # Animation logic for 8-bit ghost
 │
 ├── navigation/          # React Navigation setup
 │   └── AppNavigator.tsx            # Main navigation stack

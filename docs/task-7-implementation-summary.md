@@ -17,10 +17,11 @@ Successfully implemented the main Symbi screen with complete health data integra
 - Progress bar showing completion percentage
 - Current emotional state label with emoji
 - Configure Thresholds button
-- Settings button in header
+- Settings button in top right corner
 - Threshold indicators showing ranges
 - Pull-to-refresh functionality
 - Responsive design for various screen sizes
+- Clean top bar layout without title (Symbi speaks for itself)
 
 ### 7.2 Implement Daily Health Data Update Cycle ✅
 **Files Modified:**
@@ -88,10 +89,9 @@ Successfully implemented the main Symbi screen with complete health data integra
 ## Key Features
 
 ### UI Components
-1. **Header**
-   - App title
+1. **Top Bar**
    - Offline indicator (when disconnected)
-   - Settings button
+   - Settings button (top right corner)
 
 2. **Symbi Animation**
    - Centered display
