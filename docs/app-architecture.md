@@ -385,6 +385,66 @@ interface HealthMetrics {
 
 For detailed information, see [Phase 2 Multi-Metric Implementation](./phase2-multi-metric-implementation.md).
 
+## Evolution History Page Architecture
+
+### Data Visualization Types
+
+The Evolution History Page uses specialized type definitions for displaying historical health data:
+
+**HistoricalDataPoint**:
+```typescript
+interface HistoricalDataPoint {
+  date: string; // YYYY-MM-DD
+  steps: number;
+  sleepHours?: number;
+  hrv?: number;
+  emotionalState: EmotionalState;
+  calculationMethod: 'rule-based' | 'ai';
+}
+```
+
+Used for:
+- Timeline visualizations of emotional states
+- Line charts showing health metric trends
+- Data table displays with daily breakdowns
+
+**HistoryStatistics**:
+```typescript
+interface HistoryStatistics {
+  averageSteps: number;
+  averageSleep: number | null;
+  averageHRV: number | null;
+  mostFrequentState: EmotionalState;
+  totalEvolutions: number;
+  daysSinceLastEvolution: number;
+}
+```
+
+Used for:
+- Summary cards displaying aggregated metrics
+- Time range comparisons (7D, 30D, 90D, All)
+- Evolution milestone tracking
+
+### Data Flow
+
+```
+StorageService.getHealthDataCache()
+   ↓
+Transform to HistoricalDataPoint[]
+   ↓
+Filter by Time Range (7D/30D/90D/All)
+   ↓
+Calculate HistoryStatistics
+   ↓
+Render Visualizations
+   ├── Summary Cards
+   ├── Line Charts
+   ├── Timeline
+   └── Data Table
+```
+
+For detailed information, see [Evolution History Page Design](./.kiro/specs/evolution-history-page/design.md).
+
 ## Related Documentation
 
 - [Crash Reporting Setup](./crash-reporting-setup.md)
@@ -393,6 +453,7 @@ For detailed information, see [Phase 2 Multi-Metric Implementation](./phase2-mul
 - [Testing Guide](./testing-configuration.md)
 - [Health Data Integration](./health-data-integration-summary.md)
 - [Phase 2 Multi-Metric Implementation](./phase2-multi-metric-implementation.md)
+- [Evolution History Page Spec](./.kiro/specs/evolution-history-page/)
 
 ## References
 

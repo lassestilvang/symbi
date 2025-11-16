@@ -5,3 +5,8 @@ export { SymbiAnimationDemo } from './SymbiAnimationDemo';
 export { BreathingExercise } from './BreathingExercise';
 export { EvolutionCelebration } from './EvolutionCelebration';
 export { ProgressiveImage } from './ProgressiveImage';
+export { StatisticsCard } from './StatisticsCard';
+export { HealthMetricsChart } from './HealthMetricsChart';
+export { EmotionalStateTimeline } from './EmotionalStateTimeline';
+export { EvolutionMilestoneCard } from './EvolutionMilestoneCard';
+export { HealthDataTable } from './HealthDataTable';

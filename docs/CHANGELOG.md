@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Evolution History Page type definitions (2025-11-16)
+  - Added `HistoricalDataPoint` interface for daily health data visualization
+  - Added `HistoryStatistics` interface for aggregated time range statistics
+  - Supports time range filtering (7D, 30D, 90D, All Time)
+  - Enables line charts, timelines, and data tables for historical analysis
+  - See [.kiro/specs/evolution-history-page/](../.kiro/specs/evolution-history-page/)
+
 ### Changed
 - Improved MainScreen responsive layout for tablets and large screens (2025-11-16)
   - Added 600px max-width constraint to content container

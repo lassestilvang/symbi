@@ -206,6 +206,27 @@ The `MainScreen` component is the primary user interface, integrating all three 
 - **Health Data Integration**: [docs/health-data-integration-summary.md](docs/health-data-integration-summary.md)
 - **Screen Components**: [src/screens/README.md](src/screens/README.md)
 
+### Evolution History Page
+
+The Evolution History Page provides comprehensive visualizations of historical health data and emotional states:
+
+**Key Features**:
+- Time range filtering (7D, 30D, 90D, All Time)
+- Summary statistics cards with Halloween-themed decorations
+- Line charts for steps, sleep, and HRV trends
+- Emotional state timeline with ghost icons
+- Evolution milestone gallery
+- Scrollable data table with daily breakdowns
+
+**Type Definitions**:
+- `HistoricalDataPoint`: Single day's health data with emotional state
+- `HistoryStatistics`: Aggregated statistics for time range analysis
+
+**Documentation**:
+- **Requirements**: [.kiro/specs/evolution-history-page/requirements.md](.kiro/specs/evolution-history-page/requirements.md)
+- **Design**: [.kiro/specs/evolution-history-page/design.md](.kiro/specs/evolution-history-page/design.md)
+- **Implementation Tasks**: [.kiro/specs/evolution-history-page/tasks.md](.kiro/specs/evolution-history-page/tasks.md)
+
 ## Monitoring
 
 Crash reporting and monitoring is configured with Sentry:
@@ -215,6 +236,26 @@ Crash reporting and monitoring is configured with Sentry:
 - **Initialization**: Automatic on app startup with environment validation
 - **Privacy**: Health data is automatically sanitized from error reports
 - **Cleanup**: Proper handler restoration on component unmount
+
+## Type System
+
+The application uses TypeScript with strict mode for type safety. Core type definitions are located in `src/types/index.ts`:
+
+**Health Data Types**:
+- `HealthMetrics`: Current health data values (steps, sleep, HRV)
+- `HealthDataCache`: Daily health data with emotional state (30-day rolling cache)
+- `HistoricalDataPoint`: Single day's data for visualization (Evolution History Page)
+- `HistoryStatistics`: Aggregated statistics for time range analysis
+
+**User Configuration**:
+- `UserProfile`: Complete user profile with preferences and goals
+- `UserPreferences`: App settings (data source, notifications, theme)
+- `StepThresholds`: Configurable emotional state boundaries
+- `HealthGoals`: Target metrics for health tracking
+
+**Evolution System**:
+- `EvolutionRecord`: Single evolution event with appearance and metadata
+- `EmotionalState`: Enum of all possible Symbi states (9 total)
 
 ## Changelog
 

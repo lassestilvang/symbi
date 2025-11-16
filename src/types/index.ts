@@ -129,6 +129,32 @@ export interface EvolutionRecord {
   dominantStates: EmotionalState[];
 }
 
+/**
+ * HistoricalDataPoint represents a single day's health data with emotional state
+ * Used for Evolution History Page visualizations
+ */
+export interface HistoricalDataPoint {
+  date: string; // YYYY-MM-DD
+  steps: number;
+  sleepHours?: number;
+  hrv?: number;
+  emotionalState: EmotionalState;
+  calculationMethod: 'rule-based' | 'ai';
+}
+
+/**
+ * HistoryStatistics contains aggregated statistics for a time range
+ * Used for Evolution History Page summary cards
+ */
+export interface HistoryStatistics {
+  averageSteps: number;
+  averageSleep: number | null;
+  averageHRV: number | null;
+  mostFrequentState: EmotionalState;
+  totalEvolutions: number;
+  daysSinceLastEvolution: number;
+}
+
 // ============================================================================
 // Utility Types
 // ============================================================================
