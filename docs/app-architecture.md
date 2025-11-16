@@ -345,12 +345,54 @@ return () => {
 - [ ] Track API response times
 - [ ] Monitor battery usage impact
 
+## Health Data Architecture
+
+### Multi-Metric Collection (Phase 2)
+
+The application now collects multiple health metrics for comprehensive analysis:
+
+**HealthDataUpdateService Flow**:
+```
+1. Initialize health data service (platform-specific)
+   ↓
+2. Fetch step count (required, Phase 1)
+   ↓
+3. Fetch sleep duration (optional, Phase 2)
+   ↓
+4. Fetch HRV (optional, Phase 2)
+   ↓
+5. Package into HealthMetrics object
+   ↓
+6. Calculate emotional state
+   ↓
+7. Update stores and trigger UI updates
+```
+
+**Graceful Degradation**:
+- Sleep and HRV fetching wrapped in try-catch blocks
+- Zero values treated as unavailable (set to `undefined`)
+- Continues with available metrics if some fail
+- Maintains Phase 1 compatibility (step-only tracking)
+
+**Data Structure**:
+```typescript
+interface HealthMetrics {
+  steps: number;           // Required (Phase 1)
+  sleepHours?: number;     // Optional (Phase 2)
+  hrv?: number;            // Optional (Phase 2)
+}
+```
+
+For detailed information, see [Phase 2 Multi-Metric Implementation](./phase2-multi-metric-implementation.md).
+
 ## Related Documentation
 
 - [Crash Reporting Setup](./crash-reporting-setup.md)
 - [Error Reporting Service](../src/services/ErrorReportingService.ts)
 - [Sentry Configuration](../src/config/sentry.config.ts)
 - [Testing Guide](./testing-configuration.md)
+- [Health Data Integration](./health-data-integration-summary.md)
+- [Phase 2 Multi-Metric Implementation](./phase2-multi-metric-implementation.md)
 
 ## References
 

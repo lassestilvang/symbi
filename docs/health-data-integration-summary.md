@@ -51,6 +51,7 @@ Task 2 "Set up health data integration infrastructure" has been successfully com
   - `getDataForDate()`
   - `clearAllData()`
 - Implemented subscription notifications for manual data updates
+- **Refactored (Nov 16, 2025)**: Eliminated code duplication using Template Method Pattern, improved type safety, and enhanced maintainability (see [manual-health-data-service-refactoring.md](manual-health-data-service-refactoring.md))
 
 ### 2.5 Implement background fetch and subscription system ✅
 - Created `BackgroundSyncService` singleton for managing background data synchronization
@@ -138,6 +139,47 @@ Task 2 "Set up health data integration infrastructure" has been successfully com
 ## Next Steps
 The health data integration infrastructure is now complete and ready for use in subsequent tasks. The next task (Task 3) will implement local storage and state management, which will build upon this foundation to create the reactive data layer for the Symbi application.
 
+## Phase 2 Integration
+
+The health data integration now supports Phase 2 multi-metric analysis:
+
+### HealthDataUpdateService Enhancement
+
+The `HealthDataUpdateService` has been updated to fetch additional health metrics beyond step count:
+
+- **Sleep Duration**: Automatically fetched when available (Phase 2+)
+- **Heart Rate Variability (HRV)**: Automatically fetched when available (Phase 2+)
+- **Graceful Degradation**: Falls back to step-only tracking if additional metrics unavailable
+
+**Key Features**:
+- Non-blocking metric fetching (continues if sleep/HRV unavailable)
+- Zero values treated as unavailable (set to `undefined`)
+- Maintains backward compatibility with Phase 1 step-only tracking
+- All metrics included in `HealthMetrics` object for AI analysis
+
+**Implementation Details**:
+```typescript
+// Fetch additional metrics with error handling
+try {
+  sleepHours = await this.healthDataService.getSleepDuration(startOfDay, endOfDay);
+  if (sleepHours === 0) sleepHours = undefined;
+} catch (error) {
+  console.log('Sleep data not available');
+}
+
+try {
+  hrv = await this.healthDataService.getHeartRateVariability(startOfDay, endOfDay);
+  if (hrv === 0) hrv = undefined;
+} catch (error) {
+  console.log('HRV data not available');
+}
+
+// Create comprehensive health metrics
+const metrics: HealthMetrics = { steps, sleepHours, hrv };
+```
+
+This enables the AI Brain Service (Phase 2) to analyze multiple health dimensions for more nuanced emotional state determination.
+
 ## Usage Example
 
 ```typescript
@@ -146,9 +188,9 @@ import { createHealthDataService, HealthDataType } from './services';
 // Create service (automatically detects platform)
 const healthService = createHealthDataService();
 
-// Initialize with permissions
+// Initialize with permissions (Phase 2 includes sleep and HRV)
 const result = await healthService.initialize({
-  read: [HealthDataType.STEPS, HealthDataType.SLEEP],
+  read: [HealthDataType.STEPS, HealthDataType.SLEEP, HealthDataType.HRV],
   write: [HealthDataType.MINDFUL_MINUTES],
 });
 
@@ -159,6 +201,18 @@ healthService.subscribeToUpdates(HealthDataType.STEPS, (data) => {
 
 // Get step count
 const steps = await healthService.getStepCount(
+  new Date('2024-01-01'),
+  new Date('2024-01-02')
+);
+
+// Get sleep duration (Phase 2)
+const sleepHours = await healthService.getSleepDuration(
+  new Date('2024-01-01'),
+  new Date('2024-01-02')
+);
+
+// Get HRV (Phase 2)
+const hrv = await healthService.getHeartRateVariability(
   new Date('2024-01-01'),
   new Date('2024-01-02')
 );

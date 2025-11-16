@@ -33,6 +33,9 @@ export class HealthDataUpdateService {
 
     // Subscribe to background updates
     this.subscribeToHealthDataUpdates();
+
+    // Load cached data first to show something immediately
+    await this.loadCachedHealthData();
   }
 
   /**
@@ -57,8 +60,35 @@ export class HealthDataUpdateService {
       const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
 
+      console.log(
+        `[HealthDataUpdateService] Fetching data for: ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`
+      );
+      console.log(
+        `[HealthDataUpdateService] Date keys: start=${startOfDay.toISOString().split('T')[0]}, end=${endOfDay.toISOString().split('T')[0]}`
+      );
+
       // Fetch step count
       const steps = await this.healthDataService.getStepCount(startOfDay, endOfDay);
+
+      // Fetch additional metrics if available (Phase 2+)
+      let sleepHours: number | undefined;
+      let hrv: number | undefined;
+
+      try {
+        sleepHours = await this.healthDataService.getSleepDuration(startOfDay, endOfDay);
+        if (sleepHours === 0) sleepHours = undefined;
+      } catch {
+        // Sleep data not available, continue without it
+        console.log('Sleep data not available');
+      }
+
+      try {
+        hrv = await this.healthDataService.getHeartRateVariability(startOfDay, endOfDay);
+        if (hrv === 0) hrv = undefined;
+      } catch {
+        // HRV data not available, continue without it
+        console.log('HRV data not available');
+      }
 
       // Get user thresholds
       const profile = useUserPreferencesStore.getState().profile;
@@ -71,7 +101,7 @@ export class HealthDataUpdateService {
       const emotionalState = EmotionalStateCalculator.calculateStateFromSteps(steps, thresholds);
 
       // Create health metrics
-      const metrics: HealthMetrics = { steps };
+      const metrics: HealthMetrics = { steps, sleepHours, hrv };
 
       // Update health data store
       await healthStore.updateHealthData(metrics, emotionalState, 'rule-based');
@@ -105,9 +135,14 @@ export class HealthDataUpdateService {
     try {
       const cache = await StorageService.getHealthDataCache();
       if (!cache) {
-        console.log('No cached health data available');
+        console.log('[HealthDataUpdateService] No cached health data available');
         return;
       }
+
+      console.log(
+        `[HealthDataUpdateService] Found ${Object.keys(cache).length} cached entries:`,
+        Object.keys(cache)
+      );
 
       // Get today's or most recent cached data
       const today = this.getDateKey(new Date());
@@ -117,8 +152,13 @@ export class HealthDataUpdateService {
         // Find most recent entry
         const sortedDates = Object.keys(cache).sort().reverse();
         if (sortedDates.length > 0) {
+          console.log(
+            `[HealthDataUpdateService] No data for today (${today}), using most recent: ${sortedDates[0]}`
+          );
           cacheEntry = cache[sortedDates[0]];
         }
+      } else {
+        console.log(`[HealthDataUpdateService] Found data for today (${today})`);
       }
 
       if (cacheEntry) {
@@ -138,7 +178,7 @@ export class HealthDataUpdateService {
         symbiStore.setEmotionalState(cacheEntry.emotionalState);
 
         console.log(
-          `Loaded cached health data: ${cacheEntry.steps} steps → ${cacheEntry.emotionalState} state`
+          `[HealthDataUpdateService] Loaded cached health data: ${cacheEntry.steps} steps → ${cacheEntry.emotionalState} state`
         );
       }
     } catch (error) {

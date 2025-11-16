@@ -20,10 +20,15 @@ export class StorageService {
   static async get<T>(key: string): Promise<T | null> {
     try {
       const value = await AsyncStorage.getItem(key);
-      if (!value) return null;
+      if (!value) {
+        console.log(`[StorageService] No data found for key: ${key}`);
+        return null;
+      }
 
       const parsed = JSON.parse(value);
-      return this.deserializeDates(parsed);
+      const result = this.deserializeDates(parsed);
+      console.log(`[StorageService] Retrieved data for key: ${key}`);
+      return result;
     } catch (error) {
       console.error(`Error getting ${key} from storage:`, error);
       return null;
@@ -32,7 +37,9 @@ export class StorageService {
 
   static async set<T>(key: string, value: T): Promise<boolean> {
     try {
-      await AsyncStorage.setItem(key, JSON.stringify(value));
+      const jsonString = JSON.stringify(value);
+      await AsyncStorage.setItem(key, jsonString);
+      console.log(`[StorageService] Saved data for key: ${key} (${jsonString.length} bytes)`);
       return true;
     } catch (error) {
       console.error(`Error setting ${key} in storage:`, error);
@@ -103,9 +110,14 @@ export class StorageService {
   }
 
   static async addHealthDataEntry(dateKey: string, data: HealthDataCache): Promise<boolean> {
+    console.log(`[StorageService] Adding health data entry for ${dateKey}`);
     const cache = (await this.getHealthDataCache()) || {};
     cache[dateKey] = data;
-    return this.setHealthDataCache(cache);
+    const result = await this.setHealthDataCache(cache);
+    console.log(
+      `[StorageService] Health data entry saved. Total entries: ${Object.keys(cache).length}`
+    );
+    return result;
   }
 
   static async removeHealthDataCache(): Promise<boolean> {

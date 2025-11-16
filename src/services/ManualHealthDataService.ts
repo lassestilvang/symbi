@@ -10,14 +10,29 @@ interface ManualHealthData {
   mindfulMinutes?: number;
 }
 
+interface ValidationConfig {
+  min: number;
+  max: number;
+  fieldName: string;
+}
+
+interface HealthDataUpdate {
+  steps?: number;
+  sleepHours?: number;
+  hrv?: number;
+  mindfulMinutes?: number;
+  timestamp: Date;
+}
+
 export class ManualHealthDataService extends HealthDataService {
   private static readonly STORAGE_KEY = 'manual_health_data';
-  private static readonly MIN_STEPS = 0;
-  private static readonly MAX_STEPS = 100000;
-  private static readonly MIN_SLEEP = 0;
-  private static readonly MAX_SLEEP = 24;
-  private static readonly MIN_HRV = 0;
-  private static readonly MAX_HRV = 200;
+
+  // Validation configurations
+  private static readonly VALIDATION_RULES: Record<string, ValidationConfig> = {
+    steps: { min: 0, max: 100000, fieldName: 'Step count' },
+    sleepHours: { min: 0, max: 24, fieldName: 'Sleep duration' },
+    hrv: { min: 0, max: 200, fieldName: 'HRV' },
+  };
 
   async initialize(_permissions: HealthPermissions): Promise<InitResult> {
     // Manual data entry doesn't require actual permissions
@@ -40,6 +55,10 @@ export class ManualHealthDataService extends HealthDataService {
       // Sum up steps for all days in the range
       const totalSteps = data.reduce((sum, dayData) => sum + (dayData.steps || 0), 0);
 
+      console.log(
+        `[ManualHealthDataService] getStepCount: ${startDate.toISOString()} to ${endDate.toISOString()} = ${totalSteps} steps (${data.length} days)`
+      );
+
       return totalSteps;
     } catch (error) {
       console.error('Error getting step count:', error);
@@ -48,35 +67,31 @@ export class ManualHealthDataService extends HealthDataService {
   }
 
   async getSleepDuration(startDate: Date, endDate: Date): Promise<number> {
-    try {
-      const data = await this.getHealthDataForDateRange(startDate, endDate);
-
-      // Average sleep hours for the date range
-      const sleepData = data.filter(d => d.sleepHours !== undefined);
-      if (sleepData.length === 0) return 0;
-
-      const totalSleep = sleepData.reduce((sum, dayData) => sum + (dayData.sleepHours || 0), 0);
-
-      return totalSleep / sleepData.length;
-    } catch (error) {
-      console.error('Error getting sleep duration:', error);
-      throw error;
-    }
+    return this.getAverageMetric(startDate, endDate, 'sleepHours');
   }
 
   async getHeartRateVariability(startDate: Date, endDate: Date): Promise<number> {
+    return this.getAverageMetric(startDate, endDate, 'hrv');
+  }
+
+  /**
+   * Generic method to calculate average for a metric over a date range
+   */
+  private async getAverageMetric(
+    startDate: Date,
+    endDate: Date,
+    field: keyof ManualHealthData
+  ): Promise<number> {
     try {
       const data = await this.getHealthDataForDateRange(startDate, endDate);
+      const validData = data.filter(d => d[field] !== undefined);
 
-      // Average HRV for the date range
-      const hrvData = data.filter(d => d.hrv !== undefined);
-      if (hrvData.length === 0) return 0;
+      if (validData.length === 0) return 0;
 
-      const totalHRV = hrvData.reduce((sum, dayData) => sum + (dayData.hrv || 0), 0);
-
-      return totalHRV / hrvData.length;
+      const total = validData.reduce((sum, dayData) => sum + (Number(dayData[field]) || 0), 0);
+      return total / validData.length;
     } catch (error) {
-      console.error('Error getting HRV:', error);
+      console.error(`Error getting ${String(field)}:`, error);
       throw error;
     }
   }
@@ -104,139 +119,114 @@ export class ManualHealthDataService extends HealthDataService {
    * Save manual step count entry
    */
   async saveStepCount(steps: number, date: Date = new Date()): Promise<boolean> {
-    if (!this.validateStepCount(steps)) {
-      throw new Error(
-        `Step count must be between ${ManualHealthDataService.MIN_STEPS} and ${ManualHealthDataService.MAX_STEPS}`
-      );
-    }
-
-    try {
-      const dateKey = this.getDateKey(date);
-      const allData = await this.getAllHealthData();
-
-      const existingData = allData[dateKey] || {};
-      existingData.steps = steps;
-
-      allData[dateKey] = existingData;
-
-      await StorageService.set(ManualHealthDataService.STORAGE_KEY, allData);
-
-      // Notify subscribers
-      this.notifyUpdate(HealthDataType.STEPS, { steps, timestamp: date });
-
-      return true;
-    } catch (error) {
-      console.error('Error saving step count:', error);
-      return false;
-    }
+    return this.saveHealthMetric('steps', steps, HealthDataType.STEPS, date);
   }
 
   /**
    * Save manual sleep duration entry
    */
   async saveSleepDuration(hours: number, date: Date = new Date()): Promise<boolean> {
-    if (!this.validateSleepDuration(hours)) {
-      throw new Error(
-        `Sleep duration must be between ${ManualHealthDataService.MIN_SLEEP} and ${ManualHealthDataService.MAX_SLEEP} hours`
-      );
-    }
-
-    try {
-      const dateKey = this.getDateKey(date);
-      const allData = await this.getAllHealthData();
-
-      const existingData = allData[dateKey] || {};
-      existingData.sleepHours = hours;
-
-      allData[dateKey] = existingData;
-
-      await StorageService.set(ManualHealthDataService.STORAGE_KEY, allData);
-
-      // Notify subscribers
-      this.notifyUpdate(HealthDataType.SLEEP, { sleepHours: hours, timestamp: date });
-
-      return true;
-    } catch (error) {
-      console.error('Error saving sleep duration:', error);
-      return false;
-    }
+    return this.saveHealthMetric('sleepHours', hours, HealthDataType.SLEEP, date);
   }
 
   /**
    * Save manual HRV entry
    */
   async saveHRV(hrv: number, date: Date = new Date()): Promise<boolean> {
-    if (!this.validateHRV(hrv)) {
-      throw new Error(
-        `HRV must be between ${ManualHealthDataService.MIN_HRV} and ${ManualHealthDataService.MAX_HRV}`
-      );
-    }
+    return this.saveHealthMetric('hrv', hrv, HealthDataType.HRV, date);
+  }
+
+  /**
+   * Generic method to save a health metric (Template Method Pattern)
+   * Reduces code duplication across save methods
+   */
+  private async saveHealthMetric(
+    field: keyof Omit<ManualHealthData, 'date' | 'mindfulMinutes'>,
+    value: number,
+    dataType: HealthDataType,
+    date: Date
+  ): Promise<boolean> {
+    // Validate the value
+    this.validateMetric(field, value);
 
     try {
       const dateKey = this.getDateKey(date);
       const allData = await this.getAllHealthData();
 
+      // Update or create entry for this date
       const existingData = allData[dateKey] || {};
-      existingData.hrv = hrv;
-
+      existingData[field] = value;
       allData[dateKey] = existingData;
 
+      // Persist to storage
       await StorageService.set(ManualHealthDataService.STORAGE_KEY, allData);
 
-      // Notify subscribers
-      this.notifyUpdate(HealthDataType.HRV, { hrv, timestamp: date });
+      if (__DEV__) {
+        console.log(
+          `[ManualHealthDataService] Saved ${value} ${field} for ${dateKey}. Total entries: ${Object.keys(allData).length}`
+        );
+      }
+
+      // Notify subscribers with properly typed data
+      const updateData: HealthDataUpdate = { [field]: value, timestamp: date };
+      this.notifyUpdate(dataType, updateData);
 
       return true;
     } catch (error) {
-      console.error('Error saving HRV:', error);
-      return false;
+      console.error(`Error saving ${field}:`, error);
+      throw error; // Throw instead of returning false for consistent error handling
     }
   }
 
   /**
-   * Validation methods
+   * Generic validation method
+   * Throws descriptive error if validation fails
    */
-  private validateStepCount(steps: number): boolean {
-    return (
-      typeof steps === 'number' &&
-      !isNaN(steps) &&
-      steps >= ManualHealthDataService.MIN_STEPS &&
-      steps <= ManualHealthDataService.MAX_STEPS
-    );
-  }
+  private validateMetric(field: string, value: number): void {
+    const rules = ManualHealthDataService.VALIDATION_RULES[field];
 
-  private validateSleepDuration(hours: number): boolean {
-    return (
-      typeof hours === 'number' &&
-      !isNaN(hours) &&
-      hours >= ManualHealthDataService.MIN_SLEEP &&
-      hours <= ManualHealthDataService.MAX_SLEEP
-    );
-  }
+    if (!rules) {
+      throw new Error(`Unknown metric field: ${field}`);
+    }
 
-  private validateHRV(hrv: number): boolean {
-    return (
-      typeof hrv === 'number' &&
-      !isNaN(hrv) &&
-      hrv >= ManualHealthDataService.MIN_HRV &&
-      hrv <= ManualHealthDataService.MAX_HRV
-    );
+    if (typeof value !== 'number' || isNaN(value)) {
+      throw new Error(`${rules.fieldName} must be a valid number`);
+    }
+
+    if (value < rules.min || value > rules.max) {
+      throw new Error(`${rules.fieldName} must be between ${rules.min} and ${rules.max}`);
+    }
   }
 
   /**
    * Helper methods
    */
   private getDateKey(date: Date): string {
-    return date.toISOString().split('T')[0];
+    // Use local date components to avoid timezone issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private async getAllHealthData(): Promise<Record<string, ManualHealthData>> {
     const data = await StorageService.get<Record<string, ManualHealthData>>(
       ManualHealthDataService.STORAGE_KEY
     );
+
+    if (__DEV__) {
+      console.log(
+        `[ManualHealthDataService] getAllHealthData: ${data ? Object.keys(data).length : 0} entries`
+      );
+    }
+
     return data || {};
   }
 
+  /**
+   * Get health data for a date range
+   * Improved: Uses immutable date iteration and reduces unnecessary object spreading
+   */
   private async getHealthDataForDateRange(
     startDate: Date,
     endDate: Date
@@ -244,19 +234,58 @@ export class ManualHealthDataService extends HealthDataService {
     const allData = await this.getAllHealthData();
     const result: ManualHealthData[] = [];
 
-    const currentDate = new Date(startDate);
-    while (currentDate <= endDate) {
-      const dateKey = this.getDateKey(currentDate);
+    if (__DEV__) {
+      console.log(
+        `[ManualHealthDataService] getHealthDataForDateRange: ${startDate.toISOString()} to ${endDate.toISOString()}`
+      );
+      console.log(`[ManualHealthDataService] Available date keys:`, Object.keys(allData));
+    }
+
+    // Generate array of date keys for the range
+    const dateKeys = this.generateDateKeysInRange(startDate, endDate);
+
+    // Collect data for each date
+    for (const dateKey of dateKeys) {
       const dayData = allData[dateKey];
+
+      if (__DEV__) {
+        console.log(
+          `[ManualHealthDataService] Checking ${dateKey}: ${dayData ? 'FOUND' : 'NOT FOUND'}`
+        );
+      }
 
       if (dayData) {
         result.push({ ...dayData, date: dateKey });
       }
+    }
 
-      currentDate.setDate(currentDate.getDate() + 1);
+    if (__DEV__) {
+      console.log(`[ManualHealthDataService] Returning ${result.length} days of data`);
     }
 
     return result;
+  }
+
+  /**
+   * Generate array of date keys (YYYY-MM-DD) for a date range
+   * Uses immutable date handling to avoid mutation bugs
+   */
+  private generateDateKeysInRange(startDate: Date, endDate: Date): string[] {
+    const dateKeys: string[] = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Normalize to start of day
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    let current = new Date(start);
+    while (current <= end) {
+      dateKeys.push(this.getDateKey(current));
+      current = new Date(current.setDate(current.getDate() + 1));
+    }
+
+    return dateKeys;
   }
 
   /**

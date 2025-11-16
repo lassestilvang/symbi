@@ -106,11 +106,13 @@ npm run test:watch
 - Configurable thresholds
 - Manual data entry mode
 
-### Phase 2: Multi-Metric Health Analysis
+### Phase 2: Multi-Metric Health Analysis ✅
 
-- Sleep and HRV tracking
+- Sleep and HRV tracking (automatic fetching with graceful fallback)
+- Multi-metric health data collection in `HealthDataUpdateService`
 - AI-powered emotional state analysis (Gemini API)
 - Six additional emotional states
+- Backward compatible with Phase 1 step-only tracking
 
 ### Phase 3: Interactive Features & Evolution
 
@@ -143,6 +145,20 @@ npm run pre-submit
 - **Both**: Privacy policy hosted at https://symbi.app/privacy-policy
 
 ## Architecture
+
+### Services Layer
+
+The services layer provides business logic and external integrations with a focus on code quality and maintainability:
+
+- **Health Data Services**: Cross-platform health data integration with iOS HealthKit, Android Google Fit, and manual entry support
+  - Refactored `ManualHealthDataService` (Nov 2025) using Template Method Pattern to eliminate code duplication
+  - Generic validation and metric handling for easy extensibility
+  - Immutable date handling to prevent mutation bugs
+  - See [docs/manual-health-data-service-refactoring.md](docs/manual-health-data-service-refactoring.md) for details
+
+- **State Management**: Zustand stores with AsyncStorage persistence
+- **AI Integration**: Gemini API for multi-metric emotional state analysis
+- **Background Sync**: Battery-efficient health data updates
 
 ### Application Entry Point
 
@@ -186,6 +202,7 @@ The `MainScreen` component is the primary user interface, integrating all three 
 **Documentation**:
 - **Complete Feature Guide**: [docs/mainscreen-complete-feature-documentation.md](docs/mainscreen-complete-feature-documentation.md)
 - **Architecture Details**: [docs/app-architecture.md](docs/app-architecture.md)
+- **Health Data Integration**: [docs/health-data-integration-summary.md](docs/health-data-integration-summary.md)
 - **Screen Components**: [src/screens/README.md](src/screens/README.md)
 
 ## Monitoring
@@ -197,6 +214,10 @@ Crash reporting and monitoring is configured with Sentry:
 - **Initialization**: Automatic on app startup with environment validation
 - **Privacy**: Health data is automatically sanitized from error reports
 - **Cleanup**: Proper handler restoration on component unmount
+
+## Changelog
+
+See [CHANGELOG.md](docs/CHANGELOG.md) for a detailed history of changes and improvements.
 
 ## License
 
