@@ -93,7 +93,7 @@ npm run test:watch
 - **Language**: TypeScript
 - **State Management**: Zustand
 - **Navigation**: React Navigation
-- **Animations**: Lottie
+- **Animations**: Lottie (vector animations) + 8-bit pixel art (pure React Native)
 - **Storage**: AsyncStorage
 - **Security**: TLS 1.3, AES-256 encryption, dependency vulnerability management
 

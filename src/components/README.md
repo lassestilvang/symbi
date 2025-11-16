@@ -6,7 +6,7 @@ This directory contains the Symbi animation component and related UI components 
 
 ### SymbiAnimation
 
-The main animation component that renders the Symbi creature with different emotional states.
+The main animation component that renders the Symbi creature with different emotional states using Lottie animations.
 
 **Features:**
 - Lottie-based vector animations for smooth, scalable visuals
@@ -38,6 +38,43 @@ import { EmotionalState } from './types';
 - `style` (optional): Custom styling for the container
 - `autoPlay` (optional): Whether to auto-play the animation (default: true)
 - `loop` (optional): Whether to loop the animation (default: true)
+
+### Symbi8BitCanvas
+
+An alternative 8-bit pixel art implementation of the Symbi ghost using React Native Views as pixels. This provides a retro aesthetic option that doesn't require Lottie animation files.
+
+**Features:**
+- Pure React Native implementation (no external animation files needed)
+- 8-bit pixel art style with cream-colored ghost
+- Interactive poke/tap animation with bounce and squish effects
+- Idle floating animation with gentle sway
+- State-based visual changes (eyes, mouth, blush, body color)
+- Responsive sizing based on screen width
+- Performance optimized with native driver animations
+
+**Usage:**
+```tsx
+import { Symbi8BitCanvas } from './components';
+import { EmotionalState } from './types';
+
+<Symbi8BitCanvas 
+  emotionalState={EmotionalState.ACTIVE}
+  size={300}
+  onPoke={() => console.log('Ghost poked!')}
+/>
+```
+
+**Props:**
+- `emotionalState` (required): The current emotional state of the Symbi
+- `style` (optional): Custom styling for the container
+- `size` (optional): Size of the ghost in pixels (default: 70% of screen width, max 300)
+- `onPoke` (optional): Callback function when ghost is tapped
+
+**Visual States:**
+- **SAD/TIRED**: Droopy eyes, frown, duller body color
+- **RESTING/CALM**: Normal eyes, neutral mouth, standard body color
+- **ACTIVE/VIBRANT/RESTED**: Larger eyes, smile, brighter body color, pink blush
+- **STRESSED/ANXIOUS**: Wide eyes, worried mouth, salmon blush
 
 ### Phase 1 Emotional States
 
@@ -99,9 +136,11 @@ Tests cover:
 - Performance optimizations
 - Custom props and styling
 
-### Demo Component
+### Demo Components
 
-Use `SymbiAnimationDemo` to test the animation component:
+#### SymbiAnimationDemo
+
+Use `SymbiAnimationDemo` to test the Lottie animation component:
 
 ```tsx
 import { SymbiAnimationDemo } from './components';
@@ -110,6 +149,22 @@ import { SymbiAnimationDemo } from './components';
 ```
 
 This provides an interactive UI to switch between emotional states and see the transitions in action.
+
+#### Symbi8BitDemo
+
+Use `Symbi8BitDemo` to test the 8-bit pixel art component:
+
+```tsx
+import { Symbi8BitDemo } from './components';
+
+<Symbi8BitDemo />
+```
+
+This provides an interactive UI to:
+- Switch between all emotional states
+- Test poke/tap interactions
+- View poke counter
+- See real-time state changes
 
 ## Future Enhancements (Phase 2 & 3)
 

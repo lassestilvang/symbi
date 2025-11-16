@@ -12,7 +12,7 @@ import {
   Modal,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { SymbiAnimation } from '../components/SymbiAnimation';
+import { Symbi8BitCanvas } from '../components/Symbi8BitCanvas';
 import { BreathingExercise } from '../components/BreathingExercise';
 import { EvolutionCelebration } from '../components/EvolutionCelebration';
 import { useHealthDataStore } from '../stores/healthDataStore';
@@ -61,12 +61,12 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
     clearError,
   } = useHealthDataStore();
   const { profile } = useUserPreferencesStore();
-  const symbiState = useSymbiStateStore();
+  // const symbiState = useSymbiStateStore(); // Not used in simplified version
   const [refreshing, setRefreshing] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [stateChangeNotification, setStateChangeNotification] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState(false);
-  const [hasNoData, setHasNoData] = useState(false);
+  // const [hasNoData, setHasNoData] = useState(false); // Not used in simplified version
   const [showBreathingExercise, setShowBreathingExercise] = useState(false);
   const [evolutionEligibility, setEvolutionEligibility] = useState<EvolutionEligibility | null>(
     null
@@ -138,18 +138,12 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       setIsInitializing(true);
       setLoading(true);
       clearError();
-      setHasNoData(false);
 
       // Initialize the health data update service
       await HealthDataUpdateService.initialize();
 
       // Fetch today's health data
       await HealthDataUpdateService.updateDailyHealthData();
-
-      // Check if we have any data
-      if (healthMetrics.steps === 0 && !lastUpdated) {
-        setHasNoData(true);
-      }
 
       setIsInitializing(false);
       setLoading(false);
@@ -162,12 +156,10 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
       const cachedData = await HealthDataUpdateService.getTodayHealthData();
       if (cachedData) {
         setError('Using cached data from previous update');
-        setHasNoData(false);
       } else {
         // Determine error type and show appropriate message
         const errorMessage = getErrorMessage(err);
         setError(errorMessage);
-        setHasNoData(true);
       }
     }
   };
@@ -383,34 +375,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   };
 
   /**
-   * Get emoji for emotional state
-   */
-  const getStateEmoji = (): string => {
-    switch (emotionalState) {
-      case EmotionalState.SAD:
-        return '😢';
-      case EmotionalState.RESTING:
-        return '😌';
-      case EmotionalState.ACTIVE:
-        return '🎉';
-      case EmotionalState.VIBRANT:
-        return '✨';
-      case EmotionalState.CALM:
-        return '🧘';
-      case EmotionalState.TIRED:
-        return '😴';
-      case EmotionalState.STRESSED:
-        return '😰';
-      case EmotionalState.ANXIOUS:
-        return '😟';
-      case EmotionalState.RESTED:
-        return '😊';
-      default:
-        return '👻';
-    }
-  };
-
-  /**
    * Get display name for emotional state
    */
   const getStateName = (): string => {
@@ -492,6 +456,14 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   };
 
   /**
+   * Handle Symbi poke/tap interaction
+   */
+  const handleSymbiPoke = () => {
+    console.log('Symbi poked! Current state:', emotionalState);
+    // Could add haptic feedback here in the future
+  };
+
+  /**
    * Check if "Calm your Symbi" button should be shown
    * Requirements: 7.1
    */
@@ -566,44 +538,74 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         </Animated.View>
       )}
 
-      {/* Symbi Animation */}
+      {/* Symbi Ghost */}
       <View style={styles.symbiContainer}>
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#9333EA" />
-            <Text style={styles.loadingText}>Loading Symbi...</Text>
-          </View>
-        ) : hasNoData ? (
-          <View style={styles.noDataContainer}>
-            <Text style={styles.noDataEmoji}>👻</Text>
-            <Text style={styles.noDataText}>Waiting for today's data...</Text>
-            <Text style={styles.noDataSubtext}>
-              {profile?.preferences.dataSource === 'manual'
-                ? 'Tap "Enter Steps" to add your activity'
-                : 'Start moving to see your Symbi come alive!'}
-            </Text>
-            {profile?.preferences.dataSource === 'manual' && (
-              <TouchableOpacity
-                style={styles.manualEntryButton}
-                onPress={() => navigation.navigate('ManualEntry')}>
-                <Text style={styles.manualEntryButtonText}>Enter Steps</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          <ActivityIndicator size="large" color="#9333EA" />
         ) : (
-          <SymbiAnimation
-            emotionalState={symbiState.emotionalState || emotionalState}
-            evolutionLevel={symbiState.evolutionLevel}
-            customAppearance={symbiState.customAppearanceUrl}
-            style={styles.animation}
-          />
+          <>
+            {console.log('📍 Rendering ghost with state:', emotionalState)}
+            <Symbi8BitCanvas
+              key={`ghost-${emotionalState}`}
+              emotionalState={emotionalState}
+              size={Math.min(SCREEN_WIDTH * 0.8, 350)}
+              onPoke={() => {
+                console.log('👻 Ghost poked! Current state:', emotionalState);
+                handleSymbiPoke();
+              }}
+            />
+          </>
         )}
       </View>
 
       {/* Emotional State Label */}
       <View style={styles.stateContainer}>
-        <Text style={styles.stateEmoji}>{getStateEmoji()}</Text>
         <Text style={styles.stateName}>{getStateName()}</Text>
+        <Text style={styles.debugText}>
+          Debug: {emotionalState} | Steps: {healthMetrics.steps}
+        </Text>
+      </View>
+
+      {/* Manual Entry Button */}
+      {profile?.preferences.dataSource === 'manual' && (
+        <View style={styles.manualEntryContainer}>
+          <TouchableOpacity
+            style={styles.manualEntryButton}
+            onPress={() => navigation.navigate('ManualEntry')}>
+            <Text style={styles.manualEntryButtonText}>📝 Enter Steps Manually</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Test Buttons */}
+      <View style={styles.testButtonsContainer}>
+        <TouchableOpacity
+          style={[styles.testButton, styles.testButtonSad]}
+          onPress={() => {
+            useHealthDataStore
+              .getState()
+              .updateHealthData({ steps: 500 }, EmotionalState.SAD, 'rule-based');
+          }}>
+          <Text style={styles.testButtonText}>😢 Sad</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.testButton, styles.testButtonResting]}
+          onPress={() => {
+            useHealthDataStore
+              .getState()
+              .updateHealthData({ steps: 5000 }, EmotionalState.RESTING, 'rule-based');
+          }}>
+          <Text style={styles.testButtonText}>😌 Rest</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.testButton, styles.testButtonActive]}
+          onPress={() => {
+            useHealthDataStore
+              .getState()
+              .updateHealthData({ steps: 10000 }, EmotionalState.ACTIVE, 'rule-based');
+          }}>
+          <Text style={styles.testButtonText}>🎉 Active</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Health Metrics Display */}
@@ -846,23 +848,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    marginBottom: 20,
-    minHeight: 300,
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 300,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#a78bfa',
+    marginBottom: 10,
   },
   noDataContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 300,
+    minHeight: 400,
     paddingHorizontal: 40,
   },
   noDataEmoji: {
@@ -874,6 +865,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#9333EA',
+    marginTop: 20,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -901,17 +893,67 @@ const styles = StyleSheet.create({
   },
   stateContainer: {
     alignItems: 'center',
-    marginBottom: 30,
-  },
-  stateEmoji: {
-    fontSize: 48,
-    marginBottom: 8,
+    marginBottom: 20,
   },
   stateName: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#9333EA',
     textTransform: 'capitalize',
+    letterSpacing: 1,
+  },
+  debugText: {
+    color: '#6b7280',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  manualEntryContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  manualEntryButton: {
+    backgroundColor: '#7C3AED',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#9333EA',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  manualEntryButtonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  testButtonsContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  testButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  testButtonSad: {
+    backgroundColor: '#DC2626',
+  },
+  testButtonResting: {
+    backgroundColor: '#7C3AED',
+  },
+  testButtonActive: {
+    backgroundColor: '#10B981',
+  },
+  testButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   metricsContainer: {
     paddingHorizontal: 20,
