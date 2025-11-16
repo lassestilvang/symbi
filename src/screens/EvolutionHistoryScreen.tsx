@@ -422,31 +422,34 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={handleBackPress}
-          accessibilityLabel="Go back to main screen"
-          accessibilityRole="button"
-          accessibilityHint="Returns to the main screen">
-          <Text style={styles.backButtonText} accessibilityElementsHidden={true}>
-            ←
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={handleBackPress}
+            accessibilityLabel="Go back to main screen"
+            accessibilityRole="button"
+            accessibilityHint="Returns to the main screen">
+            <Text style={styles.backButtonText} accessibilityElementsHidden={true}>
+              ←
+            </Text>
+          </TouchableOpacity>
+          <Text
+            style={styles.title}
+            accessibilityRole="header"
+            accessibilityLabel="Evolution History">
+            Evolution History 🦇
           </Text>
-        </TouchableOpacity>
-        <Text
-          style={styles.title}
-          accessibilityRole="header"
-          accessibilityLabel="Evolution History">
-          Evolution History 🦇
-        </Text>
-        <View style={styles.headerSpacer} />
+          <View style={styles.headerSpacer} />
+        </View>
       </View>
 
       {/* Time Range Filter */}
-      <View
-        style={styles.filterContainer}
-        accessibilityRole="radiogroup"
-        accessibilityLabel="Time range filter">
+      <View style={styles.filterContainerOuter}>
+        <View
+          style={styles.filterContainer}
+          accessibilityRole="radiogroup"
+          accessibilityLabel="Time range filter">
         <TouchableOpacity
           style={[styles.filterButton, timeRange === '7d' && styles.filterButtonActive]}
           onPress={() => handleTimeRangeChange('7d')}
@@ -499,14 +502,16 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
             All
           </Text>
         </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
         ref={scrollViewRef}
         style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={styles.scrollContent}
         onScroll={handleScroll}
         scrollEventThrottle={16}>
+        <View style={styles.contentWrapper}>
         {filteredData.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji} accessibilityElementsHidden={true}>
@@ -634,6 +639,7 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
             </View>
           </>
         )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -644,22 +650,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: HALLOWEEN_COLORS.darkBg,
   },
+  headerContainer: {
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    borderBottomWidth: 2,
+    borderBottomColor: HALLOWEEN_COLORS.primary,
+    shadowColor: HALLOWEEN_COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
   header: {
+    width: '100%',
+    maxWidth: 800,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 60,
     paddingBottom: 16,
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
-    borderBottomWidth: 2,
-    borderBottomColor: HALLOWEEN_COLORS.primary,
-    // Purple glow on header
-    shadowColor: HALLOWEEN_COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
   backButton: {
     width: 44, // Accessibility touch target
@@ -693,7 +704,12 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  contentContainer: {
+  scrollContent: {
+    alignItems: 'center',
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: 800,
     paddingBottom: 40,
   },
   loadingContainer: {
@@ -752,14 +768,20 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
+  filterContainerOuter: {
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    borderBottomWidth: 1,
+    borderBottomColor: HALLOWEEN_COLORS.primaryDark,
+  },
   filterContainer: {
+    width: '100%',
+    maxWidth: 800,
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingVertical: 16,
     gap: 12,
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
-    borderBottomWidth: 1,
-    borderBottomColor: HALLOWEEN_COLORS.primaryDark,
     flexWrap: 'wrap',
   },
   filterButton: {

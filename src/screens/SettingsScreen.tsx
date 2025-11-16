@@ -15,6 +15,9 @@ import { DataManagementService } from '../services/DataManagementService';
 import { AnalyticsService } from '../services/AnalyticsService';
 
 interface SettingsScreenProps {
+  navigation?: {
+    goBack: () => void;
+  };
   onReplayOnboarding: () => void;
   onNavigateToThresholds: () => void;
   onNavigateToManualEntry?: () => void;
@@ -24,6 +27,7 @@ interface SettingsScreenProps {
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
+  navigation,
   onReplayOnboarding,
   onNavigateToThresholds,
   onNavigateToManualEntry,
@@ -161,167 +165,180 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.header}>Settings</Text>
-
-      {/* Data Source Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Data Source</Text>
-
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Current Source</Text>
-            <Text style={styles.settingValue}>{getDataSourceLabel()}</Text>
-          </View>
+      <View style={styles.contentWrapper}>
+        <View style={styles.headerRow}>
+          <Text style={styles.header}>Settings</Text>
+          {navigation && (
+            <TouchableOpacity 
+              style={styles.closeButton}
+              onPress={() => navigation.goBack()}
+              accessibilityLabel="Close settings"
+              accessibilityRole="button">
+              <Text style={styles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            const platformSource = Platform.OS === 'ios' ? 'healthkit' : 'googlefit';
-            handleChangeDataSource(
-              profile.preferences.dataSource === 'manual' ? platformSource : 'manual'
-            );
-          }}
-          disabled={isChangingDataSource}>
-          <Text style={styles.buttonText}>
-            {profile.preferences.dataSource === 'manual'
-              ? `Connect to ${PermissionService.getPlatformHealthServiceName()}`
-              : 'Switch to Manual Entry'}
-          </Text>
-        </TouchableOpacity>
-
-        {profile.preferences.dataSource === 'manual' && onNavigateToManualEntry && (
-          <TouchableOpacity style={styles.linkButton} onPress={onNavigateToManualEntry}>
-            <Text style={styles.linkButtonText}>Enter Today's Steps →</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Thresholds Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Emotional State Thresholds</Text>
-
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Sad Threshold</Text>
-            <Text style={styles.settingValue}>{profile.thresholds.sadThreshold} steps</Text>
-          </View>
-        </View>
-
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Active Threshold</Text>
-            <Text style={styles.settingValue}>{profile.thresholds.activeThreshold} steps</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity style={styles.button} onPress={onNavigateToThresholds}>
-          <Text style={styles.buttonText}>Configure Thresholds</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Evolution Gallery Section */}
-      {onNavigateToEvolutionGallery && (
+        {/* Data Source Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Evolution History</Text>
+          <Text style={styles.sectionTitle}>Data Source</Text>
 
-          <TouchableOpacity style={styles.button} onPress={onNavigateToEvolutionGallery}>
-            <Text style={styles.buttonText}>✨ View Evolution Gallery</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Current Source</Text>
+              <Text style={styles.settingValue}>{getDataSourceLabel()}</Text>
+            </View>
+          </View>
 
-      {/* Preferences Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Preferences</Text>
-
-        <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Notifications</Text>
-          <Switch
-            value={profile.preferences.notificationsEnabled}
-            onValueChange={handleToggleNotifications}
-            trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
-            thumbColor="#ffffff"
-          />
-        </View>
-
-        <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Haptic Feedback</Text>
-          <Switch
-            value={profile.preferences.hapticFeedbackEnabled}
-            onValueChange={handleToggleHaptics}
-            trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
-            thumbColor="#ffffff"
-          />
-        </View>
-
-        <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Sound Effects</Text>
-          <Switch
-            value={profile.preferences.soundEnabled}
-            onValueChange={handleToggleSound}
-            trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
-            thumbColor="#ffffff"
-          />
-        </View>
-
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Anonymous Analytics</Text>
-            <Text style={styles.settingDescription}>
-              Help improve Symbi by sharing anonymous usage data. No health data is collected.
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              const platformSource = Platform.OS === 'ios' ? 'healthkit' : 'googlefit';
+              handleChangeDataSource(
+                profile.preferences.dataSource === 'manual' ? platformSource : 'manual'
+              );
+            }}
+            disabled={isChangingDataSource}>
+            <Text style={styles.buttonText}>
+              {profile.preferences.dataSource === 'manual'
+                ? `Connect to ${PermissionService.getPlatformHealthServiceName()}`
+                : 'Switch to Manual Entry'}
             </Text>
-          </View>
-          <Switch
-            value={profile.preferences.analyticsEnabled}
-            onValueChange={handleToggleAnalytics}
-            trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
-            thumbColor="#ffffff"
-          />
+          </TouchableOpacity>
+
+          {profile.preferences.dataSource === 'manual' && onNavigateToManualEntry && (
+            <TouchableOpacity style={styles.linkButton} onPress={onNavigateToManualEntry}>
+              <Text style={styles.linkButtonText}>Enter Today's Steps →</Text>
+            </TouchableOpacity>
+          )}
         </View>
-      </View>
 
-      {/* Tutorial Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Help & Tutorial</Text>
-
-        <TouchableOpacity style={styles.button} onPress={onReplayOnboarding}>
-          <Text style={styles.buttonText}>Replay Tutorial</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Cloud Sync Section */}
-      {onNavigateToAccount && (
+        {/* Thresholds Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cloud Sync</Text>
+          <Text style={styles.sectionTitle}>Emotional State Thresholds</Text>
 
-          <TouchableOpacity style={styles.button} onPress={onNavigateToAccount}>
-            <Text style={styles.buttonText}>☁️ Manage Cloud Sync</Text>
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Sad Threshold</Text>
+              <Text style={styles.settingValue}>{profile.thresholds.sadThreshold} steps</Text>
+            </View>
+          </View>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Active Threshold</Text>
+              <Text style={styles.settingValue}>{profile.thresholds.activeThreshold} steps</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.button} onPress={onNavigateToThresholds}>
+            <Text style={styles.buttonText}>Configure Thresholds</Text>
           </TouchableOpacity>
         </View>
-      )}
 
-      {/* Privacy & Data Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Privacy & Data</Text>
+        {/* Evolution Gallery Section */}
+        {onNavigateToEvolutionGallery && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Evolution History</Text>
 
-        <TouchableOpacity style={styles.linkButton} onPress={handleOpenPrivacyPolicy}>
-          <Text style={styles.linkButtonText}>Privacy Policy →</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={onNavigateToEvolutionGallery}>
+              <Text style={styles.buttonText}>✨ View Evolution Gallery</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
-        <TouchableOpacity style={styles.linkButton} onPress={handleExportData}>
-          <Text style={styles.linkButtonText}>Export My Data →</Text>
-        </TouchableOpacity>
+        {/* Preferences Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Preferences</Text>
 
-        <TouchableOpacity style={styles.dangerButton} onPress={handleDeleteData}>
-          <Text style={styles.dangerButtonText}>Delete All Data</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Notifications</Text>
+            <Switch
+              value={profile.preferences.notificationsEnabled}
+              onValueChange={handleToggleNotifications}
+              trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
+              thumbColor="#ffffff"
+            />
+          </View>
 
-      {/* App Info */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Symbi v1.0.0</Text>
-        <Text style={styles.footerText}>Made with 💜 for your health</Text>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Haptic Feedback</Text>
+            <Switch
+              value={profile.preferences.hapticFeedbackEnabled}
+              onValueChange={handleToggleHaptics}
+              trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
+              thumbColor="#ffffff"
+            />
+          </View>
+
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Sound Effects</Text>
+            <Switch
+              value={profile.preferences.soundEnabled}
+              onValueChange={handleToggleSound}
+              trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
+              thumbColor="#ffffff"
+            />
+          </View>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Anonymous Analytics</Text>
+              <Text style={styles.settingDescription}>
+                Help improve Symbi by sharing anonymous usage data. No health data is collected.
+              </Text>
+            </View>
+            <Switch
+              value={profile.preferences.analyticsEnabled}
+              onValueChange={handleToggleAnalytics}
+              trackColor={{ false: '#4a4a5e', true: '#9333ea' }}
+              thumbColor="#ffffff"
+            />
+          </View>
+        </View>
+
+        {/* Tutorial Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Help & Tutorial</Text>
+
+          <TouchableOpacity style={styles.button} onPress={onReplayOnboarding}>
+            <Text style={styles.buttonText}>Replay Tutorial</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Cloud Sync Section */}
+        {onNavigateToAccount && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Cloud Sync</Text>
+
+            <TouchableOpacity style={styles.button} onPress={onNavigateToAccount}>
+              <Text style={styles.buttonText}>☁️ Manage Cloud Sync</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Privacy & Data Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Privacy & Data</Text>
+
+          <TouchableOpacity style={styles.linkButton} onPress={handleOpenPrivacyPolicy}>
+            <Text style={styles.linkButtonText}>Privacy Policy →</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.linkButton} onPress={handleExportData}>
+            <Text style={styles.linkButtonText}>Export My Data →</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.dangerButton} onPress={handleDeleteData}>
+            <Text style={styles.dangerButtonText}>Delete All Data</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* App Info */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Symbi v1.0.0</Text>
+          <Text style={styles.footerText}>Made with 💜 for your health</Text>
+        </View>
       </View>
     </ScrollView>
   );
@@ -336,12 +353,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 40,
+    alignItems: 'center',
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: 600,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 32,
   },
   header: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#9333ea',
-    marginBottom: 32,
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#2d2d44',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: '#9333ea',
+    fontWeight: 'bold',
   },
   section: {
     marginBottom: 32,

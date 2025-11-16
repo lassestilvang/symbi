@@ -29,6 +29,7 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
 }) => {
   const [selectedPoint, setSelectedPoint] = useState<HistoricalDataPoint | null>(null);
   const [chartWidth, setChartWidth] = useState(Dimensions.get('window').width - 32);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const { profile } = useUserPreferencesStore();
 
   // Memoize filtered data to prevent unnecessary recalculations
@@ -53,9 +54,18 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
   );
 
   // Handle dimension changes
+  // Use container width if available, otherwise fall back to window width
+  useEffect(() => {
+    if (containerWidth !== null) {
+      setChartWidth(containerWidth - 32);
+    }
+  }, [containerWidth]);
+
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
-      setChartWidth(window.width - 32);
+      if (containerWidth === null) {
+        setChartWidth(window.width - 32);
+      }
     });
 
     return () => subscription?.remove();
@@ -112,7 +122,12 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
   }, [filteredData, metricType, config.label]);
 
   return (
-    <View style={styles.container}>
+    <View 
+      style={styles.container}
+      onLayout={(event) => {
+        const { width } = event.nativeEvent.layout;
+        setContainerWidth(width);
+      }}>
       <Text style={styles.title} accessibilityRole="header">
         {config.label}
       </Text>

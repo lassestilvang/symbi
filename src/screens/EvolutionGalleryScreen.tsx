@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
   Image,
   Modal,
@@ -30,8 +30,11 @@ interface EvolutionGalleryScreenProps {
   };
 }
 
+// Layout constants
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // 2 columns with padding
+const MAX_CONTAINER_WIDTH = 400;
+const MAX_CARD_WIDTH = 180;
+const GRID_COLUMNS = 2;
 
 export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ navigation }) => {
   const [evolutionRecords, setEvolutionRecords] = useState<EvolutionRecord[]>([]);
@@ -61,15 +64,15 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
   /**
    * Handle evolution card press - show full image
    */
-  const handleCardPress = (record: EvolutionRecord) => {
+  const handleCardPress = useCallback((record: EvolutionRecord) => {
     setSelectedRecord(record);
     setShowFullImage(true);
-  };
+  }, []);
 
   /**
    * Handle share evolution milestone
    */
-  const handleShare = async (record: EvolutionRecord) => {
+  const handleShare = useCallback(async (record: EvolutionRecord) => {
     try {
       await Share.share({
         message: `My Symbi just evolved to Level ${record.evolutionLevel}! 🎉✨`,
@@ -78,73 +81,107 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
     } catch (error) {
       console.error('Error sharing evolution:', error);
     }
-  };
+  }, []);
 
   /**
    * Format date for display
    */
-  const formatDate = (date: Date): string => {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', {
+  const formatDate = useCallback((date: Date): string => {
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     });
-  };
+  }, []);
 
   /**
    * Render evolution card
    */
-  const renderEvolutionCard = ({ item }: { item: EvolutionRecord }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => handleCardPress(item)}
-      accessibilityLabel={`Evolution level ${item.evolutionLevel}`}>
-      <View style={styles.cardImageContainer}>
-        {item.appearanceUrl ? (
-          <Image source={{ uri: item.appearanceUrl }} style={styles.cardImage} resizeMode="cover" />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <Text style={styles.placeholderEmoji}>👻</Text>
+  const renderEvolutionCard = useCallback(
+    (item: EvolutionRecord) => (
+      <TouchableOpacity
+        key={item.id}
+        style={styles.card}
+        onPress={() => handleCardPress(item)}
+        accessibilityRole="button"
+        accessibilityLabel={`Evolution level ${item.evolutionLevel}, achieved on ${formatDate(item.timestamp)}`}
+        accessibilityHint="Double tap to view full size image">
+        <View style={styles.cardImageContainer}>
+          {item.appearanceUrl ? (
+            <Image
+              source={{ uri: item.appearanceUrl }}
+              style={styles.cardImage}
+              resizeMode="cover"
+              accessibilityIgnoresInvertColors
+            />
+          ) : (
+            <View style={styles.placeholderImage}>
+              <Text style={styles.placeholderEmoji} accessibilityLabel="Ghost placeholder">
+                👻
+              </Text>
+            </View>
+          )}
+          <View style={styles.levelBadge} accessibilityElementsHidden>
+            <Text style={styles.levelBadgeText}>Lv {item.evolutionLevel}</Text>
           </View>
-        )}
-        <View style={styles.levelBadge}>
-          <Text style={styles.levelBadgeText}>Lv {item.evolutionLevel}</Text>
         </View>
-      </View>
 
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardDate}>{formatDate(item.timestamp)}</Text>
-        <Text style={styles.cardDays}>{item.daysInPositiveState} days active</Text>
-      </View>
-    </TouchableOpacity>
+        <View style={styles.cardInfo}>
+          <Text style={styles.cardDate}>{formatDate(item.timestamp)}</Text>
+          <Text style={styles.cardDays}>{item.daysInPositiveState} days active</Text>
+        </View>
+      </TouchableOpacity>
+    ),
+    [handleCardPress, formatDate]
   );
+
+  /**
+   * Chunk array into groups for grid layout
+   */
+  const chunkedRecords = useMemo(() => {
+    const chunks: EvolutionRecord[][] = [];
+    for (let i = 0; i < evolutionRecords.length; i += GRID_COLUMNS) {
+      chunks.push(evolutionRecords.slice(i, i + GRID_COLUMNS));
+    }
+    return chunks;
+  }, [evolutionRecords]);
 
   /**
    * Render empty state
    */
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyEmoji}>🌟</Text>
-      <Text style={styles.emptyTitle}>No Evolutions Yet</Text>
-      <Text style={styles.emptyText}>
-        Keep your Symbi in Active or Vibrant states for 30 days to unlock your first evolution!
-      </Text>
-    </View>
+  const renderEmptyState = useCallback(
+    () => (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyEmoji} accessibilityLabel="Star">
+          🌟
+        </Text>
+        <Text style={styles.emptyTitle}>No Evolutions Yet</Text>
+        <Text style={styles.emptyText}>
+          Keep your Symbi in Active or Vibrant states for 30 days to unlock your first evolution!
+        </Text>
+      </View>
+    ),
+    []
   );
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Go back">
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Evolution Gallery</Text>
-        <View style={styles.placeholder} />
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            accessibilityHint="Returns to previous screen">
+            <Text style={styles.backButtonText}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.title} accessibilityRole="header">
+            Evolution Gallery
+          </Text>
+          <View style={styles.placeholder} />
+        </View>
       </View>
 
       {/* Loading state */}
@@ -156,15 +193,24 @@ export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ 
       ) : (
         <>
           {/* Gallery grid */}
-          <FlatList
-            data={evolutionRecords}
-            renderItem={renderEvolutionCard}
-            keyExtractor={item => item.id}
-            numColumns={2}
-            contentContainerStyle={styles.gridContainer}
-            ListEmptyComponent={renderEmptyState}
-            showsVerticalScrollIndicator={false}
-          />
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}>
+            <View style={styles.contentWrapper}>
+              {evolutionRecords.length === 0 ? (
+                renderEmptyState()
+              ) : (
+                <View style={styles.gridContainer} accessibilityRole="list">
+                  {chunkedRecords.map((row, rowIndex) => (
+                    <View key={`row-${rowIndex}`} style={styles.row}>
+                      {row.map(item => renderEvolutionCard(item))}
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          </ScrollView>
 
           {/* Full image modal */}
           {selectedRecord && (
@@ -236,15 +282,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1a1a2e',
   },
+  headerContainer: {
+    width: '100%',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#374151',
+  },
   header: {
+    width: '100%',
+    maxWidth: 400,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#374151',
   },
   backButton: {
     padding: 8,
@@ -271,12 +323,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#a78bfa',
   },
-  gridContainer: {
-    padding: 20,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
     paddingBottom: 40,
+    alignItems: 'center',
+  },
+  contentWrapper: {
+    width: '100%',
+    maxWidth: 400,
+  },
+  gridContainer: {
+    paddingTop: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   card: {
-    width: CARD_WIDTH,
+    flex: 1,
+    maxWidth: 180,
     marginBottom: 20,
     marginHorizontal: 5,
     backgroundColor: '#16213e',
@@ -287,7 +357,7 @@ const styles = StyleSheet.create({
   },
   cardImageContainer: {
     width: '100%',
-    height: CARD_WIDTH,
+    aspectRatio: 1,
     position: 'relative',
   },
   cardImage: {

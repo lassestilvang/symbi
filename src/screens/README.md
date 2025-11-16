@@ -333,6 +333,86 @@ This implementation fulfills the following requirements:
 - Card padding: 16-24px
 - Button padding: 14-16px vertical
 
+### EvolutionGalleryScreen
+
+Displays all past evolution forms of the Symbi in a visual gallery format.
+
+**Features:**
+
+- 2-column grid layout of evolution cards
+- Evolution level badges on each card
+- Date and days active display
+- Full-screen image modal on card tap
+- Share evolution milestones
+- Empty state for users without evolutions
+- Loading states with activity indicator
+- Responsive layout with max-width constraint (400px)
+- ScrollView-based layout for better centering control
+
+**UI Layout:**
+
+- Header with back button and title (centered, max 400px)
+- ScrollView with centered content wrapper
+- 2-column grid of evolution cards (responsive width)
+- Each card shows: evolution image, level badge, date, days active
+- Modal overlay for full-size image viewing
+- Share button in modal
+
+**Layout Structure:**
+
+```
+Container
+└── Header Container (centers header)
+    └── Header (max 400px)
+└── ScrollView
+    └── Scroll Content (centers wrapper)
+        └── Content Wrapper (max 400px)
+            └── Grid Container
+                └── Rows (2 cards per row)
+                    └── Evolution Cards
+```
+
+**State Management:**
+
+- Local state for evolution records, selected record, modal visibility
+- Loads data from `EvolutionSystem.getEvolutionHistory()`
+
+**Key Functions:**
+
+- `loadEvolutionHistory()` - Fetches evolution records from storage
+- `handleCardPress()` - Opens full-screen modal for selected evolution
+- `handleShare()` - Shares evolution milestone via platform share sheet
+- `formatDate()` - Formats timestamp for display
+- `renderEvolutionCard()` - Renders individual evolution card
+
+**Usage:**
+
+```tsx
+import { EvolutionGalleryScreen } from './screens';
+
+<EvolutionGalleryScreen
+  navigation={{
+    goBack: () => {
+      // Navigate back to previous screen
+    },
+  }}
+/>;
+```
+
+**Responsive Design:**
+
+- Max container width: 400px (optimized for readability)
+- Centered layout on larger screens using ScrollView wrapper pattern
+- Card width: flex: 1 with maxWidth: 180px
+- Maintains consistent spacing across device sizes
+- Manual row-by-row rendering for precise layout control
+
+**Performance:**
+
+- ScrollView appropriate for small datasets (typically < 20 evolutions)
+- No virtualization overhead needed
+- Simpler layout logic than FlatList columnWrapper approach
+
 ## Future Enhancements
 
 - Add animations for screen transitions

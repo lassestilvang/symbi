@@ -88,7 +88,9 @@ export const AppNavigator: React.FC = () => {
           },
         }}>
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Settings" options={{ title: 'Settings' }}>
+        <Stack.Screen 
+          name="Settings" 
+          options={{ headerShown: false }}>
           {props => (
             <SettingsScreen
               {...props}

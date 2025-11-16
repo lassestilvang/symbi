@@ -40,6 +40,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **EvolutionGalleryScreen Layout Migration** (2025-11-16)
+  - Migrated from FlatList to ScrollView for better layout control
+  - Implemented explicit row-by-row rendering for 2-column grid
+  - Simplified centering logic using wrapper pattern (scrollContent → contentWrapper)
+  - Maintained 400px max-width constraint for optimal readability
+  - Improved layout predictability and maintainability
+  - No performance impact due to small dataset size (< 20 evolutions typically)
+  - See [docs/evolution-gallery-responsive-layout.md](evolution-gallery-responsive-layout.md)
 - **StatisticsCard Component Refactoring** (2025-11-16)
   - Migrated to centralized theme constants (`HALLOWEEN_COLORS`, `DECORATION_ICONS` from `src/constants/theme.ts`)
   - Wrapped component with `React.memo` for performance optimization
@@ -70,6 +78,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Centered content on wide displays for better readability
   - Maintains full-width on mobile devices
   - See [docs/mainscreen-responsive-layout-update.md](mainscreen-responsive-layout-update.md)
+- Optimized EvolutionGalleryScreen responsive layout (2025-11-16)
+  - Reduced max container width from 500px to 400px for better readability
+  - Improved card sizing and spacing in 2-column grid layout
+  - Enhanced visual consistency across device sizes
 - Refactored `ManualHealthDataService` to eliminate code duplication and improve maintainability (2025-11-16)
   - Implemented Template Method Pattern for generic metric saving
   - Consolidated validation logic into configuration-driven approach

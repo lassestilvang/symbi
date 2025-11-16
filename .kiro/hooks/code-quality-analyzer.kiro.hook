@@ -4,15 +4,7 @@
   "description": "Monitors source code files for changes and provides suggestions for code improvements including code smells, design patterns, best practices, readability, maintainability, and performance optimizations",
   "version": "1",
   "when": {
-    "type": "fileEdited",
-    "patterns": [
-      "src/**/*.ts",
-      "src/**/*.tsx",
-      "App.tsx",
-      "index.ts",
-      "*.config.js",
-      "*.config.ts"
-    ]
+    "type": "userTriggered"
   },
   "then": {
     "type": "askAgent",
