@@ -67,6 +67,8 @@ npm run pre-submit
 
 ### Testing
 
+The project uses Jest with React Native preset for testing:
+
 ```bash
 # Run unit tests
 npm test
@@ -77,6 +79,13 @@ npm run test:coverage
 # Watch mode
 npm run test:watch
 ```
+
+**Test Configuration**:
+- Jest preset: `react-native`
+- Test environment: Node.js
+- Transform: ts-jest for TypeScript files
+- Coverage: Excludes node_modules, tests, and config files
+- Transform ignore patterns configured for React Native libraries
 
 ### Tech Stack
 

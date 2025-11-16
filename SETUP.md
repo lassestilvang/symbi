@@ -47,6 +47,9 @@
 - **Prettier** (v3.6.2) - Code formatting
 - **TypeScript ESLint** - TypeScript-specific linting rules
 - **ESLint Prettier Integration** - Unified code style
+- **Jest** (v30.2.0) - Testing framework with React Native preset
+- **ts-jest** - TypeScript transformer for Jest
+- **React Native Testing Library** (v13.3.3) - Component testing utilities
 
 ### 5. TypeScript Configuration
 - Strict mode enabled
@@ -71,13 +74,17 @@
 
 ### 8. NPM Scripts Available
 ```bash
-npm start          # Start Expo development server
-npm run ios        # Run on iOS simulator
-npm run android    # Run on Android emulator
-npm run web        # Run in web browser
-npm run lint       # Run ESLint
-npm run lint:fix   # Run ESLint with auto-fix
-npm run format     # Format code with Prettier
+npm start              # Start Expo development server
+npm run ios            # Run on iOS simulator
+npm run android        # Run on Android emulator
+npm run web            # Run in web browser
+npm run lint           # Run ESLint
+npm run lint:fix       # Run ESLint with auto-fix
+npm run format         # Format code with Prettier
+npm test               # Run Jest unit tests
+npm run test:coverage  # Run tests with coverage report
+npm run test:watch     # Run tests in watch mode
+npm run pre-submit     # Run all pre-submission checks
 ```
 
 ## ✅ Verification Results
@@ -91,6 +98,13 @@ npm run format     # Format code with Prettier
 - ✅ All files formatted with Prettier
 - ✅ ESLint configuration is valid
 - ✅ No linting errors in existing code
+
+### Testing Infrastructure
+- ✅ Jest configured with React Native preset
+- ✅ ts-jest transformer for TypeScript support
+- ✅ Transform ignore patterns for React Native libraries
+- ✅ Test environment set to Node.js for better performance
+- ✅ Path aliases configured for test imports
 
 ### Project Structure
 - ✅ All required folders created

@@ -162,11 +162,19 @@
 - React Native 0.81.5
 
 **Testing Tools**
-- Jest 30.2.0
+- Jest 30.2.0 (React Native preset, Node.js environment)
+- ts-jest (TypeScript transformer)
 - React Native Testing Library 13.3.3
 - TestFlight (iOS)
 - Google Play Internal Testing (Android)
 - Sentry (crash reporting)
+
+**Jest Configuration**
+- Preset: `react-native`
+- Test environment: Node.js (optimized for performance)
+- Transform ignore patterns: Configured for React Native, Expo, and navigation libraries
+- Coverage: Excludes node_modules, tests, and configuration files
+- Path aliases: Supports `@components`, `@services`, `@hooks`, `@types`, `@assets`
 
 **Health Data Sources**
 - Apple Health (iOS)

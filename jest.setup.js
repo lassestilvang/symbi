@@ -29,65 +29,10 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   }),
 }));
 
-// Mock react-native modules
-jest.mock('react-native', () => ({
-  Platform: {
-    OS: 'ios',
-    select: jest.fn((obj) => obj.ios),
-  },
-  AppState: {
-    currentState: 'active',
-    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-  },
-  StyleSheet: {
-    create: jest.fn((styles) => styles),
-    flatten: jest.fn((styles) => styles),
-  },
-  Dimensions: {
-    get: jest.fn(() => ({ width: 375, height: 667 })),
-    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-  },
-  Animated: {
-    Value: jest.fn().mockImplementation(() => ({
-      setValue: jest.fn(),
-      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      removeAllListeners: jest.fn(),
-    })),
-    timing: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
-    })),
-    spring: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
-    })),
-    sequence: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
-    })),
-    parallel: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
-    })),
-    View: 'Animated.View',
-    Text: 'Animated.Text',
-  },
-  Vibration: {
-    vibrate: jest.fn(),
-  },
-  View: 'View',
-  Text: 'Text',
-  ScrollView: 'ScrollView',
-  TouchableOpacity: 'TouchableOpacity',
-  SafeAreaView: 'SafeAreaView',
-  ActivityIndicator: 'ActivityIndicator',
-  Pressable: 'Pressable',
-  Modal: 'Modal',
-  RefreshControl: 'RefreshControl',
-  Alert: {
-    alert: jest.fn(),
-  },
-  Share: {
-    share: jest.fn(() => Promise.resolve({ action: 'sharedAction' })),
-  },
+// Mock React Native core modules
+jest.mock('react-native/Libraries/Utilities/Platform', () => ({
+  OS: 'ios',
+  select: jest.fn((obj) => obj.ios),
 }));
 
 // Mock react-native-health
