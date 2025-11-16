@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Utility Modules**: Centralized helper functions (2025-11-16)
+  - `src/utils/dateHelpers.ts`: Date formatting utilities (formatShortDate, formatMediumDate, formatFullDate, formatWeekday, formatDisplayDate)
+  - `src/utils/metricHelpers.ts`: Type-safe metric operations (getMetricValue, hasMetricValue, filterByMetric, formatMetricValue, getMetricConfig)
+  - Eliminates ~250 lines of duplicated code across components
+  - Single source of truth for formatting logic
+  - See [docs/code-refactoring-nov-16-2025.md](code-refactoring-nov-16-2025.md)
+  - See [docs/utilities-quick-reference.md](utilities-quick-reference.md) for usage guide
+- **Theme Constants**: Centralized color palette and configuration (2025-11-16)
+  - `src/constants/theme.ts`: Halloween colors, state colors, metric configuration, decoration icons
+  - Exports: `HALLOWEEN_COLORS`, `STATE_COLORS`, `METRIC_CONFIG`, `DECORATION_ICONS`
+  - Comprehensive JSDoc documentation with usage examples
+  - See [docs/halloween-theme-colors.md](halloween-theme-colors.md)
+- **Data Visualization Components**: New reusable components for Evolution History (2025-11-16)
+  - `StatisticsCard`: Displays metrics with Halloween decorations and automatic number formatting
+  - `HealthMetricsChart`: Interactive line charts with tooltips, haptic feedback, and responsive sizing
+  - `EmotionalStateTimeline`: Scrollable timeline with color-coded states and modal details
+  - `EvolutionMilestoneCard`: Evolution achievement cards with badges and images
+  - `HealthDataTable`: Scrollable data table with alternating row colors
+  - All components include comprehensive accessibility support
+  - See [docs/evolution-history-implementation-summary.md](evolution-history-implementation-summary.md)
+- **Type Definitions**: New interfaces for historical data visualization (2025-11-16)
+  - `HistoricalDataPoint`: Daily health data with emotional state
+  - `HistoryStatistics`: Aggregated statistics for time ranges
+  - `HealthDataCache`: Cached health data structure
+  - Added to `src/types/index.ts` for centralized type management
+  - See [docs/evolution-history-types-implementation.md](evolution-history-types-implementation.md)
 - **Accessibility Enhancement**: Evolution History Screen now WCAG 2.1 AA compliant (2025-11-16)
   - Added semantic roles (button, header, alert, radiogroup, radio, list) for proper screen reader navigation
   - Implemented descriptive accessibility labels for all interactive elements

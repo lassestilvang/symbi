@@ -474,6 +474,189 @@ Render Visualizations
 
 For detailed information, see [Evolution History Page Design](./.kiro/specs/evolution-history-page/design.md).
 
+## Utility Layer Architecture
+
+### Centralized Constants (`src/constants/theme.ts`)
+
+The application uses centralized theme constants for consistent styling:
+
+**HALLOWEEN_COLORS**:
+- Primary purple palette (#7C3AED, #5B21B6, #9333EA)
+- Accent colors (orange, green)
+- Background colors (darkBg, cardBg)
+- Text colors (ghostWhite)
+
+**STATE_COLORS**:
+- Color mapping for each emotional state
+- Used in timelines, badges, and indicators
+- Consistent visual language across components
+
+**METRIC_CONFIG**:
+- Configuration for each health metric (steps, sleep, HRV)
+- Includes labels, colors, suffixes, and decimal precision
+- Type-safe metric operations
+
+**Benefits**:
+- Single source of truth for styling
+- Eliminates ~250 lines of duplicated code
+- Easy theme updates and maintenance
+- Consistent visual design
+
+### Date Utilities (`src/utils/dateHelpers.ts`)
+
+Centralized date formatting functions:
+
+```typescript
+formatShortDate(date)      // "11/16"
+formatMediumDate(date)     // "Nov 16"
+formatFullDate(date)       // "Monday, November 16, 2025"
+formatWeekday(date)        // "Mon"
+formatDisplayDate(date)    // "Nov 16, 2025"
+```
+
+**Usage**:
+- Charts: Short dates for axis labels
+- Timelines: Medium dates for readability
+- Modals: Full dates for detailed views
+- Tables: Display dates for data rows
+
+**Benefits**:
+- Consistent date formatting across app
+- Locale-aware formatting
+- Easy to update format patterns
+- Reduces component complexity
+
+### Metric Utilities (`src/utils/metricHelpers.ts`)
+
+Type-safe health metric operations:
+
+```typescript
+getMetricValue(point, type)        // Extract metric value
+hasMetricValue(point, type)        // Check if metric exists
+filterByMetric(data, type)         // Filter data by metric
+formatMetricValue(value, type)     // Format with suffix
+getMetricConfig(type)              // Get metric configuration
+```
+
+**Type Safety**:
+```typescript
+type MetricType = 'steps' | 'sleep' | 'hrv';
+```
+
+**Benefits**:
+- Type-safe metric operations
+- Eliminates null/undefined errors
+- Consistent value formatting
+- Reusable across components
+
+### Component Composition Patterns
+
+**Memoization Strategy**:
+```typescript
+// Component level
+export const Component = React.memo(({ props }) => {
+  // Hook level
+  const value = useMemo(() => expensiveCalc(), [deps]);
+  const handler = useCallback(() => action(), [deps]);
+  
+  return <View>...</View>;
+});
+```
+
+**Benefits**:
+- Prevents unnecessary re-renders
+- Optimizes expensive calculations
+- Improves scroll performance
+- Reduces battery consumption
+
+**Extraction Pattern**:
+```typescript
+// Extract sub-components for better separation
+const Tooltip: React.FC<Props> = ({ data }) => {
+  // Focused component logic
+};
+
+export const Chart: React.FC<Props> = ({ data }) => {
+  return (
+    <View>
+      <ChartView />
+      {showTooltip && <Tooltip />}
+    </View>
+  );
+};
+```
+
+**Benefits**:
+- Better code organization
+- Easier testing
+- Improved readability
+- Reusable sub-components
+
+## Performance Optimization Patterns
+
+### Debouncing User Interactions
+
+```typescript
+const debounce = <T extends (...args: unknown[]) => unknown>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+```
+
+**Usage**:
+- Time range filter changes (300ms debounce)
+- Chart updates on data changes
+- Search input handling
+- Scroll position tracking
+
+**Benefits**:
+- Reduces unnecessary API calls
+- Prevents UI jank
+- Improves battery life
+- Better user experience
+
+### Data Transformation Optimization
+
+```typescript
+// Memoize expensive transformations
+const filteredData = useMemo(() => {
+  return filterDataByTimeRange(allData, timeRange);
+}, [allData, timeRange]);
+
+const statistics = useMemo(() => {
+  return calculateStatistics(filteredData, records);
+}, [filteredData, records]);
+```
+
+**Benefits**:
+- Calculations only run when dependencies change
+- Prevents redundant processing
+- Improves render performance
+- Reduces memory allocations
+
+### Layout Calculations
+
+```typescript
+const { isLandscape, cardWidth } = useMemo(() => {
+  const isLandscape = dimensions.width > dimensions.height;
+  const columns = isLandscape ? 4 : 2;
+  const cardWidth = (availableWidth - gaps) / columns;
+  return { isLandscape, cardWidth };
+}, [dimensions]);
+```
+
+**Benefits**:
+- Responsive layout calculations cached
+- Smooth orientation transitions
+- Consistent card sizing
+- Reduced layout thrashing
+
 ## Related Documentation
 
 - [Crash Reporting Setup](./crash-reporting-setup.md)
@@ -483,9 +666,14 @@ For detailed information, see [Evolution History Page Design](./.kiro/specs/evol
 - [Health Data Integration](./health-data-integration-summary.md)
 - [Phase 2 Multi-Metric Implementation](./phase2-multi-metric-implementation.md)
 - [Evolution History Page Spec](./.kiro/specs/evolution-history-page/)
+- [Code Refactoring Summary](./code-refactoring-nov-16-2025.md)
+- [Halloween Theme Colors](./halloween-theme-colors.md)
+- [Performance Optimization](./evolution-history-performance-optimization.md)
 
 ## References
 
 - [React Native Error Handling](https://reactnative.dev/docs/error-handling)
 - [Sentry React Native SDK](https://docs.sentry.io/platforms/react-native/)
 - [Expo Error Handling](https://docs.expo.dev/guides/errors/)
+- [React Performance Optimization](https://react.dev/reference/react/memo)
+- [TypeScript Utility Types](https://www.typescriptlang.org/docs/handbook/utility-types.html)

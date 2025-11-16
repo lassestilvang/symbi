@@ -122,9 +122,9 @@ export const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({
   }, [filteredData, metricType, config.label]);
 
   return (
-    <View 
+    <View
       style={styles.container}
-      onLayout={(event) => {
+      onLayout={event => {
         const { width } = event.nativeEvent.layout;
         setContainerWidth(width);
       }}>

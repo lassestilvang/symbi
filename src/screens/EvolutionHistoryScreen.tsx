@@ -450,58 +450,67 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
           style={styles.filterContainer}
           accessibilityRole="radiogroup"
           accessibilityLabel="Time range filter">
-        <TouchableOpacity
-          style={[styles.filterButton, timeRange === '7d' && styles.filterButtonActive]}
-          onPress={() => handleTimeRangeChange('7d')}
-          accessibilityLabel="Show last 7 days"
-          accessibilityRole="radio"
-          accessibilityState={{ selected: timeRange === '7d' }}
-          accessibilityHint="Filter data to show the last 7 days">
-          <Text
-            style={[styles.filterButtonText, timeRange === '7d' && styles.filterButtonTextActive]}
-            accessibilityElementsHidden={true}>
-            7D
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, timeRange === '30d' && styles.filterButtonActive]}
-          onPress={() => handleTimeRangeChange('30d')}
-          accessibilityLabel="Show last 30 days"
-          accessibilityRole="radio"
-          accessibilityState={{ selected: timeRange === '30d' }}
-          accessibilityHint="Filter data to show the last 30 days">
-          <Text
-            style={[styles.filterButtonText, timeRange === '30d' && styles.filterButtonTextActive]}
-            accessibilityElementsHidden={true}>
-            30D
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, timeRange === '90d' && styles.filterButtonActive]}
-          onPress={() => handleTimeRangeChange('90d')}
-          accessibilityLabel="Show last 90 days"
-          accessibilityRole="radio"
-          accessibilityState={{ selected: timeRange === '90d' }}
-          accessibilityHint="Filter data to show the last 90 days">
-          <Text
-            style={[styles.filterButtonText, timeRange === '90d' && styles.filterButtonTextActive]}
-            accessibilityElementsHidden={true}>
-            90D
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, timeRange === 'all' && styles.filterButtonActive]}
-          onPress={() => handleTimeRangeChange('all')}
-          accessibilityLabel="Show all time, limited to 90 days"
-          accessibilityRole="radio"
-          accessibilityState={{ selected: timeRange === 'all' }}
-          accessibilityHint="Filter data to show up to 90 days of history">
-          <Text
-            style={[styles.filterButtonText, timeRange === 'all' && styles.filterButtonTextActive]}
-            accessibilityElementsHidden={true}>
-            All
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, timeRange === '7d' && styles.filterButtonActive]}
+            onPress={() => handleTimeRangeChange('7d')}
+            accessibilityLabel="Show last 7 days"
+            accessibilityRole="radio"
+            accessibilityState={{ selected: timeRange === '7d' }}
+            accessibilityHint="Filter data to show the last 7 days">
+            <Text
+              style={[styles.filterButtonText, timeRange === '7d' && styles.filterButtonTextActive]}
+              accessibilityElementsHidden={true}>
+              7D
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, timeRange === '30d' && styles.filterButtonActive]}
+            onPress={() => handleTimeRangeChange('30d')}
+            accessibilityLabel="Show last 30 days"
+            accessibilityRole="radio"
+            accessibilityState={{ selected: timeRange === '30d' }}
+            accessibilityHint="Filter data to show the last 30 days">
+            <Text
+              style={[
+                styles.filterButtonText,
+                timeRange === '30d' && styles.filterButtonTextActive,
+              ]}
+              accessibilityElementsHidden={true}>
+              30D
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, timeRange === '90d' && styles.filterButtonActive]}
+            onPress={() => handleTimeRangeChange('90d')}
+            accessibilityLabel="Show last 90 days"
+            accessibilityRole="radio"
+            accessibilityState={{ selected: timeRange === '90d' }}
+            accessibilityHint="Filter data to show the last 90 days">
+            <Text
+              style={[
+                styles.filterButtonText,
+                timeRange === '90d' && styles.filterButtonTextActive,
+              ]}
+              accessibilityElementsHidden={true}>
+              90D
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, timeRange === 'all' && styles.filterButtonActive]}
+            onPress={() => handleTimeRangeChange('all')}
+            accessibilityLabel="Show all time, limited to 90 days"
+            accessibilityRole="radio"
+            accessibilityState={{ selected: timeRange === 'all' }}
+            accessibilityHint="Filter data to show up to 90 days of history">
+            <Text
+              style={[
+                styles.filterButtonText,
+                timeRange === 'all' && styles.filterButtonTextActive,
+              ]}
+              accessibilityElementsHidden={true}>
+              All
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -512,133 +521,135 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
         onScroll={handleScroll}
         scrollEventThrottle={16}>
         <View style={styles.contentWrapper}>
-        {filteredData.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji} accessibilityElementsHidden={true}>
-              👻
-            </Text>
-            <Text style={styles.emptyText} accessibilityRole="header">
-              No history yet
-            </Text>
-            <Text style={styles.emptySubtext}>Keep tracking your health to see your journey!</Text>
-          </View>
-        ) : (
-          <>
-            {/* Summary Statistics Cards */}
-            {statistics && (
-              <View style={styles.statisticsSection}>
-                <Text
-                  style={styles.sectionTitle}
-                  accessibilityRole="header"
-                  accessibilityLabel="Summary Statistics">
-                  📊 Summary Statistics
-                </Text>
-                <View
-                  style={[styles.statisticsGrid, isLandscape && styles.statisticsGridLandscape]}
-                  accessibilityRole="list">
-                  <StatisticsCard
-                    icon="👣"
-                    label="Avg Steps"
-                    value={statistics.averageSteps.toLocaleString()}
-                    halloweenDecoration="ghost"
-                    width={cardWidth}
-                  />
-                  {statistics.averageSleep !== null && (
-                    <StatisticsCard
-                      icon="😴"
-                      label="Avg Sleep"
-                      value={`${statistics.averageSleep.toFixed(1)}h`}
-                      halloweenDecoration="pumpkin"
-                      width={cardWidth}
-                    />
-                  )}
-                  {statistics.averageHRV !== null && (
-                    <StatisticsCard
-                      icon="❤️"
-                      label="Avg HRV"
-                      value={`${Math.round(statistics.averageHRV)}ms`}
-                      halloweenDecoration="bat"
-                      width={cardWidth}
-                    />
-                  )}
-                  <StatisticsCard
-                    icon="🎭"
-                    label="Most Frequent"
-                    value={capitalizeFirst(statistics.mostFrequentState)}
-                    subtitle={`${statistics.totalEvolutions} evolutions`}
-                    halloweenDecoration="tombstone"
-                    width={cardWidth}
-                  />
-                </View>
-              </View>
-            )}
-
-            {/* Health Metrics Charts */}
-            <View style={styles.chartsSection}>
-              <Text
-                style={styles.sectionTitle}
-                accessibilityRole="header"
-                accessibilityLabel="Health Trends">
-                📈 Health Trends
+          {filteredData.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyEmoji} accessibilityElementsHidden={true}>
+                👻
               </Text>
-              <HealthMetricsChart
-                data={filteredData}
-                metricType="steps"
-                color={HALLOWEEN_COLORS.primary}
-              />
-              {filteredData.some(d => d.sleepHours !== undefined) && (
-                <HealthMetricsChart
-                  data={filteredData}
-                  metricType="sleep"
-                  color={HALLOWEEN_COLORS.orange}
-                />
-              )}
-              {filteredData.some(d => d.hrv !== undefined) && (
-                <HealthMetricsChart
-                  data={filteredData}
-                  metricType="hrv"
-                  color={HALLOWEEN_COLORS.green}
-                />
-              )}
+              <Text style={styles.emptyText} accessibilityRole="header">
+                No history yet
+              </Text>
+              <Text style={styles.emptySubtext}>
+                Keep tracking your health to see your journey!
+              </Text>
             </View>
+          ) : (
+            <>
+              {/* Summary Statistics Cards */}
+              {statistics && (
+                <View style={styles.statisticsSection}>
+                  <Text
+                    style={styles.sectionTitle}
+                    accessibilityRole="header"
+                    accessibilityLabel="Summary Statistics">
+                    📊 Summary Statistics
+                  </Text>
+                  <View
+                    style={[styles.statisticsGrid, isLandscape && styles.statisticsGridLandscape]}
+                    accessibilityRole="list">
+                    <StatisticsCard
+                      icon="👣"
+                      label="Avg Steps"
+                      value={statistics.averageSteps.toLocaleString()}
+                      halloweenDecoration="ghost"
+                      width={cardWidth}
+                    />
+                    {statistics.averageSleep !== null && (
+                      <StatisticsCard
+                        icon="😴"
+                        label="Avg Sleep"
+                        value={`${statistics.averageSleep.toFixed(1)}h`}
+                        halloweenDecoration="pumpkin"
+                        width={cardWidth}
+                      />
+                    )}
+                    {statistics.averageHRV !== null && (
+                      <StatisticsCard
+                        icon="❤️"
+                        label="Avg HRV"
+                        value={`${Math.round(statistics.averageHRV)}ms`}
+                        halloweenDecoration="bat"
+                        width={cardWidth}
+                      />
+                    )}
+                    <StatisticsCard
+                      icon="🎭"
+                      label="Most Frequent"
+                      value={capitalizeFirst(statistics.mostFrequentState)}
+                      subtitle={`${statistics.totalEvolutions} evolutions`}
+                      halloweenDecoration="tombstone"
+                      width={cardWidth}
+                    />
+                  </View>
+                </View>
+              )}
 
-            {/* Emotional State Timeline */}
-            <View style={styles.timelineSection}>
-              <EmotionalStateTimeline
-                data={[...filteredData].reverse()}
-                onItemPress={item => {
-                  console.log('Timeline item pressed:', item);
-                }}
-              />
-            </View>
-
-            {/* Evolution Milestones */}
-            {evolutionRecords.length > 0 && (
-              <View style={styles.milestonesSection}>
+              {/* Health Metrics Charts */}
+              <View style={styles.chartsSection}>
                 <Text
                   style={styles.sectionTitle}
                   accessibilityRole="header"
-                  accessibilityLabel="Evolution Milestones">
-                  ✨ Evolution Milestones
+                  accessibilityLabel="Health Trends">
+                  📈 Health Trends
                 </Text>
-                <View accessibilityRole="list">
-                  {evolutionRecords.map((record, index) => (
-                    <EvolutionMilestoneCard
-                      key={record.id}
-                      record={record}
-                      badgeIcon={getEvolutionBadgeIcon(index)}
-                    />
-                  ))}
-                </View>
+                <HealthMetricsChart
+                  data={filteredData}
+                  metricType="steps"
+                  color={HALLOWEEN_COLORS.primary}
+                />
+                {filteredData.some(d => d.sleepHours !== undefined) && (
+                  <HealthMetricsChart
+                    data={filteredData}
+                    metricType="sleep"
+                    color={HALLOWEEN_COLORS.orange}
+                  />
+                )}
+                {filteredData.some(d => d.hrv !== undefined) && (
+                  <HealthMetricsChart
+                    data={filteredData}
+                    metricType="hrv"
+                    color={HALLOWEEN_COLORS.green}
+                  />
+                )}
               </View>
-            )}
 
-            {/* Data Table */}
-            <View style={styles.tableSection}>
-              <HealthDataTable data={[...filteredData].reverse()} maxHeight={400} />
-            </View>
-          </>
-        )}
+              {/* Emotional State Timeline */}
+              <View style={styles.timelineSection}>
+                <EmotionalStateTimeline
+                  data={[...filteredData].reverse()}
+                  onItemPress={item => {
+                    console.log('Timeline item pressed:', item);
+                  }}
+                />
+              </View>
+
+              {/* Evolution Milestones */}
+              {evolutionRecords.length > 0 && (
+                <View style={styles.milestonesSection}>
+                  <Text
+                    style={styles.sectionTitle}
+                    accessibilityRole="header"
+                    accessibilityLabel="Evolution Milestones">
+                    ✨ Evolution Milestones
+                  </Text>
+                  <View accessibilityRole="list">
+                    {evolutionRecords.map((record, index) => (
+                      <EvolutionMilestoneCard
+                        key={record.id}
+                        record={record}
+                        badgeIcon={getEvolutionBadgeIcon(index)}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Data Table */}
+              <View style={styles.tableSection}>
+                <HealthDataTable data={[...filteredData].reverse()} maxHeight={400} />
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
     </View>

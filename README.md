@@ -8,14 +8,32 @@ A Halloween-themed digital pet application that reflects your real-world health 
 /
 ├── src/
 │   ├── components/     # React components
+│   │   ├── symbi/      # 8-bit ghost rendering system
+│   │   ├── SymbiAnimation.tsx
+│   │   ├── Symbi8BitCanvas.tsx
+│   │   ├── HealthMetricsChart.tsx
+│   │   ├── EmotionalStateTimeline.tsx
+│   │   ├── StatisticsCard.tsx
+│   │   ├── EvolutionMilestoneCard.tsx
+│   │   └── HealthDataTable.tsx
+│   ├── screens/        # Full-screen views
+│   │   ├── MainScreen.tsx
+│   │   ├── EvolutionHistoryScreen.tsx
+│   │   ├── EvolutionGalleryScreen.tsx
+│   │   ├── SettingsScreen.tsx
+│   │   └── onboarding/
 │   ├── services/       # Business logic and API services
+│   ├── stores/         # Zustand state management
 │   ├── hooks/          # Custom React hooks
 │   ├── types/          # TypeScript type definitions
+│   ├── constants/      # Theme colors and configuration
+│   ├── utils/          # Helper utilities
 │   └── assets/         # Static assets (animations, images)
 │       └── animations/
 │           ├── phase1/ # Basic emotional state animations
 │           ├── phase2/ # Advanced emotional state animations
 │           └── phase3/ # Evolution animations
+├── docs/               # Comprehensive documentation
 ├── App.tsx             # Main application entry point
 └── package.json
 ```
@@ -50,6 +68,15 @@ npm run web
 
 ## Development
 
+### Architecture
+
+- **State Management**: Zustand stores for reactive state with AsyncStorage persistence
+- **Service Layer**: Platform-agnostic abstractions for health data (HealthKit/Google Fit)
+- **Component Organization**: Barrel exports, co-located tests, and comprehensive READMEs
+- **Type Safety**: Strict TypeScript with centralized type definitions
+- **Performance**: React.memo, useMemo, useCallback for optimized rendering
+- **Utilities**: Centralized helpers for dates, metrics, and formatting
+
 ### Code Quality
 
 This project uses ESLint and Prettier for code consistency:
@@ -64,6 +91,29 @@ npm run format
 # Run pre-submission tests
 npm run pre-submit
 ```
+
+### Key Utilities
+
+- **Date Helpers** (`src/utils/dateHelpers.ts`): Consistent date formatting across components
+- **Metric Helpers** (`src/utils/metricHelpers.ts`): Type-safe health metric operations
+- **Theme Constants** (`src/constants/theme.ts`): Centralized color palette and configuration
+
+## Documentation
+
+Comprehensive documentation is available in the `/docs` folder. See [Documentation Index](docs/DOCUMENTATION-INDEX.md) for a complete list of all documentation files.
+
+### Key Documentation
+
+- **Architecture**: `docs/app-architecture.md` - System design and patterns
+- **Evolution History**: `docs/evolution-history-implementation-summary.md` - Data visualization features
+- **Accessibility**: `docs/accessibility-compliance.md` - WCAG 2.1 AA compliance details
+- **Testing**: `docs/evolution-history-testing.md` - Test coverage and strategies
+- **Theme**: `docs/halloween-theme-colors.md` - Color palette and styling guide
+- **Utilities**: `docs/utilities-quick-reference.md` - Helper functions and constants
+- **Performance**: `docs/evolution-history-performance-optimization.md` - Optimization techniques
+- **Responsive Design**: `docs/evolution-history-responsive-layout.md` - Layout strategies
+- **App Store**: `docs/app-store/` - Submission guides and metadata
+- **Changelog**: `docs/CHANGELOG.md` - Project history and updates
 
 ### Testing
 
@@ -97,6 +147,46 @@ npm run test:watch
 - ✅ Stores: State management and persistence
 
 See `docs/evolution-history-testing.md` for detailed test documentation.
+
+## Features
+
+### Core Functionality
+
+- **Health Data Integration**: Connects to iOS HealthKit and Android Google Fit for automatic health tracking
+- **Manual Entry Mode**: Privacy-first option for users who prefer manual data input
+- **8-bit Ghost Visualization**: Retro pixel art rendering of Symbi creature with emotional state animations
+- **Multi-Metric Analysis**: Tracks steps, sleep duration, and heart rate variability (HRV)
+- **Emotional States**: 9 distinct states (Sad, Resting, Active, Vibrant, Calm, Tired, Stressed, Anxious, Rested)
+- **Evolution System**: Symbi evolves based on sustained positive health patterns
+
+### Evolution History Page (New)
+
+A comprehensive data visualization screen showing your health journey:
+
+- **Time Range Filtering**: View data for 7 days, 30 days, 90 days, or all time
+- **Summary Statistics**: Average steps, sleep, HRV, and most frequent emotional state
+- **Interactive Charts**: Line charts for steps, sleep, and HRV trends with tap-to-view details
+- **Emotional Timeline**: Scrollable timeline showing daily emotional states with color-coded indicators
+- **Evolution Milestones**: Gallery of evolution achievements with badges
+- **Data Table**: Detailed daily breakdown of all health metrics
+- **Responsive Layout**: Optimized for portrait and landscape orientations
+- **Accessibility**: WCAG 2.1 AA compliant with screen reader support
+
+### UI Components
+
+- **StatisticsCard**: Displays key metrics with Halloween-themed decorations
+- **HealthMetricsChart**: Interactive line charts with tooltips and haptic feedback
+- **EmotionalStateTimeline**: Visual timeline of emotional states with modal details
+- **EvolutionMilestoneCard**: Showcases evolution achievements with images and metadata
+- **HealthDataTable**: Scrollable table view of historical health data
+
+### Theme & Design
+
+- **Halloween Aesthetic**: Purple color palette (#7C3AED to #9333EA) with spooky elements
+- **Centralized Theme**: Consistent colors and styling via `src/constants/theme.ts`
+- **Dark Mode**: Optimized for low-light viewing with dark backgrounds
+- **Responsive**: Adapts to different screen sizes and orientations
+- **Accessibility**: High contrast, proper touch targets (44x44pt), and screen reader support
 
 ### Tech Stack
 

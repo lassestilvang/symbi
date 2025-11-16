@@ -38,6 +38,95 @@ import { OnboardingFlow } from './screens/onboarding';
 
 The primary app screen displaying the Symbi creature and health metrics.
 
+### EvolutionHistoryScreen
+
+A comprehensive data visualization screen showing the user's health journey over time.
+
+**Features:**
+
+- Time range filtering (7 days, 30 days, 90 days, all time)
+- Summary statistics cards with Halloween decorations
+- Interactive line charts for steps, sleep, and HRV trends
+- Emotional state timeline with color-coded indicators
+- Evolution milestone gallery with badges
+- Scrollable data table with daily health metrics
+- Responsive layout for portrait and landscape orientations
+- Scroll position preservation during orientation changes
+- Loading, error, and empty states with Halloween theming
+- WCAG 2.1 AA accessibility compliance
+- AsyncStorage persistence for time range preference
+
+**Components Used:**
+
+- `StatisticsCard` - Displays average metrics
+- `HealthMetricsChart` - Line charts for metric trends
+- `EmotionalStateTimeline` - Timeline of emotional states
+- `EvolutionMilestoneCard` - Evolution achievement cards
+- `HealthDataTable` - Detailed data table
+
+**Data Flow:**
+
+```
+StorageService.getHealthDataCache()
+   ↓
+Transform to HistoricalDataPoint[]
+   ↓
+Filter by Time Range
+   ↓
+Calculate Statistics
+   ↓
+Render Visualizations
+```
+
+**Navigation:**
+
+- Accessible from Settings screen
+- Back button returns to main screen
+- Deep linking support (future)
+
+**Performance:**
+
+- Memoized data transformations
+- Debounced time range changes (300ms)
+- Efficient scroll handling
+- Responsive layout calculations cached
+
+**Accessibility:**
+
+- Semantic roles (button, header, alert, radiogroup, list)
+- Descriptive accessibility labels
+- Screen reader announcements for state changes
+- 44x44pt minimum touch targets
+- High contrast colors
+
+See [Evolution History Implementation Summary](../../docs/evolution-history-implementation-summary.md) for detailed documentation.
+
+### EvolutionGalleryScreen
+
+Displays a gallery of all evolution milestones achieved by the user.
+
+**Features:**
+
+- 2-column grid layout with responsive sizing
+- Evolution cards with images and metadata
+- ScrollView-based rendering for optimal layout control
+- 400px max-width for readability
+- Halloween-themed styling
+- Empty state for new users
+
+**Layout:**
+
+- Portrait: 2 columns
+- Landscape: 2 columns (maintained for consistency)
+- Card gap: 12px
+- Horizontal padding: 16px
+
+See [Evolution Gallery Responsive Layout](../../docs/evolution-gallery-responsive-layout.md) for details.
+
+### MainScreen
+
+The primary app screen displaying the Symbi creature and health metrics.
+
 **Features:**
 
 - 8-bit pixel art Symbi ghost with emotional state animations in Tamagotchi-style frame

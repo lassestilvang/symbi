@@ -32,8 +32,6 @@ interface EvolutionGalleryScreenProps {
 
 // Layout constants
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const MAX_CONTAINER_WIDTH = 400;
-const MAX_CARD_WIDTH = 180;
 const GRID_COLUMNS = 2;
 
 export const EvolutionGalleryScreen: React.FC<EvolutionGalleryScreenProps> = ({ navigation }) => {

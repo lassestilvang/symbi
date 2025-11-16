@@ -169,7 +169,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <View style={styles.headerRow}>
           <Text style={styles.header}>Settings</Text>
           {navigation && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.closeButton}
               onPress={() => navigation.goBack()}
               accessibilityLabel="Close settings"
