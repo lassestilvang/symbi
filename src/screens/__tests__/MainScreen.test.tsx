@@ -116,7 +116,7 @@ describe('MainScreen', () => {
       unmount();
       unmount = undefined;
     }
-    
+
     // Force cleanup of background service
     mockStopBackgroundSync();
     mockBackgroundSyncInstance.destroy();

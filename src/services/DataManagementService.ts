@@ -328,7 +328,7 @@ export class DataManagementService {
    */
   private static async saveToFile(data: string): Promise<string> {
     const fileName = `${this.EXPORT_FILE_NAME.replace('.json', '')}-${Date.now()}.json`;
-    
+
     // Use the new expo-file-system API
     const file = new FileSystem.File(FileSystem.Paths.cache, fileName);
     await file.write(data);

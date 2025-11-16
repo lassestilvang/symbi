@@ -4,7 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import ErrorReportingService from './src/services/ErrorReportingService';
 import { SENTRY_CONFIG } from './src/config/sentry.config';
-import { Platform } from 'react-native';
+import { Platform, View, StyleSheet } from 'react-native';
 
 export default function App() {
   useEffect(() => {
@@ -61,8 +61,29 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <AppNavigator />
+      <View style={styles.appContainer}>
+        <View style={styles.contentWrapper}>
+          <AppNavigator />
+        </View>
+      </View>
       <StatusBar style="light" />
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  appContainer: {
+    flex: 1,
+    backgroundColor: '#1a1a2e',
+    ...(Platform.OS === 'web' && {
+      alignItems: 'center',
+    }),
+  },
+  contentWrapper: {
+    flex: 1,
+    width: '100%',
+    ...(Platform.OS === 'web' && {
+      maxWidth: 600,
+    }),
+  },
+});
