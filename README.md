@@ -161,11 +161,32 @@ SafeAreaProvider
 └── View (appContainer)
     └── View (contentWrapper - max 600px on web)
         └── AppNavigator
+            └── MainScreen (primary interface)
 ```
 
 The app uses a centered layout on web with a dark background (#1a1a2e) matching the Halloween theme.
 
-**Detailed Architecture Documentation**: [docs/app-architecture.md](docs/app-architecture.md)
+### Main Screen
+
+The `MainScreen` component is the primary user interface, integrating all three development phases:
+
+- **Phase 1**: Step tracking, emotional states (Sad/Resting/Active), configurable thresholds
+- **Phase 2**: Multi-metric display (sleep, HRV), AI-powered emotional states
+- **Phase 3**: Evolution system, breathing exercises, interactive sessions
+
+**Key Features**:
+- 8-bit pixel art Symbi ghost in Tamagotchi-style frame
+- Real-time health metrics with progress tracking
+- Background sync with automatic updates
+- Evolution progress tracking and triggering
+- Interactive breathing exercises for stress relief
+- Offline support with cached data
+- Pull-to-refresh for manual updates
+
+**Documentation**:
+- **Complete Feature Guide**: [docs/mainscreen-complete-feature-documentation.md](docs/mainscreen-complete-feature-documentation.md)
+- **Architecture Details**: [docs/app-architecture.md](docs/app-architecture.md)
+- **Screen Components**: [src/screens/README.md](src/screens/README.md)
 
 ## Monitoring
 

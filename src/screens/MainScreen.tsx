@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Animated,
   Modal,
+  ImageBackground,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { Symbi8BitCanvas } from '../components/Symbi8BitCanvas';
@@ -31,6 +32,10 @@ import {
   AIBrainService,
 } from '../services';
 import { EmotionalState, HealthDataType } from '../types';
+
+// Import tamagotchi frame image
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const tamagotchiFrameImage = require('../assets/images/tamagotchi-frame.png');
 
 /**
  * MainScreen Component
@@ -538,20 +543,29 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         </Animated.View>
       )}
 
-      {/* Symbi Ghost */}
+      {/* Symbi Ghost with Tamagotchi Frame */}
       <View style={styles.symbiContainer}>
         {isLoading ? (
           <ActivityIndicator size="large" color="#9333EA" />
         ) : (
-          <Symbi8BitCanvas
-            key={`ghost-${emotionalState}`}
-            emotionalState={emotionalState}
-            size={Math.min(SCREEN_WIDTH * 0.8, 350)}
-            onPoke={() => {
-              console.log('👻 Ghost poked! Current state:', emotionalState);
-              handleSymbiPoke();
-            }}
-          />
+          <View style={styles.tamagotchiFrame}>
+            <ImageBackground
+              source={tamagotchiFrameImage}
+              style={styles.frameImage}
+              resizeMode="contain">
+              <View style={styles.ghostScreenArea}>
+                <Symbi8BitCanvas
+                  key={`ghost-${emotionalState}`}
+                  emotionalState={emotionalState}
+                  size={Math.min(SCREEN_WIDTH * 0.5, 220)}
+                  onPoke={() => {
+                    console.log('👻 Ghost poked! Current state:', emotionalState);
+                    handleSymbiPoke();
+                  }}
+                />
+              </View>
+            </ImageBackground>
+          </View>
         )}
       </View>
 
@@ -846,6 +860,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20,
     marginBottom: 10,
+  },
+  tamagotchiFrame: {
+    height: 500,
+    width: 500,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  frameImage: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ghostScreenArea: {
+    width: '60%',
+    height: '60%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -50,
   },
   noDataContainer: {
     alignItems: 'center',

@@ -50,6 +50,8 @@ module.exports = {
   // Path aliases matching tsconfig.json
   moduleNameMapper: {
     '^react-native$': '<rootDir>/__mocks__/react-native.js',
+    // Mock image imports
+    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/__mocks__/fileMock.js',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
     '^@services/(.*)$': '<rootDir>/src/services/$1',
     '^@screens/(.*)$': '<rootDir>/src/screens/$1',

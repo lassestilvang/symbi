@@ -39,7 +39,7 @@ import { OnboardingFlow } from './screens/onboarding';
 The primary app screen displaying the Symbi creature and health metrics.
 
 **Features:**
-- 8-bit pixel art Symbi ghost with emotional state animations
+- 8-bit pixel art Symbi ghost with emotional state animations in Tamagotchi-style frame
 - Real-time step count display with progress bar
 - Emotional state label (Sad, Resting, Active, etc.)
 - Threshold indicators showing state ranges
@@ -49,18 +49,51 @@ The primary app screen displaying the Symbi creature and health metrics.
 - Settings button (top right corner)
 - Configure thresholds button
 - Test buttons for quick state changes (development)
-- Evolution progress tracker (Phase 3)
-- "Calm your Symbi" breathing exercise button (Phase 3)
-- State change notifications with smooth animations
+- Evolution progress tracker with eligibility display (Phase 3)
+- Evolution trigger button when eligible (Phase 3)
+- "Calm your Symbi" breathing exercise button for Stressed/Anxious states (Phase 3)
+- State change notifications with smooth fade animations
+- Manual entry button for users in manual mode
+- Multi-metric display (sleep, HRV) when available (Phase 2)
+- Evolution celebration modal (Phase 3)
+- Breathing exercise modal (Phase 3)
 
 **UI Layout:**
-- Clean top bar with offline indicator and settings button
-- Centered Symbi ghost (responsive sizing)
-- Emotional state label below ghost
-- Health metrics card with step count
-- Progress bar with color-coded fill
-- Threshold indicators showing ranges
-- Action buttons at bottom
+- Minimalist top bar with app title, offline indicator, and settings button
+- Tamagotchi-style frame containing the 8-bit Symbi ghost (centered, responsive)
+- Emotional state label with debug info below ghost
+- Manual entry button (when in manual mode)
+- Test buttons for quick state testing (3 buttons: Sad, Resting, Active)
+- Health metrics card with step count and goal
+- Additional metrics row for sleep and HRV (Phase 2)
+- Progress bar with color-coded fill based on emotional state
+- Threshold indicators showing state ranges (Sad, Resting, Active)
+- Evolution progress card with progress bar and trigger button (Phase 3)
+- "Calm your Symbi" button (shown for Stressed/Anxious states)
+- Configure thresholds button
+- Last updated timestamp
+
+**State Management:**
+- Uses `useHealthDataStore` for health metrics and emotional state
+- Uses `useSymbiStateStore` for Symbi evolution level and custom appearance
+- Uses `useUserPreferencesStore` for user preferences and thresholds
+- Local state for UI interactions (modals, notifications, loading states)
+
+**Services Used:**
+- `HealthDataUpdateService` - Fetches and updates health data
+- `BackgroundSyncService` - Handles background data synchronization
+- `InteractiveSessionManager` - Manages breathing exercises
+- `EvolutionSystem` - Tracks evolution progress and triggers evolution events
+- `AIBrainService` - Generates evolved Symbi appearances (Phase 3)
+
+**Key Functions:**
+- `initializeHealthData()` - Initializes health data service and fetches today's data
+- `checkEvolutionProgress()` - Checks if Symbi is eligible for evolution
+- `handleTriggerEvolution()` - Triggers evolution event with AI image generation
+- `handleStartBreathingExercise()` - Starts breathing exercise session
+- `handleBreathingComplete()` - Handles breathing exercise completion and state update
+- `handleRefresh()` - Manual refresh via pull-to-refresh
+- `handleSymbiPoke()` - Handles tap interaction with Symbi ghost
 
 **Usage:**
 ```tsx
@@ -69,7 +102,8 @@ import { MainScreen } from './screens';
 <MainScreen
   navigation={{
     navigate: (screen) => {
-      // Handle navigation
+      // Handle navigation to other screens
+      // Supported: 'Settings', 'Thresholds', 'ManualEntry'
     }
   }}
 />
