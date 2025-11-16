@@ -1,0 +1,60 @@
+name: Performance Monitoring
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  bundle-size:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build bundle
+        run: npx expo export --platform all
+      
+      - name: Analyze bundle size
+        run: |
+          echo "## Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d "dist" ]; then
+            du -sh dist/* | sort -h >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No dist directory found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  test-performance:
+    name: Test Performance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run performance tests
+        run: npm test -- --testPathPattern=performance --maxWorkers=2
+        continue-on-error: true
+      
+      - name: Performance summary
+        run: |
+          echo "## Performance Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Performance tests completed. Check logs for details." >> $GITHUB_STEP_SUMMARY
