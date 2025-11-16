@@ -139,7 +139,112 @@ const handleDataPointClick = useCallback(
 - More testable code (utility functions can be tested independently)
 - Eliminated code duplication (uses centralized utilities)
 
-### 4. Component Extraction
+### 4. Refactored StatisticsCard Component (Medium Priority) ✅
+
+**Status**: Complete - All refactoring applied
+
+**Improvements Made**:
+
+#### Centralized Constants
+- ✅ Imports `HALLOWEEN_COLORS` from `src/constants/theme.ts`
+- ✅ Imports `DECORATION_ICONS` from `src/constants/theme.ts`
+- ✅ Removed inline color and icon definitions
+
+#### Performance Optimizations
+- ✅ Wrapped component with `React.memo` to prevent unnecessary re-renders
+- ✅ Added `useMemo` for dynamic style calculation
+- ✅ Extracted `formatValue()` helper function for number formatting
+
+#### Accessibility Enhancements
+- ✅ Added comprehensive `accessibilityLabel` with full context
+- ✅ Added `accessibilityRole="summary"` for proper semantics
+- ✅ Supports `testID` prop for automated testing
+
+#### Code Quality
+- ✅ Better prop typing with `keyof typeof DECORATION_ICONS`
+- ✅ Automatic locale-specific number formatting (e.g., 8,542 instead of 8542)
+- ✅ Cleaner, more maintainable code structure
+
+**Before**:
+```typescript
+const HALLOWEEN_COLORS = {
+  primary: '#7C3AED',
+  primaryDark: '#5B21B6',
+  // ... duplicated constants
+};
+
+const DECORATION_ICONS = {
+  ghost: '👻',
+  pumpkin: '🎃',
+  // ... duplicated constants
+};
+
+export const StatisticsCard: React.FC<StatisticsCardProps> = ({
+  icon, label, value, subtitle, halloweenDecoration, width
+}) => {
+  return (
+    <View style={[styles.card, width ? { width } : undefined]}>
+      <Text style={styles.decoration}>
+        {DECORATION_ICONS[halloweenDecoration]}
+      </Text>
+      <Text style={styles.value}>{value}</Text>
+      {/* ... */}
+    </View>
+  );
+};
+```
+
+**After**:
+```typescript
+import { HALLOWEEN_COLORS, DECORATION_ICONS } from '../constants/theme';
+
+const formatValue = (val: string | number): string => {
+  if (typeof val === 'number') {
+    return val.toLocaleString();
+  }
+  return val;
+};
+
+export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
+  ({ icon, label, value, subtitle, halloweenDecoration, width, testID }) => {
+    const dynamicStyle = React.useMemo(
+      () => (width ? { width, minWidth: width } : undefined),
+      [width]
+    );
+
+    const accessibilityLabel = `${label}: ${value}${subtitle ? `, ${subtitle}` : ''}`;
+
+    return (
+      <View
+        style={[styles.card, dynamicStyle]}
+        accessible={true}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole="summary"
+        testID={testID}
+      >
+        <View style={styles.decorationContainer}>
+          <Text style={styles.decoration}>{DECORATION_ICONS[halloweenDecoration]}</Text>
+        </View>
+        <View style={styles.content}>
+          <Text style={styles.icon}>{icon}</Text>
+          <Text style={styles.value}>{formatValue(value)}</Text>
+          {/* ... */}
+        </View>
+      </View>
+    );
+  }
+);
+```
+
+**Impact**:
+- Eliminated ~30 lines of duplicated constants
+- Improved performance with React.memo (prevents re-renders when parent updates)
+- Better accessibility for screen readers
+- Automatic number formatting improves UX
+- More testable with testID support
+- Type-safe decoration icons with `keyof typeof`
+
+### 5. Component Extraction
 
 **Extracted Components**:
 - `Tooltip` component from `HealthMetricsChart`
@@ -167,7 +272,13 @@ const handleDataPointClick = useCallback(
    - Uses `dateHelpers` utilities (formatShortDate, formatDisplayDate)
    - Added performance optimizations (useMemo, useCallback)
    - Extracted Tooltip component
-2. ⏳ `src/components/StatisticsCard.tsx` - Should import from constants
+2. ✅ `src/components/StatisticsCard.tsx` - **COMPLETE**
+   - Imports `HALLOWEEN_COLORS` and `DECORATION_ICONS` from constants
+   - Added React.memo for performance optimization
+   - Added automatic number formatting with `formatValue()` helper
+   - Memoized dynamic styles with `useMemo`
+   - Enhanced accessibility with proper labels and roles
+   - Added `testID` prop for testing support
 3. ⏳ `src/components/EmotionalStateTimeline.tsx` - Should import from constants
 4. ⏳ `src/components/EvolutionMilestoneCard.tsx` - Should import from constants
 5. ⏳ `src/components/HealthDataTable.tsx` - Should import from constants
@@ -177,10 +288,11 @@ const handleDataPointClick = useCallback(
 
 ### Immediate (Should be done now)
 1. ✅ **COMPLETE**: HealthMetricsChart refactored with all optimizations
-2. ⏳ Update remaining components to use centralized constants
-3. ⏳ Update components to use date/metric helper functions
-4. ⏳ Run tests to ensure no regressions
-5. ⏳ Update component exports in `src/components/index.ts`
+2. ✅ **COMPLETE**: StatisticsCard refactored with centralized constants and performance optimizations
+3. ⏳ Update remaining components to use centralized constants (EmotionalStateTimeline, EvolutionMilestoneCard, HealthDataTable, EvolutionHistoryScreen)
+4. ⏳ Update components to use date/metric helper functions
+5. ⏳ Run tests to ensure no regressions
+6. ⏳ Update component exports in `src/components/index.ts`
 
 ### Short-term (Next sprint)
 1. Apply similar refactoring to other screens (MainScreen, etc.)

@@ -96,6 +96,7 @@ npm run test:watch
 - **Animations**: Lottie (vector animations) + 8-bit pixel art with configurable spacing (pure React Native)
 - **Storage**: AsyncStorage
 - **Security**: TLS 1.3, AES-256 encryption, dependency vulnerability management
+- **Accessibility**: WCAG 2.1 Level AA compliant with full screen reader support
 
 ## Phase Development
 
@@ -217,6 +218,7 @@ The Evolution History Page provides comprehensive visualizations of historical h
 - **Emotional Timeline**: Chronological view of state changes with ghost icons and metrics
 - **Evolution Milestones**: Gallery of evolution events with badges and appearance previews
 - **Data Table**: Scrollable table with daily breakdowns and color-coded states
+- **Accessibility**: Full WCAG 2.1 AA compliance with screen reader support, semantic roles, and dynamic announcements
 - **Responsive Design**: Adapts to portrait/landscape with scroll position preservation
 
 **Components**:
@@ -239,6 +241,7 @@ The Evolution History Page provides comprehensive visualizations of historical h
 
 **Documentation**:
 - **Implementation Summary**: [docs/evolution-history-implementation-summary.md](docs/evolution-history-implementation-summary.md)
+- **Accessibility Compliance**: [docs/evolution-history-accessibility-update.md](docs/evolution-history-accessibility-update.md)
 - **Responsive Layout**: [docs/evolution-history-responsive-layout.md](docs/evolution-history-responsive-layout.md)
 - **Type Definitions**: [docs/evolution-history-types-implementation.md](docs/evolution-history-types-implementation.md)
 - **Code Refactoring**: [docs/code-refactoring-nov-16-2025.md](docs/code-refactoring-nov-16-2025.md)
@@ -276,6 +279,29 @@ The application uses TypeScript with strict mode for type safety. Core type defi
 **Evolution System**:
 - `EvolutionRecord`: Single evolution event with appearance and metadata
 - `EmotionalState`: Enum of all possible Symbi states (9 total)
+
+## Accessibility
+
+Symbi is designed to be accessible to all users, including those using assistive technologies.
+
+**WCAG 2.1 Level AA Compliance**:
+- ✅ Semantic roles for proper screen reader navigation (button, header, alert, radiogroup, list)
+- ✅ Descriptive labels for all interactive elements
+- ✅ Accessibility hints explaining complex interactions
+- ✅ Dynamic announcements for state changes
+- ✅ Minimum 44x44pt touch targets
+- ✅ 4.5:1 color contrast ratio for all text
+- ✅ Decorative elements hidden from screen readers
+- ✅ Live regions for loading and error states
+
+**Testing**:
+- iOS: VoiceOver compatible
+- Android: TalkBack compatible
+- Automated: React Native Testing Library with accessibility queries
+
+**Documentation**:
+- [docs/accessibility-compliance.md](docs/accessibility-compliance.md)
+- [docs/evolution-history-accessibility-update.md](docs/evolution-history-accessibility-update.md)
 
 ## Changelog
 

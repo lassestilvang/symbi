@@ -4,6 +4,51 @@ This directory contains the Symbi animation component and related UI components 
 
 ## Components
 
+### StatisticsCard
+
+A reusable card component for displaying health statistics with Halloween-themed styling.
+
+**Features:**
+- Halloween-themed styling with purple glow shadows
+- Decorative icons (ghost, pumpkin, tombstone, bat)
+- Automatic number formatting with locale-specific thousand separators
+- Responsive width support
+- Memoized for performance optimization
+- Full accessibility support with labels and roles
+- Text shadows and purple glow effects
+
+**Usage:**
+```tsx
+import { StatisticsCard } from './components';
+
+<StatisticsCard
+  icon="👣"
+  label="Average Steps"
+  value={8542}
+  subtitle="Last 30 days"
+  halloweenDecoration="pumpkin"
+  width={160}
+  testID="steps-card"
+/>
+```
+
+**Props:**
+- `icon` (required): Emoji icon to display (e.g., "👣", "😴", "❤️")
+- `label` (required): Label text for the statistic
+- `value` (required): Numeric or string value to display
+- `subtitle` (optional): Additional context text below the label
+- `halloweenDecoration` (required): Decoration icon type ("ghost" | "pumpkin" | "tombstone" | "bat")
+- `width` (optional): Custom width for the card
+- `testID` (optional): Test identifier for testing
+
+**Styling:**
+- Enhanced purple glow shadow (12px radius)
+- Main icon: 36px with text shadow
+- Decorative icon: 28px in corner at 20% opacity
+- Value text: 28px bold with purple glow
+- Border: 2px with dark purple color
+- Uses centralized `HALLOWEEN_COLORS` and `DECORATION_ICONS` from theme constants
+
 ### SymbiAnimation
 
 The main animation component that renders the Symbi creature with different emotional states using Lottie animations.

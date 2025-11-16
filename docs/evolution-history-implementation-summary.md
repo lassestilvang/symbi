@@ -50,6 +50,10 @@ Implemented a comprehensive Evolution History page that provides users with deta
 - Responsive width prop for grid layouts
 - Icon, label, value, and optional subtitle display
 - Purple color palette with shadow effects
+- **Refactored** (Nov 16, 2025) to use centralized theme constants
+- **Performance optimized** with React.memo
+- **Accessibility enhanced** with proper labels and roles
+- **Automatic number formatting** with locale-specific thousand separators
 
 **Props**:
 ```typescript
@@ -58,10 +62,19 @@ interface StatisticsCardProps {
   label: string;
   value: string | number;
   subtitle?: string;
-  halloweenDecoration: 'ghost' | 'pumpkin' | 'tombstone' | 'bat';
+  halloweenDecoration: keyof typeof DECORATION_ICONS;
   width?: number;
+  testID?: string;
 }
 ```
+
+**Refactoring Details**:
+- Imports `HALLOWEEN_COLORS` and `DECORATION_ICONS` from `src/constants/theme.ts`
+- Uses `React.memo` for performance optimization
+- Includes `formatValue()` helper for automatic number formatting
+- Memoizes dynamic styles with `useMemo`
+- Provides comprehensive accessibility labels
+- Supports `testID` prop for testing
 
 ### 3. HealthMetricsChart Component
 

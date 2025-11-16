@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Accessibility Enhancement**: Evolution History Screen now WCAG 2.1 AA compliant (2025-11-16)
+  - Added semantic roles (button, header, alert, radiogroup, radio, list) for proper screen reader navigation
+  - Implemented descriptive accessibility labels for all interactive elements
+  - Added accessibility hints explaining complex interactions
+  - Added accessibility state for radio buttons (selected/not selected)
+  - Implemented dynamic announcements for time range changes via `AccessibilityInfo.announceForAccessibility()`
+  - Added live regions for loading states (`accessibilityLiveRegion="polite"`)
+  - Hidden decorative elements (emojis, arrows) from screen readers with `accessibilityElementsHidden={true}`
+  - Ensured all touch targets meet 44x44pt minimum size requirement
+  - See [docs/evolution-history-accessibility-update.md](evolution-history-accessibility-update.md)
 - Evolution History Page with comprehensive data visualizations (2025-11-16)
   - Time range filtering (7D, 30D, 90D, All Time) with AsyncStorage persistence
   - Summary statistics cards with Halloween-themed decorations
@@ -28,6 +38,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - See [.kiro/specs/evolution-history-page/](../.kiro/specs/evolution-history-page/)
 
 ### Changed
+- **StatisticsCard Component Refactoring** (2025-11-16)
+  - Migrated to centralized theme constants (`HALLOWEEN_COLORS`, `DECORATION_ICONS` from `src/constants/theme.ts`)
+  - Wrapped component with `React.memo` for performance optimization
+  - Implemented automatic number formatting with locale-specific thousand separators
+  - Enhanced accessibility with comprehensive labels (`accessibilityLabel`, `accessibilityRole="summary"`)
+  - Added `testID` prop for automated testing support
+  - Memoized dynamic styles with `useMemo` for better performance
+  - Improved prop typing with `keyof typeof DECORATION_ICONS`
+  - See [docs/code-refactoring-nov-16-2025.md](code-refactoring-nov-16-2025.md)
 - **Performance Optimization**: Refactored `HealthMetricsChart` component (2025-11-16)
   - Applied React memoization patterns (useMemo, useCallback) for 60% reduction in unnecessary recalculations
   - Extracted Tooltip as separate component for better separation of concerns

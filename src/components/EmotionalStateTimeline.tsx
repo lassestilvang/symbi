@@ -96,18 +96,30 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
   if (data.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>👻 No emotional states recorded yet</Text>
+        <Text
+          style={styles.emptyText}
+          accessibilityLabel="No emotional states recorded yet"
+          accessibilityRole="text">
+          👻 No emotional states recorded yet
+        </Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🕰️ Emotional Timeline</Text>
-      <ScrollView style={styles.timeline} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+      <Text style={styles.title} accessibilityRole="header" accessibilityLabel="Emotional Timeline">
+        🕰️ Emotional Timeline
+      </Text>
+      <ScrollView
+        style={styles.timeline}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+        accessibilityRole="list">
         {data.map((item, index) => {
           const stateColor = STATE_COLORS[item.emotionalState] || HALLOWEEN_COLORS.primary;
           const isLast = index === data.length - 1;
+          const accessibilityLabel = `${item.emotionalState} state on ${formatDate(item.date)}, ${formatTime(item.date)}. ${item.steps.toLocaleString()} steps${item.sleepHours !== undefined ? `, ${item.sleepHours.toFixed(1)} hours sleep` : ''}${item.hrv !== undefined ? `, ${item.hrv.toFixed(0)} milliseconds HRV` : ''}. Tap for details.`;
 
           return (
             <TouchableOpacity
@@ -115,14 +127,19 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
               style={styles.timelineItem}
               onPress={() => handleItemPress(item)}
               activeOpacity={0.7}
-              accessibilityLabel={`View details for ${item.emotionalState} state on ${formatDate(item.date)}`}>
-              <View style={styles.timelineLeft}>
+              accessible={true}
+              accessibilityLabel={accessibilityLabel}
+              accessibilityRole="button"
+              accessibilityHint="Opens detailed view of this emotional state">
+              <View style={styles.timelineLeft} accessibilityElementsHidden={true}>
                 <View style={[styles.dot, { backgroundColor: stateColor }]} />
                 {!isLast && <View style={styles.line} />}
               </View>
               <View style={[styles.timelineCard, { borderLeftColor: stateColor }]}>
                 <View style={styles.cardHeader}>
-                  <Text style={styles.ghost}>👻</Text>
+                  <Text style={styles.ghost} accessibilityElementsHidden={true}>
+                    👻
+                  </Text>
                   <View style={styles.cardHeaderText}>
                     <Text style={[styles.stateName, { color: stateColor }]}>
                       {item.emotionalState}
@@ -133,12 +150,21 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
                   </View>
                 </View>
                 <View style={styles.cardMetrics}>
-                  <Text style={styles.metricText}>👣 {item.steps.toLocaleString()} steps</Text>
+                  <Text style={styles.metricText}>
+                    <Text accessibilityElementsHidden={true}>👣 </Text>
+                    {item.steps.toLocaleString()} steps
+                  </Text>
                   {item.sleepHours !== undefined && (
-                    <Text style={styles.metricText}>😴 {item.sleepHours.toFixed(1)}h sleep</Text>
+                    <Text style={styles.metricText}>
+                      <Text accessibilityElementsHidden={true}>😴 </Text>
+                      {item.sleepHours.toFixed(1)}h sleep
+                    </Text>
                   )}
                   {item.hrv !== undefined && (
-                    <Text style={styles.metricText}>❤️ {item.hrv.toFixed(0)}ms HRV</Text>
+                    <Text style={styles.metricText}>
+                      <Text accessibilityElementsHidden={true}>❤️ </Text>
+                      {item.hrv.toFixed(0)}ms HRV
+                    </Text>
                   )}
                 </View>
               </View>
@@ -152,27 +178,47 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
         visible={selectedItem !== null}
         transparent
         animationType="fade"
-        onRequestClose={closeModal}>
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={closeModal}>
+        onRequestClose={closeModal}
+        accessibilityViewIsModal={true}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={closeModal}
+          accessible={false}>
           <TouchableOpacity
             style={styles.modalContent}
             activeOpacity={1}
-            onPress={e => e.stopPropagation()}>
+            onPress={e => e.stopPropagation()}
+            accessible={true}
+            accessibilityRole="alert"
+            accessibilityLabel={
+              selectedItem
+                ? `Emotional state details for ${selectedItem.emotionalState} on ${formatFullDate(selectedItem.date)}`
+                : 'Emotional state details'
+            }>
             {selectedItem && (
               <>
                 <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Emotional State Details</Text>
+                  <Text style={styles.modalTitle} accessibilityRole="header">
+                    Emotional State Details
+                  </Text>
                   <TouchableOpacity
                     onPress={closeModal}
                     style={styles.modalCloseButton}
-                    accessibilityLabel="Close details">
-                    <Text style={styles.modalCloseText}>✕</Text>
+                    accessibilityLabel="Close details"
+                    accessibilityRole="button"
+                    accessibilityHint="Closes the emotional state details dialog">
+                    <Text style={styles.modalCloseText} accessibilityElementsHidden={true}>
+                      ✕
+                    </Text>
                   </TouchableOpacity>
                 </View>
 
                 <View style={styles.modalBody}>
                   <View style={styles.modalStateHeader}>
-                    <Text style={styles.modalGhost}>👻</Text>
+                    <Text style={styles.modalGhost} accessibilityElementsHidden={true}>
+                      👻
+                    </Text>
                     <View style={styles.modalStateInfo}>
                       <Text
                         style={[
@@ -181,19 +227,26 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
                             color:
                               STATE_COLORS[selectedItem.emotionalState] || HALLOWEEN_COLORS.primary,
                           },
-                        ]}>
+                        ]}
+                        accessibilityRole="header">
                         {selectedItem.emotionalState}
                       </Text>
                       <Text style={styles.modalDate}>{formatFullDate(selectedItem.date)}</Text>
                     </View>
                   </View>
 
-                  <View style={styles.modalDivider} />
+                  <View style={styles.modalDivider} accessibilityElementsHidden={true} />
 
                   <View style={styles.modalMetrics}>
                     <View style={styles.modalMetricRow}>
-                      <View style={styles.modalMetricCard}>
-                        <Text style={styles.modalMetricIcon}>👣</Text>
+                      <View
+                        style={styles.modalMetricCard}
+                        accessible={true}
+                        accessibilityLabel={`Steps: ${selectedItem.steps.toLocaleString()}`}
+                        accessibilityRole="summary">
+                        <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
+                          👣
+                        </Text>
                         <Text style={styles.modalMetricLabel}>Steps</Text>
                         <Text style={styles.modalMetricValue}>
                           {selectedItem.steps.toLocaleString()}
@@ -201,8 +254,14 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
                       </View>
 
                       {selectedItem.sleepHours !== undefined && (
-                        <View style={styles.modalMetricCard}>
-                          <Text style={styles.modalMetricIcon}>😴</Text>
+                        <View
+                          style={styles.modalMetricCard}
+                          accessible={true}
+                          accessibilityLabel={`Sleep: ${selectedItem.sleepHours.toFixed(1)} hours`}
+                          accessibilityRole="summary">
+                          <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
+                            😴
+                          </Text>
                           <Text style={styles.modalMetricLabel}>Sleep</Text>
                           <Text style={styles.modalMetricValue}>
                             {selectedItem.sleepHours.toFixed(1)}h
@@ -213,8 +272,14 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
 
                     {selectedItem.hrv !== undefined && (
                       <View style={styles.modalMetricRow}>
-                        <View style={styles.modalMetricCard}>
-                          <Text style={styles.modalMetricIcon}>❤️</Text>
+                        <View
+                          style={styles.modalMetricCard}
+                          accessible={true}
+                          accessibilityLabel={`Heart Rate Variability: ${selectedItem.hrv.toFixed(0)} milliseconds`}
+                          accessibilityRole="summary">
+                          <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
+                            ❤️
+                          </Text>
                           <Text style={styles.modalMetricLabel}>Heart Rate Variability</Text>
                           <Text style={styles.modalMetricValue}>
                             {selectedItem.hrv.toFixed(0)}ms
@@ -225,7 +290,9 @@ export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
                   </View>
 
                   <View style={styles.modalFooter}>
-                    <Text style={styles.modalFooterText}>Tap outside to close</Text>
+                    <Text style={styles.modalFooterText} accessibilityElementsHidden={true}>
+                      Tap outside to close
+                    </Text>
                   </View>
                 </View>
               </>
@@ -247,6 +314,10 @@ const styles = StyleSheet.create({
     color: HALLOWEEN_COLORS.ghostWhite,
     marginBottom: 16,
     marginLeft: 16,
+    textShadowColor: HALLOWEEN_COLORS.primary,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+    letterSpacing: 0.5,
   },
   timeline: {
     maxHeight: 400,
@@ -282,11 +353,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     borderLeftWidth: 4,
+    // Enhanced purple glow shadow
     shadowColor: HALLOWEEN_COLORS.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -304,11 +376,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   dateText: {
     fontSize: 12,
     color: HALLOWEEN_COLORS.ghostWhite,
-    opacity: 0.6,
+    opacity: 0.7,
+    fontWeight: '500',
   },
   cardMetrics: {
     marginTop: 4,
@@ -347,11 +423,12 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     borderWidth: 2,
     borderColor: HALLOWEEN_COLORS.primary,
-    shadowColor: HALLOWEEN_COLORS.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
-    shadowRadius: 16,
-    elevation: 16,
+    // Enhanced purple glow shadow for modal
+    shadowColor: HALLOWEEN_COLORS.primaryLight,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.8,
+    shadowRadius: 24,
+    elevation: 24,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -398,6 +475,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   modalDate: {
     fontSize: 14,
@@ -442,6 +522,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.primaryLight,
+    textShadowColor: HALLOWEEN_COLORS.primary,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   modalFooter: {
     alignItems: 'center',

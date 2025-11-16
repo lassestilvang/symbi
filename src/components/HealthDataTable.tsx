@@ -59,35 +59,55 @@ export const HealthDataTable: React.FC<HealthDataTableProps> = ({ data, maxHeigh
   if (data.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>👻 No data to display</Text>
+        <Text
+          style={styles.emptyText}
+          accessibilityLabel="No data to display"
+          accessibilityRole="text">
+          👻 No data to display
+        </Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📊 Data Table</Text>
+      <Text style={styles.title} accessibilityRole="header" accessibilityLabel="Data Table">
+        📊 Data Table
+      </Text>
       <ScrollView
         style={[styles.tableContainer, { maxHeight }]}
         horizontal
-        showsHorizontalScrollIndicator={true}>
+        showsHorizontalScrollIndicator={true}
+        accessible={true}
+        accessibilityLabel={`Health data table with ${data.length} rows`}
+        accessibilityHint="Scrollable table showing date, steps, sleep, HRV, and emotional state data">
         <View>
           {/* Header Row */}
           <View style={styles.headerRow}>
             <View style={[styles.cell, styles.dateCell]}>
-              <Text style={styles.headerText}>Date</Text>
+              <Text style={styles.headerText} accessibilityRole="header">
+                Date
+              </Text>
             </View>
             <View style={[styles.cell, styles.stepsCell]}>
-              <Text style={styles.headerText}>Steps</Text>
+              <Text style={styles.headerText} accessibilityRole="header">
+                Steps
+              </Text>
             </View>
             <View style={[styles.cell, styles.sleepCell]}>
-              <Text style={styles.headerText}>Sleep (h)</Text>
+              <Text style={styles.headerText} accessibilityRole="header">
+                Sleep (h)
+              </Text>
             </View>
             <View style={[styles.cell, styles.hrvCell]}>
-              <Text style={styles.headerText}>HRV (ms)</Text>
+              <Text style={styles.headerText} accessibilityRole="header">
+                HRV (ms)
+              </Text>
             </View>
             <View style={[styles.cell, styles.stateCell]}>
-              <Text style={styles.headerText}>State</Text>
+              <Text style={styles.headerText} accessibilityRole="header">
+                State
+              </Text>
             </View>
           </View>
 
@@ -100,9 +120,14 @@ export const HealthDataTable: React.FC<HealthDataTableProps> = ({ data, maxHeigh
               const isEven = index % 2 === 0;
               const rowStyle = isEven ? styles.rowEven : styles.rowOdd;
               const stateColor = STATE_COLORS[item.emotionalState] || HALLOWEEN_COLORS.primary;
+              const rowAccessibilityLabel = `${formatDate(item.date)}, ${item.steps.toLocaleString()} steps, ${item.sleepHours !== undefined ? `${item.sleepHours.toFixed(1)} hours sleep` : 'no sleep data'}, ${item.hrv !== undefined ? `${item.hrv.toFixed(0)} milliseconds HRV` : 'no HRV data'}, ${STATE_DISPLAY_NAMES[item.emotionalState]} state`;
 
               return (
-                <View key={`${item.date}-${index}`} style={[styles.dataRow, rowStyle]}>
+                <View
+                  key={`${item.date}-${index}`}
+                  style={[styles.dataRow, rowStyle]}
+                  accessible={true}
+                  accessibilityLabel={rowAccessibilityLabel}>
                   <View style={[styles.cell, styles.dateCell]}>
                     <Text style={styles.cellText}>{formatDate(item.date)}</Text>
                   </View>
@@ -121,7 +146,10 @@ export const HealthDataTable: React.FC<HealthDataTableProps> = ({ data, maxHeigh
                   </View>
                   <View style={[styles.cell, styles.stateCell]}>
                     <View style={styles.stateContainer}>
-                      <View style={[styles.stateIndicator, { backgroundColor: stateColor }]} />
+                      <View
+                        style={[styles.stateIndicator, { backgroundColor: stateColor }]}
+                        accessibilityElementsHidden={true}
+                      />
                       <Text style={[styles.cellText, styles.stateText]}>
                         {STATE_DISPLAY_NAMES[item.emotionalState]}
                       </Text>
@@ -147,19 +175,34 @@ const styles = StyleSheet.create({
     color: HALLOWEEN_COLORS.ghostWhite,
     marginBottom: 12,
     marginLeft: 16,
+    textShadowColor: HALLOWEEN_COLORS.primary,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+    letterSpacing: 0.5,
   },
   tableContainer: {
     backgroundColor: HALLOWEEN_COLORS.cardBg,
     borderRadius: 12,
     marginHorizontal: 16,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: HALLOWEEN_COLORS.primaryDark,
+    // Enhanced purple glow shadow
+    shadowColor: HALLOWEEN_COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
   },
   headerRow: {
     flexDirection: 'row',
     backgroundColor: HALLOWEEN_COLORS.primary,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
+    // Purple glow on header
+    shadowColor: HALLOWEEN_COLORS.primaryLight,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
   },
   dataRow: {
     flexDirection: 'row',
@@ -197,11 +240,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.ghostWhite,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   cellText: {
     fontSize: 14,
     color: HALLOWEEN_COLORS.ghostWhite,
+    fontWeight: '500',
   },
   stateContainer: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Dimensions,
   ScaledSize,
+  AccessibilityInfo,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -46,6 +47,60 @@ const HALLOWEEN_COLORS = {
 
 const TIME_RANGE_STORAGE_KEY = '@symbi:history_time_range';
 
+// Layout constants
+const CARD_GAP = 12;
+const HORIZONTAL_PADDING = 32;
+const LANDSCAPE_COLUMNS = 4;
+const PORTRAIT_COLUMNS = 2;
+const SCROLL_RESTORE_DELAY = 100;
+
+// Time range constants
+const TIME_RANGES = {
+  SEVEN_DAYS: 7,
+  THIRTY_DAYS: 30,
+  NINETY_DAYS: 90,
+} as const;
+
+/**
+ * Get human-readable label for time range
+ */
+const getTimeRangeLabel = (range: TimeRange): string => {
+  switch (range) {
+    case '7d':
+      return '7 days';
+    case '30d':
+      return '30 days';
+    case '90d':
+      return '90 days';
+    case 'all':
+      return 'all time';
+    default:
+      return 'unknown';
+  }
+};
+
+/**
+ * Get badge icon for evolution milestone
+ */
+const getEvolutionBadgeIcon = (
+  index: number
+): 'tombstone' | 'jack-o-lantern' | 'crystal-ball' | 'cauldron' => {
+  const badges: Array<'tombstone' | 'jack-o-lantern' | 'crystal-ball' | 'cauldron'> = [
+    'tombstone',
+    'jack-o-lantern',
+    'crystal-ball',
+    'cauldron',
+  ];
+  return badges[index % badges.length];
+};
+
+/**
+ * Capitalize first letter of string
+ */
+const capitalizeFirst = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 /**
  * Transform HealthDataCache to HistoricalDataPoint[]
  */
@@ -76,7 +131,12 @@ const filterDataByTimeRange = (
   }
 
   const now = new Date();
-  const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+  const days =
+    range === '7d'
+      ? TIME_RANGES.SEVEN_DAYS
+      : range === '30d'
+        ? TIME_RANGES.THIRTY_DAYS
+        : TIME_RANGES.NINETY_DAYS;
   const cutoffDate = new Date(now);
   cutoffDate.setDate(cutoffDate.getDate() - days);
 
@@ -148,8 +208,6 @@ const calculateStatistics = (
 export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ navigation }) => {
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
   const [allData, setAllData] = useState<HistoricalDataPoint[]>([]);
-  const [filteredData, setFilteredData] = useState<HistoricalDataPoint[]>([]);
-  const [statistics, setStatistics] = useState<HistoryStatistics | null>(null);
   const [evolutionRecords, setEvolutionRecords] = useState<EvolutionRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -172,7 +230,7 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
   /**
    * Handle dimension changes (orientation)
    */
-  const handleDimensionsChange = ({ window }: { window: ScaledSize }) => {
+  const handleDimensionsChange = useCallback(({ window }: { window: ScaledSize }) => {
     setDimensions(window);
 
     // Restore scroll position after layout update
@@ -183,22 +241,23 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
           animated: false,
         });
       }
-    }, 100);
-  };
+    }, SCROLL_RESTORE_DELAY);
+  }, []);
 
-  useEffect(() => {
-    // Update filtered data and statistics when time range changes
-    const filtered = filterDataByTimeRange(allData, timeRange);
-    setFilteredData(filtered);
+  // Memoize filtered data to avoid recalculation on every render
+  const filteredData = useMemo(() => {
+    return filterDataByTimeRange(allData, timeRange);
+  }, [allData, timeRange]);
 
-    const stats = calculateStatistics(filtered, evolutionRecords);
-    setStatistics(stats);
-  }, [timeRange, allData, evolutionRecords]);
+  // Memoize statistics calculation
+  const statistics = useMemo(() => {
+    return calculateStatistics(filteredData, evolutionRecords);
+  }, [filteredData, evolutionRecords]);
 
   /**
    * Load saved time range preference
    */
-  const loadSavedTimeRange = async () => {
+  const loadSavedTimeRange = useCallback(async () => {
     try {
       const saved = await AsyncStorage.getItem(TIME_RANGE_STORAGE_KEY);
       if (saved && ['7d', '30d', '90d', 'all'].includes(saved)) {
@@ -207,12 +266,12 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
     } catch (err) {
       console.error('Error loading saved time range:', err);
     }
-  };
+  }, []);
 
   /**
    * Load historical data from StorageService
    */
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -221,7 +280,6 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
       const cache = await StorageService.getHealthDataCache();
       if (!cache || Object.keys(cache).length === 0) {
         setAllData([]);
-        setFilteredData([]);
         setEvolutionRecords([]);
         setIsLoading(false);
         return;
@@ -239,20 +297,20 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
 
       setIsLoading(false);
     } catch (err) {
-      console.error('Error loading historical data:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('[EvolutionHistoryScreen] Error loading historical data:', errorMessage, err);
       setError('Failed to load history. Please try again.');
       setIsLoading(false);
       // Fallback to empty state
       setAllData([]);
-      setFilteredData([]);
       setEvolutionRecords([]);
     }
-  };
+  }, []);
 
   /**
    * Handle time range change
    */
-  const handleTimeRangeChange = async (range: TimeRange) => {
+  const handleTimeRangeChange = useCallback(async (range: TimeRange) => {
     setTimeRange(range);
     // Persist selection
     try {
@@ -260,35 +318,44 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
     } catch (err) {
       console.error('Error saving time range:', err);
     }
-  };
 
-  const handleBackPress = () => {
+    // Announce time range change to screen readers
+    const rangeLabel = getTimeRangeLabel(range);
+    AccessibilityInfo.announceForAccessibility(`Showing data for ${rangeLabel}`);
+  }, []);
+
+  const handleBackPress = useCallback(() => {
     navigation.goBack();
-  };
+  }, [navigation]);
 
   /**
    * Handle scroll position tracking
    */
-  const handleScroll = (event: { nativeEvent: { contentOffset: { y: number } } }) => {
+  const handleScroll = useCallback((event: { nativeEvent: { contentOffset: { y: number } } }) => {
     scrollPositionRef.current = event.nativeEvent.contentOffset.y;
-  };
+  }, []);
 
-  // Determine if device is in landscape mode
-  const isLandscape = dimensions.width > dimensions.height;
+  // Memoize layout calculations
+  const { isLandscape, cardWidth } = useMemo(() => {
+    const isLandscape = dimensions.width > dimensions.height;
+    const availableWidth = dimensions.width - HORIZONTAL_PADDING;
+    const columns = isLandscape ? LANDSCAPE_COLUMNS : PORTRAIT_COLUMNS;
+    const cardWidth = (availableWidth - CARD_GAP * (columns - 1)) / columns;
 
-  // Calculate card width for statistics grid
-  const cardGap = 12;
-  const horizontalPadding = 32; // 16px on each side
-  const availableWidth = dimensions.width - horizontalPadding;
-  const cardWidth = isLandscape
-    ? (availableWidth - cardGap * 3) / 4 // 4 columns in landscape
-    : (availableWidth - cardGap) / 2; // 2 columns in portrait
+    return { isLandscape, cardWidth };
+  }, [dimensions]);
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primary} />
-        <Text style={styles.loadingText}>Loading history...</Text>
+        <ActivityIndicator
+          size="large"
+          color={HALLOWEEN_COLORS.primary}
+          accessibilityLabel="Loading evolution history"
+        />
+        <Text style={styles.loadingText} accessibilityLiveRegion="polite">
+          Loading history...
+        </Text>
       </View>
     );
   }
@@ -296,9 +363,18 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorEmoji}>👻</Text>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={loadData}>
+        <Text style={styles.errorEmoji} accessibilityElementsHidden={true}>
+          👻
+        </Text>
+        <Text style={styles.errorText} accessibilityRole="alert">
+          {error}
+        </Text>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={loadData}
+          accessibilityLabel="Retry loading history"
+          accessibilityRole="button"
+          accessibilityHint="Attempts to reload the evolution history data">
           <Text style={styles.retryButtonText}>Retry</Text>
         </TouchableOpacity>
       </View>
@@ -312,48 +388,76 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
         <TouchableOpacity
           style={styles.backButton}
           onPress={handleBackPress}
-          accessibilityLabel="Go back">
-          <Text style={styles.backButtonText}>←</Text>
+          accessibilityLabel="Go back to main screen"
+          accessibilityRole="button"
+          accessibilityHint="Returns to the main screen">
+          <Text style={styles.backButtonText} accessibilityElementsHidden={true}>
+            ←
+          </Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Evolution History</Text>
+        <Text
+          style={styles.title}
+          accessibilityRole="header"
+          accessibilityLabel="Evolution History">
+          Evolution History 🦇
+        </Text>
         <View style={styles.headerSpacer} />
       </View>
 
       {/* Time Range Filter */}
-      <View style={styles.filterContainer}>
+      <View
+        style={styles.filterContainer}
+        accessibilityRole="radiogroup"
+        accessibilityLabel="Time range filter">
         <TouchableOpacity
           style={[styles.filterButton, timeRange === '7d' && styles.filterButtonActive]}
           onPress={() => handleTimeRangeChange('7d')}
-          accessibilityLabel="7 days filter">
+          accessibilityLabel="Show last 7 days"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: timeRange === '7d' }}
+          accessibilityHint="Filter data to show the last 7 days">
           <Text
-            style={[styles.filterButtonText, timeRange === '7d' && styles.filterButtonTextActive]}>
+            style={[styles.filterButtonText, timeRange === '7d' && styles.filterButtonTextActive]}
+            accessibilityElementsHidden={true}>
             7D
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, timeRange === '30d' && styles.filterButtonActive]}
           onPress={() => handleTimeRangeChange('30d')}
-          accessibilityLabel="30 days filter">
+          accessibilityLabel="Show last 30 days"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: timeRange === '30d' }}
+          accessibilityHint="Filter data to show the last 30 days">
           <Text
-            style={[styles.filterButtonText, timeRange === '30d' && styles.filterButtonTextActive]}>
+            style={[styles.filterButtonText, timeRange === '30d' && styles.filterButtonTextActive]}
+            accessibilityElementsHidden={true}>
             30D
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, timeRange === '90d' && styles.filterButtonActive]}
           onPress={() => handleTimeRangeChange('90d')}
-          accessibilityLabel="90 days filter">
+          accessibilityLabel="Show last 90 days"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: timeRange === '90d' }}
+          accessibilityHint="Filter data to show the last 90 days">
           <Text
-            style={[styles.filterButtonText, timeRange === '90d' && styles.filterButtonTextActive]}>
+            style={[styles.filterButtonText, timeRange === '90d' && styles.filterButtonTextActive]}
+            accessibilityElementsHidden={true}>
             90D
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterButton, timeRange === 'all' && styles.filterButtonActive]}
           onPress={() => handleTimeRangeChange('all')}
-          accessibilityLabel="All time filter">
+          accessibilityLabel="Show all time"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: timeRange === 'all' }}
+          accessibilityHint="Filter data to show all available history">
           <Text
-            style={[styles.filterButtonText, timeRange === 'all' && styles.filterButtonTextActive]}>
+            style={[styles.filterButtonText, timeRange === 'all' && styles.filterButtonTextActive]}
+            accessibilityElementsHidden={true}>
             All
           </Text>
         </TouchableOpacity>
@@ -367,8 +471,12 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
         scrollEventThrottle={16}>
         {filteredData.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>👻</Text>
-            <Text style={styles.emptyText}>No history yet</Text>
+            <Text style={styles.emptyEmoji} accessibilityElementsHidden={true}>
+              👻
+            </Text>
+            <Text style={styles.emptyText} accessibilityRole="header">
+              No history yet
+            </Text>
             <Text style={styles.emptySubtext}>Keep tracking your health to see your journey!</Text>
           </View>
         ) : (
@@ -376,9 +484,15 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
             {/* Summary Statistics Cards */}
             {statistics && (
               <View style={styles.statisticsSection}>
-                <Text style={styles.sectionTitle}>📊 Summary Statistics</Text>
+                <Text
+                  style={styles.sectionTitle}
+                  accessibilityRole="header"
+                  accessibilityLabel="Summary Statistics">
+                  📊 Summary Statistics
+                </Text>
                 <View
-                  style={[styles.statisticsGrid, isLandscape && styles.statisticsGridLandscape]}>
+                  style={[styles.statisticsGrid, isLandscape && styles.statisticsGridLandscape]}
+                  accessibilityRole="list">
                   <StatisticsCard
                     icon="👣"
                     label="Avg Steps"
@@ -407,10 +521,7 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
                   <StatisticsCard
                     icon="🎭"
                     label="Most Frequent"
-                    value={
-                      statistics.mostFrequentState.charAt(0).toUpperCase() +
-                      statistics.mostFrequentState.slice(1)
-                    }
+                    value={capitalizeFirst(statistics.mostFrequentState)}
                     subtitle={`${statistics.totalEvolutions} evolutions`}
                     halloweenDecoration="tombstone"
                     width={cardWidth}
@@ -421,7 +532,12 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
 
             {/* Health Metrics Charts */}
             <View style={styles.chartsSection}>
-              <Text style={styles.sectionTitle}>📈 Health Trends</Text>
+              <Text
+                style={styles.sectionTitle}
+                accessibilityRole="header"
+                accessibilityLabel="Health Trends">
+                📈 Health Trends
+              </Text>
               <HealthMetricsChart
                 data={filteredData}
                 metricType="steps"
@@ -456,17 +572,21 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
             {/* Evolution Milestones */}
             {evolutionRecords.length > 0 && (
               <View style={styles.milestonesSection}>
-                <Text style={styles.sectionTitle}>✨ Evolution Milestones</Text>
-                {evolutionRecords.map((record, index) => {
-                  const badges: Array<
-                    'tombstone' | 'jack-o-lantern' | 'crystal-ball' | 'cauldron'
-                  > = ['tombstone', 'jack-o-lantern', 'crystal-ball', 'cauldron'];
-                  const badgeIcon = badges[index % badges.length];
-
-                  return (
-                    <EvolutionMilestoneCard key={record.id} record={record} badgeIcon={badgeIcon} />
-                  );
-                })}
+                <Text
+                  style={styles.sectionTitle}
+                  accessibilityRole="header"
+                  accessibilityLabel="Evolution Milestones">
+                  ✨ Evolution Milestones
+                </Text>
+                <View accessibilityRole="list">
+                  {evolutionRecords.map((record, index) => (
+                    <EvolutionMilestoneCard
+                      key={record.id}
+                      record={record}
+                      badgeIcon={getEvolutionBadgeIcon(index)}
+                    />
+                  ))}
+                </View>
               </View>
             )}
 
@@ -496,23 +616,38 @@ const styles = StyleSheet.create({
     backgroundColor: HALLOWEEN_COLORS.cardBg,
     borderBottomWidth: 2,
     borderBottomColor: HALLOWEEN_COLORS.primary,
+    // Purple glow on header
+    shadowColor: HALLOWEEN_COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44, // Accessibility touch target
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 22,
+    backgroundColor: 'rgba(124, 58, 237, 0.2)',
   },
   backButtonText: {
     fontSize: 28,
     color: HALLOWEEN_COLORS.primaryLight,
     fontWeight: 'bold',
+    textShadowColor: HALLOWEEN_COLORS.primary,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.primaryLight,
     flexShrink: 1,
+    textShadowColor: HALLOWEEN_COLORS.primary,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
+    letterSpacing: 0.5,
   },
   headerSpacer: {
     width: 40,
@@ -533,6 +668,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: HALLOWEEN_COLORS.ghostWhite,
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
   errorContainer: {
     flex: 1,
@@ -550,17 +687,32 @@ const styles = StyleSheet.create({
     color: HALLOWEEN_COLORS.ghostWhite,
     textAlign: 'center',
     marginBottom: 24,
+    fontWeight: '500',
+    letterSpacing: 0.3,
   },
   retryButton: {
     backgroundColor: HALLOWEEN_COLORS.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
+    minHeight: 44, // Accessibility touch target
+    // Purple glow on retry button
+    shadowColor: HALLOWEEN_COLORS.primaryLight,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: HALLOWEEN_COLORS.primaryLight,
   },
   retryButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.ghostWhite,
+    letterSpacing: 1,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   filterContainer: {
     flexDirection: 'row',
@@ -581,20 +733,31 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: HALLOWEEN_COLORS.primaryDark,
     alignItems: 'center',
+    minHeight: 44, // Accessibility touch target
   },
   filterButtonActive: {
     backgroundColor: HALLOWEEN_COLORS.primary,
     borderColor: HALLOWEEN_COLORS.primaryLight,
+    // Purple glow on active button
+    shadowColor: HALLOWEEN_COLORS.primaryLight,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 8,
   },
   filterButtonText: {
     fontSize: 14,
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.ghostWhite,
     opacity: 0.6,
+    letterSpacing: 1,
   },
   filterButtonTextActive: {
     color: HALLOWEEN_COLORS.ghostWhite,
     opacity: 1,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   emptyContainer: {
     padding: 60,
@@ -610,12 +773,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.ghostWhite,
     marginBottom: 8,
+    textShadowColor: HALLOWEEN_COLORS.primary,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   emptySubtext: {
     fontSize: 16,
     color: HALLOWEEN_COLORS.ghostWhite,
-    opacity: 0.6,
+    opacity: 0.7,
     textAlign: 'center',
+    fontWeight: '500',
+    letterSpacing: 0.3,
   },
   sectionTitle: {
     fontSize: 20,
@@ -624,6 +792,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginLeft: 16,
     flexShrink: 1,
+    textShadowColor: HALLOWEEN_COLORS.primary,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+    letterSpacing: 0.5,
   },
   statisticsSection: {
     marginTop: 16,
