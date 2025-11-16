@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { EvolutionRecord, EmotionalState } from '../types';
+import { ProgressiveImage } from './ProgressiveImage';
 
 interface EvolutionMilestoneCardProps {
   record: EvolutionRecord;
@@ -36,70 +37,65 @@ const STATE_DISPLAY_NAMES: Record<EmotionalState, string> = {
   [EmotionalState.RESTED]: 'Rested',
 };
 
-export const EvolutionMilestoneCard: React.FC<EvolutionMilestoneCardProps> = ({
-  record,
-  badgeIcon,
-}) => {
-  const formatDate = (date: Date): string => {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
+export const EvolutionMilestoneCard: React.FC<EvolutionMilestoneCardProps> = React.memo(
+  ({ record, badgeIcon }) => {
+    const formatDate = (date: Date): string => {
+      const d = new Date(date);
+      return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    };
 
-  const getDominantStatesText = (): string => {
-    return record.dominantStates.map(state => STATE_DISPLAY_NAMES[state]).join(', ');
-  };
+    const getDominantStatesText = (): string => {
+      return record.dominantStates.map(state => STATE_DISPLAY_NAMES[state]).join(', ');
+    };
 
-  const accessibilityLabel = `Evolution milestone: Level ${record.evolutionLevel}, achieved on ${formatDate(record.timestamp)}. Triggered by ${record.daysInPositiveState} days of positive states. Dominant emotional states: ${getDominantStatesText()}.`;
+    const accessibilityLabel = `Evolution milestone: Level ${record.evolutionLevel}, achieved on ${formatDate(record.timestamp)}. Triggered by ${record.daysInPositiveState} days of positive states. Dominant emotional states: ${getDominantStatesText()}.`;
 
-  return (
-    <View
-      style={styles.card}
-      accessible={true}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityRole="summary">
-      <View style={styles.badgeContainer} accessibilityElementsHidden={true}>
-        <Text style={styles.badge}>{BADGE_ICONS[badgeIcon]}</Text>
-      </View>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.level} accessibilityRole="header">
-            <Text accessibilityElementsHidden={true}>✨ </Text>
-            Level {record.evolutionLevel}
-          </Text>
-          <Text style={styles.date}>{formatDate(record.timestamp)}</Text>
+    return (
+      <View
+        style={styles.card}
+        accessible={true}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole="summary">
+        <View style={styles.badgeContainer} accessibilityElementsHidden={true}>
+          <Text style={styles.badge}>{BADGE_ICONS[badgeIcon]}</Text>
         </View>
-        {record.appearanceUrl && (
-          <View style={styles.imageContainer}>
-            <Image
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.level} accessibilityRole="header">
+              <Text accessibilityElementsHidden={true}>✨ </Text>
+              Level {record.evolutionLevel}
+            </Text>
+            <Text style={styles.date}>{formatDate(record.timestamp)}</Text>
+          </View>
+          {record.appearanceUrl && (
+            <ProgressiveImage
               source={{ uri: record.appearanceUrl }}
               style={styles.image}
-              resizeMode="contain"
-              accessible={true}
-              accessibilityLabel={`Evolution appearance for level ${record.evolutionLevel}`}
-              accessibilityRole="image"
+              containerStyle={styles.imageContainer}
+              placeholderColor={HALLOWEEN_COLORS.darkBg}
             />
-          </View>
-        )}
-        <View style={styles.details}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Trigger:</Text>
-            <Text style={styles.detailValue}>
-              {record.daysInPositiveState} days of positive states
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Dominant States:</Text>
-            <Text style={styles.detailValue}>{getDominantStatesText()}</Text>
+          )}
+          <View style={styles.details}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Trigger:</Text>
+              <Text style={styles.detailValue}>
+                {record.daysInPositiveState} days of positive states
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Dominant States:</Text>
+              <Text style={styles.detailValue}>{getDominantStatesText()}</Text>
+            </View>
           </View>
         </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   card: {

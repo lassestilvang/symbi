@@ -25,6 +25,18 @@ import { EmotionalStateTimeline } from '../components/EmotionalStateTimeline';
 import { EvolutionMilestoneCard } from '../components/EvolutionMilestoneCard';
 import { HealthDataTable } from '../components/HealthDataTable';
 
+// Debounce utility for performance optimization
+const debounce = <T extends (...args: unknown[]) => unknown>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
+
 interface EvolutionHistoryScreenProps {
   navigation: {
     navigate: (screen: string) => void;
@@ -59,7 +71,11 @@ const TIME_RANGES = {
   SEVEN_DAYS: 7,
   THIRTY_DAYS: 30,
   NINETY_DAYS: 90,
+  ALL_TIME_LIMIT: 90, // Limit "All Time" view to 90 days for performance
 } as const;
+
+// Debounce delay for chart updates (ms)
+const CHART_UPDATE_DEBOUNCE = 300;
 
 /**
  * Get human-readable label for time range
@@ -120,23 +136,27 @@ const transformCacheToDataPoints = (
 };
 
 /**
- * Filter data by time range
+ * Filter data by time range with pagination for "All Time" view
  */
 const filterDataByTimeRange = (
   data: HistoricalDataPoint[],
   range: TimeRange
 ): HistoricalDataPoint[] => {
+  const now = new Date();
+  let days: number;
+
   if (range === 'all') {
-    return data;
+    // Limit "All Time" to 90 days for performance (pagination)
+    days = TIME_RANGES.ALL_TIME_LIMIT;
+  } else {
+    days =
+      range === '7d'
+        ? TIME_RANGES.SEVEN_DAYS
+        : range === '30d'
+          ? TIME_RANGES.THIRTY_DAYS
+          : TIME_RANGES.NINETY_DAYS;
   }
 
-  const now = new Date();
-  const days =
-    range === '7d'
-      ? TIME_RANGES.SEVEN_DAYS
-      : range === '30d'
-        ? TIME_RANGES.THIRTY_DAYS
-        : TIME_RANGES.NINETY_DAYS;
   const cutoffDate = new Date(now);
   cutoffDate.setDate(cutoffDate.getDate() - days);
 
@@ -308,10 +328,9 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
   }, []);
 
   /**
-   * Handle time range change
+   * Persist time range and announce to screen readers
    */
-  const handleTimeRangeChange = useCallback(async (range: TimeRange) => {
-    setTimeRange(range);
+  const persistTimeRange = useCallback(async (range: TimeRange) => {
     // Persist selection
     try {
       await AsyncStorage.setItem(TIME_RANGE_STORAGE_KEY, range);
@@ -323,6 +342,25 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
     const rangeLabel = getTimeRangeLabel(range);
     AccessibilityInfo.announceForAccessibility(`Showing data for ${rangeLabel}`);
   }, []);
+
+  /**
+   * Debounced time range persistence for better performance
+   */
+  const debouncedTimeRangeChange = useMemo(
+    () => debounce(persistTimeRange, CHART_UPDATE_DEBOUNCE),
+    [persistTimeRange]
+  );
+
+  /**
+   * Handle time range change with debounced updates
+   */
+  const handleTimeRangeChange = useCallback(
+    (range: TimeRange) => {
+      setTimeRange(range);
+      debouncedTimeRangeChange(range);
+    },
+    [debouncedTimeRangeChange]
+  );
 
   const handleBackPress = useCallback(() => {
     navigation.goBack();
@@ -451,10 +489,10 @@ export const EvolutionHistoryScreen: React.FC<EvolutionHistoryScreenProps> = ({ 
         <TouchableOpacity
           style={[styles.filterButton, timeRange === 'all' && styles.filterButtonActive]}
           onPress={() => handleTimeRangeChange('all')}
-          accessibilityLabel="Show all time"
+          accessibilityLabel="Show all time, limited to 90 days"
           accessibilityRole="radio"
           accessibilityState={{ selected: timeRange === 'all' }}
-          accessibilityHint="Filter data to show all available history">
+          accessibilityHint="Filter data to show up to 90 days of history">
           <Text
             style={[styles.filterButtonText, timeRange === 'all' && styles.filterButtonTextActive]}
             accessibilityElementsHidden={true}>

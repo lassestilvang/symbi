@@ -13,6 +13,7 @@ Completed comprehensive refactoring of the HealthMetricsChart component to impro
 ### 1. Performance Optimizations
 
 #### Memoization Strategy
+
 Applied React performance patterns to prevent unnecessary recalculations and re-renders:
 
 ```typescript
@@ -20,26 +21,26 @@ Applied React performance patterns to prevent unnecessary recalculations and re-
 const config = useMemo(() => getMetricConfig(metricType), [metricType]);
 
 // Memoized filtered data
-const filteredData = useMemo(
-  () => filterByMetric(data, metricType),
-  [data, metricType]
-);
+const filteredData = useMemo(() => filterByMetric(data, metricType), [data, metricType]);
 
 // Memoized chart data transformation
 const chartData = useMemo(
   () => ({
     labels: filteredData.map(point => formatShortDate(point.date)),
-    datasets: [{
-      data: filteredData.map(point => getMetricValue(point, metricType)),
-      color: (_opacity = 1) => color || config.color,
-      strokeWidth: 3,
-    }],
+    datasets: [
+      {
+        data: filteredData.map(point => getMetricValue(point, metricType)),
+        color: (_opacity = 1) => color || config.color,
+        strokeWidth: 3,
+      },
+    ],
   }),
   [filteredData, metricType, color, config.color]
 );
 ```
 
 #### Event Handler Optimization
+
 Memoized event handlers to prevent child component re-renders:
 
 ```typescript
@@ -69,6 +70,7 @@ const handleDataPointClick = useCallback(
 ```
 
 **Performance Impact**:
+
 - Reduced unnecessary recalculations by ~60%
 - Prevented child component re-renders
 - Improved chart rendering performance on data updates
@@ -76,6 +78,7 @@ const handleDataPointClick = useCallback(
 ### 2. Code Organization
 
 #### Component Extraction
+
 Extracted Tooltip as a separate component for better separation of concerns:
 
 ```typescript
@@ -92,22 +95,29 @@ const Tooltip: React.FC<TooltipProps> = ({ point, metricType, config, onClose })
 ```
 
 **Benefits**:
+
 - Smaller, more focused main component
 - Easier to test Tooltip in isolation
 - Better code readability
 - Reusable if needed elsewhere
 
 #### Utility Function Integration
+
 Replaced inline logic with centralized utility functions:
 
 **Before**:
+
 ```typescript
 const getMetricValue = (point: HistoricalDataPoint): number => {
   switch (metricType) {
-    case 'steps': return point.steps;
-    case 'sleep': return point.sleepHours ?? 0;
-    case 'hrv': return point.hrv ?? 0;
-    default: return 0;
+    case 'steps':
+      return point.steps;
+    case 'sleep':
+      return point.sleepHours ?? 0;
+    case 'hrv':
+      return point.hrv ?? 0;
+    default:
+      return 0;
   }
 };
 
@@ -118,12 +128,19 @@ const formatDate = (dateString: string): string => {
 ```
 
 **After**:
+
 ```typescript
-import { getMetricValue, filterByMetric, formatMetricValue, getMetricConfig } from '../utils/metricHelpers';
+import {
+  getMetricValue,
+  filterByMetric,
+  formatMetricValue,
+  getMetricConfig,
+} from '../utils/metricHelpers';
 import { formatShortDate, formatDisplayDate } from '../utils/dateHelpers';
 ```
 
 **Benefits**:
+
 - Eliminated ~50 lines of duplicated code
 - Consistent formatting across all components
 - Type-safe metric operations
@@ -134,6 +151,7 @@ import { formatShortDate, formatDisplayDate } from '../utils/dateHelpers';
 Replaced inline color definitions with centralized theme constants:
 
 **Before**:
+
 ```typescript
 const HALLOWEEN_COLORS = {
   primary: '#7C3AED',
@@ -143,11 +161,13 @@ const HALLOWEEN_COLORS = {
 ```
 
 **After**:
+
 ```typescript
 import { HALLOWEEN_COLORS } from '../constants/theme';
 ```
 
 **Benefits**:
+
 - Single source of truth for theme colors
 - Easier to update theme globally
 - Reduced bundle size through deduplication
@@ -155,6 +175,7 @@ import { HALLOWEEN_COLORS } from '../constants/theme';
 ### 4. Type Safety Improvements
 
 #### Removed Inline Type Definitions
+
 ```typescript
 // Before: Inline interface
 interface HistoricalDataPoint {
@@ -168,18 +189,20 @@ import { HistoricalDataPoint } from '../types';
 ```
 
 #### Type-Safe Metric Operations
+
 ```typescript
 // Before: String literals
-metricType: 'steps' | 'sleep' | 'hrv'
+metricType: 'steps' | 'sleep' | 'hrv';
 
 // After: Type alias
 import { MetricType } from '../utils/metricHelpers';
-metricType: MetricType
+metricType: MetricType;
 ```
 
 ## Code Metrics
 
 ### Before Refactoring
+
 - **Lines of Code**: ~200 lines
 - **Responsibilities**: 5 (data filtering, formatting, rendering, tooltip, haptics)
 - **Duplicated Code**: ~50 lines (colors, formatters, metric logic)
@@ -187,6 +210,7 @@ metricType: MetricType
 - **Component Extraction**: None
 
 ### After Refactoring
+
 - **Lines of Code**: ~150 lines (main component)
 - **Responsibilities**: 3 (rendering, state management, event handling)
 - **Duplicated Code**: 0 lines (uses utilities)
@@ -194,6 +218,7 @@ metricType: MetricType
 - **Component Extraction**: 1 (Tooltip)
 
 ### Improvement Metrics
+
 - **Code Reduction**: 25% fewer lines in main component
 - **Duplication Elimination**: 100% (50 lines moved to utilities)
 - **Performance**: ~60% reduction in unnecessary recalculations
@@ -202,18 +227,21 @@ metricType: MetricType
 ## Testing Recommendations
 
 ### Unit Tests
+
 1. Test memoization behavior (verify functions aren't recreated unnecessarily)
 2. Test Tooltip component in isolation
 3. Test haptic feedback integration
 4. Test data point selection logic
 
 ### Integration Tests
+
 1. Verify chart renders correctly with memoized data
 2. Test tooltip display and dismissal
 3. Test responsive width updates
 4. Test empty state handling
 
 ### Performance Tests
+
 1. Measure render time before/after refactoring
 2. Verify no memory leaks from memoization
 3. Test with large datasets (>100 data points)
@@ -226,6 +254,7 @@ metricType: MetricType
 If you're working on similar components, follow this pattern:
 
 1. **Import utilities instead of duplicating**:
+
    ```typescript
    import { HALLOWEEN_COLORS } from '../constants/theme';
    import { formatShortDate } from '../utils/dateHelpers';
@@ -233,6 +262,7 @@ If you're working on similar components, follow this pattern:
    ```
 
 2. **Apply memoization for expensive operations**:
+
    ```typescript
    const expensiveData = useMemo(() => computeData(input), [input]);
    const handler = useCallback(() => doSomething(), [dependencies]);
@@ -246,15 +276,18 @@ If you're working on similar components, follow this pattern:
 ## Related Files
 
 ### Modified
+
 - `src/components/HealthMetricsChart.tsx` - Main component
 
 ### Dependencies
+
 - `src/constants/theme.ts` - Theme constants
 - `src/utils/metricHelpers.ts` - Metric utilities
 - `src/utils/dateHelpers.ts` - Date formatting utilities
 - `src/types/index.ts` - Type definitions
 
 ### Documentation
+
 - `docs/code-refactoring-nov-16-2025.md` - Overall refactoring summary
 - `docs/evolution-history-implementation-summary.md` - Feature implementation
 - `docs/halloween-theme-colors.md` - Theme documentation
@@ -262,6 +295,7 @@ If you're working on similar components, follow this pattern:
 ## Next Steps
 
 ### Immediate
+
 1. ✅ HealthMetricsChart refactoring complete
 2. Apply similar patterns to remaining components:
    - StatisticsCard
@@ -271,6 +305,7 @@ If you're working on similar components, follow this pattern:
    - EvolutionHistoryScreen
 
 ### Future Improvements
+
 1. Add unit tests for memoization behavior
 2. Consider extracting chart configuration to separate file
 3. Add performance monitoring to track improvements
@@ -281,6 +316,7 @@ If you're working on similar components, follow this pattern:
 The HealthMetricsChart refactoring successfully improved performance, maintainability, and code quality while maintaining all existing functionality. The component now serves as a reference implementation for performance optimization patterns in the Symbi codebase.
 
 **Key Achievements**:
+
 - ✅ 25% code reduction through utility extraction
 - ✅ 60% reduction in unnecessary recalculations
 - ✅ 100% elimination of code duplication

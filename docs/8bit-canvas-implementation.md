@@ -15,6 +15,7 @@ November 16, 2025
 Pure data module containing all pixel coordinate definitions for the 8-bit ghost.
 
 **Key Exports:**
+
 - `PixelCoordinate` type: `[x: number, y: number]` tuple
 - `GhostColors` interface: Color scheme for body, eyes, mouth, blush
 - `GHOST_GRID_SIZE`: 32 (grid dimensions)
@@ -25,6 +26,7 @@ Pure data module containing all pixel coordinate definitions for the 8-bit ghost
 - `blushPixels`: Cheek blush coordinates (8 pixels)
 
 **Design:**
+
 - Immutable const arrays
 - No business logic (pure data)
 - Taller ghost design for better proportions
@@ -35,6 +37,7 @@ Pure data module containing all pixel coordinate definitions for the 8-bit ghost
 Rendering logic and state-to-appearance mapping for canvas-based rendering.
 
 **Key Exports:**
+
 - `getStateColors()`: Maps emotional states to color palettes
 - `getEyePixels()`: Returns appropriate eye pixels for each state
 - `getMouthPixels()`: Returns appropriate mouth pixels for each state
@@ -43,6 +46,7 @@ Rendering logic and state-to-appearance mapping for canvas-based rendering.
 - `drawPixelArt()`: Helper for drawing pixel arrays with 10% spacing between pixels for enhanced pixelated aesthetic
 
 **Rendering Features:**
+
 - Pure functions for testability
 - State-based color and feature selection
 - Pixel spacing (10% gap) for enhanced visual clarity
@@ -53,6 +57,7 @@ Rendering logic and state-to-appearance mapping for canvas-based rendering.
 A pure React Native implementation that renders the Symbi ghost using individual View components as pixels.
 
 **Key Features:**
+
 - 8-bit pixel art style with cream-colored ghost (#F5F5F0)
 - 32x32 pixel grid scaled to screen size
 - Interactive poke/tap animation with bounce and squish effects
@@ -61,6 +66,7 @@ A pure React Native implementation that renders the Symbi ghost using individual
 - Responsive sizing (default: 70% of screen width, max 300px)
 
 **Technical Implementation:**
+
 - Uses React Native `View` components positioned absolutely as pixels
 - Animated API for smooth floating, bouncing, and squishing
 - Native driver enabled for optimal performance
@@ -72,6 +78,7 @@ A pure React Native implementation that renders the Symbi ghost using individual
 Interactive demo component for testing the 8-bit ghost.
 
 **Features:**
+
 - State selector buttons for all 9 emotional states
 - Poke counter to track interactions
 - Real-time state visualization
@@ -87,24 +94,24 @@ Interactive demo component for testing the 8-bit ghost.
 - **Colors**: Cream white base (#F5F5F0) with state-dependent variations
 - **Features**: Eyes, mouth, optional blush on cheeks
 - **Pixel Count**: ~400 body pixels, varying facial features
-- **Pixel Spacing**: 
+- **Pixel Spacing**:
   - Canvas rendering: 10% gap for subtle separation
   - React Native Views: 20% gap for enhanced visual clarity
 
 ### Emotional State Variations
 
-| State | Eyes | Mouth | Body Color | Blush |
-|-------|------|-------|------------|-------|
-| SAD/TIRED | Small, droopy | Frown | Duller (#E8E8E0) | None |
-| RESTING/CALM | Normal oval | Neutral line | Standard (#F5F5F0) | None |
-| ACTIVE/VIBRANT/RESTED | Large, bright | Smile | Brighter (#FFFFFF) | Pink (#FF69B4) |
-| STRESSED/ANXIOUS | Wide | Worried | Standard (#F0F0E8) | Salmon (#FFA07A) |
+| State                 | Eyes          | Mouth        | Body Color         | Blush            |
+| --------------------- | ------------- | ------------ | ------------------ | ---------------- |
+| SAD/TIRED             | Small, droopy | Frown        | Duller (#E8E8E0)   | None             |
+| RESTING/CALM          | Normal oval   | Neutral line | Standard (#F5F5F0) | None             |
+| ACTIVE/VIBRANT/RESTED | Large, bright | Smile        | Brighter (#FFFFFF) | Pink (#FF69B4)   |
+| STRESSED/ANXIOUS      | Wide          | Worried      | Standard (#F0F0E8) | Salmon (#FFA07A) |
 
 ### Animations
 
 1. **Idle Float**: Continuous up/down movement (-15px range, 2.5s duration)
 2. **Idle Sway**: Gentle rotation (-3° to +3°, 3s duration)
-3. **Poke Response**: 
+3. **Poke Response**:
    - Squish horizontally (1.1x scale)
    - Compress vertically (0.9x scale)
    - Spring back to normal with bounce
@@ -137,6 +144,7 @@ Interactive demo component for testing the 8-bit ghost.
 ### Component Export
 
 Added to `src/components/index.ts`:
+
 ```typescript
 export { Symbi8BitCanvas } from './Symbi8BitCanvas';
 export { Symbi8BitDemo } from './Symbi8BitDemo';
@@ -148,7 +156,7 @@ export { Symbi8BitDemo } from './Symbi8BitDemo';
 import { Symbi8BitCanvas } from './components';
 import { EmotionalState } from './types';
 
-<Symbi8BitCanvas 
+<Symbi8BitCanvas
   emotionalState={EmotionalState.ACTIVE}
   size={300}
   onPoke={() => console.log('Ghost poked!')}
@@ -201,9 +209,11 @@ import { EmotionalState } from './types';
 **Change**: Increased pixel spacing in `Symbi8BitCanvas.tsx` from minimal to 20%
 
 **Files Modified**:
+
 - `src/components/Symbi8BitCanvas.tsx` - Updated `renderPixel()` function
 
 **Impact**:
+
 - Enhanced visual clarity with more pronounced pixel separation
 - Better retro aesthetic matching classic 8-bit games
 - No performance impact
@@ -240,12 +250,14 @@ Enhanced pixel spacing in the React Native component to improve visual clarity:
 - **Change**: Updated from minimal spacing to 7% spacing in `Symbi8BitCanvas.tsx`
 
 **Spacing Variations Across Implementations**:
+
 - **Canvas rendering** (ghostRenderer.ts): 10% spacing for subtle separation
 - **React Native Views** (Symbi8BitCanvas.tsx): 7% spacing for balanced clarity and cohesion
 
 **Technical Details:**
 
 Canvas implementation (10% spacing):
+
 ```typescript
 const pixelGap = pixelSize * 0.1;
 const adjustedPixelSize = pixelSize - pixelGap;
@@ -258,6 +270,7 @@ ctx.fillRect(
 ```
 
 React Native implementation (7% spacing - updated):
+
 ```typescript
 const pixelGap = pixelSize * 0.07;
 const adjustedPixelSize = pixelSize - pixelGap;

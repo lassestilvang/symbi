@@ -74,7 +74,7 @@ ErrorUtils.setGlobalHandler((error, isFatal) => {
     isFatal,
     context: 'global_error_handler',
   });
-  
+
   // 2. Call original handler (preserve default behavior)
   if (originalHandler) {
     originalHandler(error, isFatal);
@@ -83,6 +83,7 @@ ErrorUtils.setGlobalHandler((error, isFatal) => {
 ```
 
 **Features:**
+
 - Captures all unhandled JavaScript errors
 - Preserves original error handler behavior
 - Adds fatal/non-fatal context
@@ -91,15 +92,15 @@ ErrorUtils.setGlobalHandler((error, isFatal) => {
 #### Promise Rejection Handler
 
 ```typescript
-window.addEventListener('unhandledrejection', (event) => {
-  errorReporting.captureException(
-    new Error(`Unhandled Promise Rejection: ${event.reason}`),
-    { context: 'unhandled_promise_rejection' }
-  );
+window.addEventListener('unhandledrejection', event => {
+  errorReporting.captureException(new Error(`Unhandled Promise Rejection: ${event.reason}`), {
+    context: 'unhandled_promise_rejection',
+  });
 });
 ```
 
 **Features:**
+
 - Captures unhandled promise rejections
 - Converts rejection reason to Error object
 - Adds specific context for debugging
@@ -132,11 +133,11 @@ const styles = StyleSheet.create({
 
 **Platform-Specific Behavior:**
 
-| Platform | Layout | Max Width | Alignment |
-|----------|--------|-----------|-----------|
-| iOS | Full width | None | Default |
-| Android | Full width | None | Default |
-| Web | Centered | 600px | Center |
+| Platform | Layout     | Max Width | Alignment |
+| -------- | ---------- | --------- | --------- |
+| iOS      | Full width | None      | Default   |
+| Android  | Full width | None      | Default   |
+| Web      | Centered   | 600px     | Center    |
 
 #### Visual Hierarchy
 
@@ -170,6 +171,7 @@ const environment = validEnvironments.includes(
 ```
 
 **Benefits:**
+
 - Prevents runtime errors from invalid environment values
 - Provides safe fallback to development environment
 - Type-safe environment handling
@@ -188,6 +190,7 @@ if (!isInitialized) {
 ```
 
 **Why This Matters:**
+
 - Prevents race conditions with error handlers
 - Ensures error reporting is ready before app renders
 - Provides clean loading state (initialization is fast)
@@ -212,6 +215,7 @@ useEffect(() => {
 ```
 
 **Benefits:**
+
 - App remains functional if Sentry is unavailable
 - Errors logged to console for debugging
 - User experience not impacted by monitoring failures
@@ -236,6 +240,7 @@ return () => {
 ```
 
 **Cleanup Ensures:**
+
 - No memory leaks from event listeners
 - Original error handlers restored
 - Proper behavior during hot reload (development)
@@ -244,16 +249,19 @@ return () => {
 ## Platform-Specific Considerations
 
 ### iOS
+
 - Uses native safe area insets via SafeAreaProvider
 - Full-width layout on all device sizes
 - Native error handling preserved
 
 ### Android
+
 - Uses native safe area insets via SafeAreaProvider
 - Full-width layout on all device sizes
 - Native error handling preserved
 
 ### Web
+
 - Centered layout with 600px max-width
 - Responsive design for desktop browsers
 - Web-specific error handling for promise rejections
@@ -262,16 +270,19 @@ return () => {
 ## Performance Considerations
 
 ### Initialization Performance
+
 - Error reporting initialization is synchronous and fast (<50ms)
 - No blocking operations during startup
 - Minimal impact on Time to Interactive (TTI)
 
 ### Memory Footprint
+
 - Single ErrorReportingService instance (singleton pattern)
 - Event listeners properly cleaned up
 - No memory leaks from error handlers
 
 ### Bundle Size Impact
+
 - Sentry SDK: ~50KB gzipped
 - Error reporting service: ~5KB
 - Total overhead: ~55KB (acceptable for monitoring)
@@ -279,16 +290,19 @@ return () => {
 ## Security Considerations
 
 ### Data Sanitization
+
 - Health data automatically sanitized from error reports
 - PII removed before sending to Sentry
 - Only anonymous device IDs included
 
 ### Network Security
+
 - All Sentry communication over HTTPS
 - TLS 1.3 encryption
 - Certificate pinning (production)
 
 ### Error Context
+
 - Platform information included for debugging
 - No sensitive user data in error context
 - Environment tags for filtering
@@ -296,16 +310,19 @@ return () => {
 ## Testing Considerations
 
 ### Unit Testing
+
 - `initializeErrorReporting` extracted for testability
 - Can be mocked in component tests
 - Cleanup function can be tested independently
 
 ### Integration Testing
+
 - Test error capture flow end-to-end
 - Verify platform tags are set correctly
 - Confirm cleanup restores handlers
 
 ### Manual Testing
+
 - Test crash reporting with intentional errors
 - Verify Sentry dashboard receives errors
 - Confirm health data is sanitized
@@ -315,17 +332,20 @@ return () => {
 ### Common Issues
 
 **Issue: Errors not appearing in Sentry**
+
 - Check SENTRY_DSN environment variable
 - Verify network connectivity
 - Check Sentry dashboard for project status
 - Confirm initialization completed successfully
 
 **Issue: App crashes on startup**
+
 - Check Sentry configuration in `src/config/sentry.config.ts`
 - Verify environment variable format
 - Check console for initialization errors
 
 **Issue: Memory leaks in development**
+
 - Ensure cleanup function is being called
 - Check for multiple error handler registrations
 - Verify hot reload behavior
@@ -333,6 +353,7 @@ return () => {
 ## Future Enhancements
 
 ### Planned Improvements
+
 - [ ] Add performance monitoring for screen transitions
 - [ ] Implement custom error boundaries for React components
 - [ ] Add offline error queueing
@@ -340,6 +361,7 @@ return () => {
 - [ ] Add user feedback mechanism for errors
 
 ### Monitoring Enhancements
+
 - [ ] Track app startup time
 - [ ] Monitor memory usage trends
 - [ ] Track API response times
@@ -352,6 +374,7 @@ return () => {
 The application now collects multiple health metrics for comprehensive analysis:
 
 **HealthDataUpdateService Flow**:
+
 ```
 1. Initialize health data service (platform-specific)
    ↓
@@ -369,17 +392,19 @@ The application now collects multiple health metrics for comprehensive analysis:
 ```
 
 **Graceful Degradation**:
+
 - Sleep and HRV fetching wrapped in try-catch blocks
 - Zero values treated as unavailable (set to `undefined`)
 - Continues with available metrics if some fail
 - Maintains Phase 1 compatibility (step-only tracking)
 
 **Data Structure**:
+
 ```typescript
 interface HealthMetrics {
-  steps: number;           // Required (Phase 1)
-  sleepHours?: number;     // Optional (Phase 2)
-  hrv?: number;            // Optional (Phase 2)
+  steps: number; // Required (Phase 1)
+  sleepHours?: number; // Optional (Phase 2)
+  hrv?: number; // Optional (Phase 2)
 }
 ```
 
@@ -392,6 +417,7 @@ For detailed information, see [Phase 2 Multi-Metric Implementation](./phase2-mul
 The Evolution History Page uses specialized type definitions for displaying historical health data:
 
 **HistoricalDataPoint**:
+
 ```typescript
 interface HistoricalDataPoint {
   date: string; // YYYY-MM-DD
@@ -404,11 +430,13 @@ interface HistoricalDataPoint {
 ```
 
 Used for:
+
 - Timeline visualizations of emotional states
 - Line charts showing health metric trends
 - Data table displays with daily breakdowns
 
 **HistoryStatistics**:
+
 ```typescript
 interface HistoryStatistics {
   averageSteps: number;
@@ -421,6 +449,7 @@ interface HistoryStatistics {
 ```
 
 Used for:
+
 - Summary cards displaying aggregated metrics
 - Time range comparisons (7D, 30D, 90D, All)
 - Evolution milestone tracking

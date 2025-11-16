@@ -20,12 +20,14 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### Test Devices
 
 **iOS Devices (Minimum)**
+
 - [ ] iPhone 12 or newer (iOS 14+)
 - [ ] iPhone SE (smaller screen)
 - [ ] iPad (if supporting tablets)
 - [ ] Various iOS versions: 14.0, 15.0, 16.0, 17.0, 18.0
 
 **Android Devices (Minimum)**
+
 - [ ] Google Pixel (stock Android)
 - [ ] Samsung Galaxy (One UI)
 - [ ] Various Android versions: 8.0, 10.0, 12.0, 13.0, 14.0
@@ -59,6 +61,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 2. Onboarding Flow
 
 **Welcome Screen**
+
 - [ ] Welcome screen displays correctly
 - [ ] Text is readable and properly formatted
 - [ ] Images/animations load correctly
@@ -66,12 +69,14 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] "Skip" button works (if applicable)
 
 **Health Data Explanation**
+
 - [ ] Explanation screen displays correctly
 - [ ] Information is clear and accurate
 - [ ] Navigation buttons work
 - [ ] Progress indicator updates correctly
 
 **Permission Request**
+
 - [ ] Permission screen displays correctly
 - [ ] Explanation text is clear
 - [ ] "Allow" button triggers system permission dialog
@@ -79,6 +84,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] "Maybe Later" option works (if applicable)
 
 **iOS HealthKit Permission**
+
 - [ ] System permission dialog appears
 - [ ] All requested data types are listed
 - [ ] Granting permission works
@@ -86,6 +92,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Partial permission works (some data types granted)
 
 **Android Google Fit/Health Connect Permission**
+
 - [ ] System permission dialog appears
 - [ ] All requested data types are listed
 - [ ] Granting permission works
@@ -93,6 +100,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Health Connect detected on Android 14+
 
 **Onboarding Completion**
+
 - [ ] Completion screen displays (if applicable)
 - [ ] User is navigated to main screen
 - [ ] Onboarding state is saved (doesn't repeat on restart)
@@ -100,6 +108,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 3. Main Screen
 
 **Initial State**
+
 - [ ] Main screen loads successfully
 - [ ] Symbi animation displays correctly
 - [ ] Step count displays (or "Waiting for data")
@@ -107,6 +116,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] UI is responsive and smooth
 
 **Symbi Animation**
+
 - [ ] Animation plays smoothly (60 FPS)
 - [ ] Animation loops correctly
 - [ ] Animation matches emotional state
@@ -114,6 +124,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Animation performs well on low-end devices
 
 **Step Count Display**
+
 - [ ] Step count fetches from health data
 - [ ] Step count updates when data changes
 - [ ] Step count displays with proper formatting (e.g., "8,543 steps")
@@ -121,6 +132,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Manual entry shows entered value
 
 **Emotional State**
+
 - [ ] Correct state calculated based on steps
 - [ ] State label displays correctly (Sad, Resting, Active)
 - [ ] State transitions smoothly when data changes
@@ -129,6 +141,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 4. Health Data Integration
 
 **iOS HealthKit**
+
 - [ ] Step count reads correctly
 - [ ] Sleep data reads correctly (Phase 2)
 - [ ] HRV data reads correctly (Phase 2)
@@ -137,6 +150,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] No crashes when health data unavailable
 
 **Android Google Fit**
+
 - [ ] Step count reads correctly
 - [ ] Sleep data reads correctly (Phase 2)
 - [ ] HRV data reads correctly (Phase 2)
@@ -145,6 +159,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] No crashes when health data unavailable
 
 **Android Health Connect (Android 14+)**
+
 - [ ] Health Connect is detected
 - [ ] Permissions request works
 - [ ] Data reads correctly
@@ -153,11 +168,13 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 5. Manual Entry Mode
 
 **Activation**
+
 - [ ] Manual entry mode can be enabled in settings
 - [ ] Manual entry mode can be enabled during onboarding
 - [ ] Mode switch persists across restarts
 
 **Data Entry**
+
 - [ ] Manual entry screen displays correctly
 - [ ] Step count input field works
 - [ ] Input validation works (0-100000 range)
@@ -169,6 +186,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 6. Threshold Configuration
 
 **Configuration Screen**
+
 - [ ] Threshold config screen opens from settings
 - [ ] Current thresholds display correctly
 - [ ] Input fields are editable
@@ -176,6 +194,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Default values are correct (2000, 8000)
 
 **Validation**
+
 - [ ] Lower threshold < higher threshold validation works
 - [ ] Error message displays for invalid values
 - [ ] Negative values are rejected
@@ -184,6 +203,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Cancel button works
 
 **Application**
+
 - [ ] New thresholds apply immediately
 - [ ] Symbi state updates based on new thresholds
 - [ ] Thresholds persist across restarts
@@ -192,12 +212,14 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 7. Settings Screen
 
 **Display**
+
 - [ ] Settings screen opens correctly
 - [ ] All settings options display
 - [ ] Current values display correctly
 - [ ] Navigation works
 
 **Options**
+
 - [ ] Data source toggle works (auto/manual)
 - [ ] Notifications toggle works
 - [ ] Haptic feedback toggle works
@@ -205,12 +227,14 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Theme toggle works (if applicable)
 
 **Links**
+
 - [ ] Privacy policy link opens
 - [ ] Support link works
 - [ ] About screen opens
 - [ ] Replay tutorial button works
 
 **Data Management**
+
 - [ ] Export data button works
 - [ ] Export generates valid JSON file
 - [ ] Delete data button works
@@ -220,6 +244,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 8. Phase 2 Features (If Implemented)
 
 **Multi-Metric Analysis**
+
 - [ ] Sleep data displays correctly
 - [ ] HRV data displays correctly
 - [ ] Multiple metrics shown on main screen
@@ -228,6 +253,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Fallback to rule-based logic works
 
 **Additional Emotional States**
+
 - [ ] Vibrant state displays correctly
 - [ ] Calm state displays correctly
 - [ ] Tired state displays correctly
@@ -239,6 +265,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### 9. Phase 3 Features (If Implemented)
 
 **Interactive Sessions**
+
 - [ ] "Calm your Symbi" button appears when stressed/anxious
 - [ ] Breathing exercise launches correctly
 - [ ] Exercise UI displays correctly
@@ -249,6 +276,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Mindful minutes written to health data
 
 **Evolution System**
+
 - [ ] Daily state tracking works
 - [ ] Progress indicator displays correctly
 - [ ] Evolution eligibility calculated correctly
@@ -259,6 +287,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Evolution gallery displays all forms
 
 **Cloud Sync**
+
 - [ ] Account creation works
 - [ ] Login works
 - [ ] Data syncs to cloud
@@ -274,6 +303,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### iOS Specific
 
 **System Integration**
+
 - [ ] App appears in Settings app
 - [ ] HealthKit permissions manageable in Settings
 - [ ] Background fetch works
@@ -283,6 +313,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Siri shortcuts work (if applicable)
 
 **UI/UX**
+
 - [ ] Safe area insets respected
 - [ ] Navigation bar displays correctly
 - [ ] Tab bar displays correctly (if applicable)
@@ -291,6 +322,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Action sheets display correctly
 
 **Device Compatibility**
+
 - [ ] Works on iPhone 12, 13, 14, 15
 - [ ] Works on iPhone SE (small screen)
 - [ ] Works on iPad (if supported)
@@ -300,6 +332,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### Android Specific
 
 **System Integration**
+
 - [ ] App appears in Settings
 - [ ] Google Fit permissions manageable
 - [ ] Health Connect permissions manageable (Android 14+)
@@ -308,6 +341,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Widgets work (if applicable)
 
 **UI/UX**
+
 - [ ] Material Design guidelines followed
 - [ ] Navigation drawer works (if applicable)
 - [ ] Bottom navigation works (if applicable)
@@ -316,6 +350,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Dialogs display correctly
 
 **Device Compatibility**
+
 - [ ] Works on Google Pixel
 - [ ] Works on Samsung Galaxy
 - [ ] Works on various screen sizes
@@ -330,29 +365,34 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### App Performance
 
 **Launch Time**
+
 - [ ] Cold start < 3 seconds
 - [ ] Warm start < 1 second
 - [ ] No splash screen delays
 
 **Animation Performance**
+
 - [ ] Symbi animation runs at 60 FPS
 - [ ] State transitions are smooth
 - [ ] No frame drops during animations
 - [ ] Animations perform well on low-end devices
 
 **Memory Usage**
+
 - [ ] Memory usage < 100MB during normal use
 - [ ] No memory leaks during extended use
 - [ ] Memory usage stable over time
 - [ ] App doesn't crash due to memory issues
 
 **Battery Usage**
+
 - [ ] Battery drain < 5% over 24 hours
 - [ ] Background fetch doesn't drain battery excessively
 - [ ] No excessive wake-ups
 - [ ] Low power mode respected
 
 **Network Performance**
+
 - [ ] API calls complete within 5 seconds
 - [ ] Timeout handling works (10 seconds)
 - [ ] Retry logic works
@@ -362,12 +402,14 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### Load Testing
 
 **Data Volume**
+
 - [ ] Handles 30 days of health data
 - [ ] Handles 90 days of emotional state history
 - [ ] Handles multiple evolution records
 - [ ] Large datasets don't cause slowdowns
 
 **Concurrent Operations**
+
 - [ ] Multiple API calls handled correctly
 - [ ] Background sync doesn't interfere with UI
 - [ ] Animation continues during data fetch
@@ -609,6 +651,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ### Store Submission
 
 **iOS**
+
 - [ ] HealthKit entitlement added
 - [ ] Info.plist usage descriptions correct
 - [ ] Screenshots prepared (all sizes)
@@ -621,6 +664,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] App review notes prepared
 
 **Android**
+
 - [ ] Health Connect permissions declared
 - [ ] Google Fit permissions configured
 - [ ] Screenshots prepared
@@ -682,8 +726,8 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Ready for submission
 - [ ] Needs fixes before submission
 
-**Tester Signature**: _______________
-**Date**: _______________
+**Tester Signature**: ******\_\_\_******
+**Date**: ******\_\_\_******
 ```
 
 ---
@@ -702,6 +746,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 ## Timeline
 
 **Estimated Testing Time:**
+
 - Functional Testing: 8-12 hours
 - Platform-Specific Testing: 4-6 hours
 - Performance Testing: 2-4 hours
@@ -711,6 +756,7 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - **Total: 20-32 hours**
 
 **Recommended Schedule:**
+
 - Week 1: Functional testing
 - Week 2: Platform-specific and performance testing
 - Week 3: Security and edge case testing

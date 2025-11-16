@@ -22,8 +22,8 @@ Update `src/navigation/AppNavigator.tsx` to include the AccountScreen:
 import { AccountScreen } from '../screens';
 
 // In your navigator stack:
-<Stack.Screen 
-  name="Account" 
+<Stack.Screen
+  name="Account"
   component={AccountScreen}
   options={{ title: 'Cloud Sync' }}
 />
@@ -53,7 +53,7 @@ import { CloudSyncService } from './services';
 useEffect(() => {
   // Enable auto-sync
   const unsubscribe = CloudSyncService.enableAutoSync();
-  
+
   return () => {
     unsubscribe();
   };
@@ -89,6 +89,7 @@ export const firebaseConfig: FirebaseConfig = {
 ## Features Implemented
 
 ### Authentication
+
 - ✅ Email/password sign up
 - ✅ Email/password sign in
 - ✅ Sign out
@@ -96,6 +97,7 @@ export const firebaseConfig: FirebaseConfig = {
 - ✅ Session management
 
 ### Cloud Sync
+
 - ✅ Upload user profile and evolution records
 - ✅ Download and merge cloud data
 - ✅ Conflict resolution (cloud wins for preferences, merge evolution records)
@@ -104,11 +106,13 @@ export const firebaseConfig: FirebaseConfig = {
 - ✅ Sync status tracking
 
 ### Data Management
+
 - ✅ Export all data as JSON
 - ✅ Delete all local data
 - ✅ Delete account with 7-day retention policy
 
 ### UI Components
+
 - ✅ Account creation screen
 - ✅ Sign in screen
 - ✅ Sync status display
@@ -125,6 +129,7 @@ npm test -- --testPathPatterns="AuthService|CloudSyncService"
 ```
 
 Tests cover:
+
 - User authentication flows
 - Data upload and download
 - Offline behavior
@@ -135,13 +140,16 @@ Tests cover:
 ## Security Notes
 
 ### Current Implementation
+
 The current implementation is a **simplified version** suitable for development and testing. It includes:
+
 - Basic email/password validation
 - Mock authentication (no actual backend)
 - Simulated API calls
 - Local token storage
 
 ### Production Requirements
+
 For production deployment, you should:
 
 1. **Integrate with Firebase Authentication** or another secure auth provider
@@ -158,12 +166,14 @@ For production deployment, you should:
 When implementing the actual backend, you'll need these endpoints:
 
 ### Authentication
+
 - `POST /api/v1/auth/signup` - Create new account
 - `POST /api/v1/auth/signin` - Sign in
 - `POST /api/v1/auth/signout` - Sign out
 - `DELETE /api/v1/auth/account` - Delete account
 
 ### Sync
+
 - `GET /api/v1/sync` - Download user data
 - `POST /api/v1/sync` - Upload user data
 - `GET /api/v1/sync/status` - Get sync status
@@ -171,17 +181,20 @@ When implementing the actual backend, you'll need these endpoints:
 ## Troubleshooting
 
 ### Sync Not Working
+
 1. Check network connectivity
 2. Verify user is authenticated
 3. Check console for error messages
 4. Verify Firebase configuration (if using Firebase)
 
 ### Data Not Merging
+
 1. Check conflict resolution logic in `CloudSyncService.mergeCloudData()`
 2. Verify data format matches expected schema
 3. Check for serialization/deserialization errors
 
 ### Authentication Failing
+
 1. Verify email format is valid
 2. Check password meets minimum requirements (8 characters)
 3. Verify storage service is working correctly

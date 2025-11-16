@@ -81,11 +81,22 @@ npm run test:watch
 ```
 
 **Test Configuration**:
+
 - Jest preset: `react-native`
 - Test environment: Node.js
 - Transform: ts-jest for TypeScript files
 - Coverage: Excludes node_modules, tests, and config files
 - Transform ignore patterns configured for React Native libraries
+
+**Test Coverage**:
+
+- ✅ Evolution History Screen: Data transformation, filtering, and statistics (664 lines)
+- ✅ Symbi 8-bit Canvas: Pixel rendering and state mappings
+- ✅ Symbi Animation: Lottie animation integration
+- ✅ Services: Health data, AI brain, evolution system, cloud sync
+- ✅ Stores: State management and persistence
+
+See `docs/evolution-history-testing.md` for detailed test documentation.
 
 ### Tech Stack
 
@@ -192,6 +203,7 @@ The `MainScreen` component is the primary user interface, integrating all three 
 - **Phase 3**: Evolution system, breathing exercises, interactive sessions
 
 **Key Features**:
+
 - 8-bit pixel art Symbi ghost in Tamagotchi-style frame
 - Real-time health metrics with progress tracking
 - Background sync with automatic updates
@@ -202,6 +214,7 @@ The `MainScreen` component is the primary user interface, integrating all three 
 - Responsive layout optimized for tablets and large screens (600px max-width, centered)
 
 **Documentation**:
+
 - **Complete Feature Guide**: [docs/mainscreen-complete-feature-documentation.md](docs/mainscreen-complete-feature-documentation.md)
 - **Architecture Details**: [docs/app-architecture.md](docs/app-architecture.md)
 - **Health Data Integration**: [docs/health-data-integration-summary.md](docs/health-data-integration-summary.md)
@@ -212,6 +225,7 @@ The `MainScreen` component is the primary user interface, integrating all three 
 The Evolution History Page provides comprehensive visualizations of historical health data and emotional states, accessible from the MainScreen's Evolution Progress box.
 
 **Key Features**:
+
 - **Time Range Filtering**: Switch between 7D, 30D, 90D, and All Time views with persistent selection
 - **Summary Statistics**: Average steps, sleep, HRV, and most frequent emotional state
 - **Interactive Charts**: Line graphs for steps, sleep, and HRV with touch-to-view tooltips
@@ -222,6 +236,7 @@ The Evolution History Page provides comprehensive visualizations of historical h
 - **Responsive Design**: Adapts to portrait/landscape with scroll position preservation
 
 **Components**:
+
 - `EvolutionHistoryScreen`: Main screen with data loading and filtering
 - `StatisticsCard`: Halloween-themed metric cards with decorations
 - `HealthMetricsChart`: Line charts using react-native-chart-kit
@@ -230,16 +245,19 @@ The Evolution History Page provides comprehensive visualizations of historical h
 - `HealthDataTable`: Scrollable table with formatted values
 
 **Type Definitions**:
+
 - `HistoricalDataPoint`: Single day's health data with emotional state
 - `HistoryStatistics`: Aggregated statistics for time range analysis
 
 **Performance Optimizations** (Nov 16, 2025):
+
 - HealthMetricsChart refactored with React memoization patterns (useMemo, useCallback)
 - Centralized theme constants and utility functions to eliminate code duplication
 - Extracted Tooltip component for better separation of concerns
 - 60% reduction in unnecessary recalculations, 25% code reduction
 
 **Documentation**:
+
 - **Implementation Summary**: [docs/evolution-history-implementation-summary.md](docs/evolution-history-implementation-summary.md)
 - **Accessibility Compliance**: [docs/evolution-history-accessibility-update.md](docs/evolution-history-accessibility-update.md)
 - **Responsive Layout**: [docs/evolution-history-responsive-layout.md](docs/evolution-history-responsive-layout.md)
@@ -265,18 +283,21 @@ Crash reporting and monitoring is configured with Sentry:
 The application uses TypeScript with strict mode for type safety. Core type definitions are located in `src/types/index.ts`:
 
 **Health Data Types**:
+
 - `HealthMetrics`: Current health data values (steps, sleep, HRV)
 - `HealthDataCache`: Daily health data with emotional state (30-day rolling cache)
 - `HistoricalDataPoint`: Single day's data for visualization (Evolution History Page)
 - `HistoryStatistics`: Aggregated statistics for time range analysis
 
 **User Configuration**:
+
 - `UserProfile`: Complete user profile with preferences and goals
 - `UserPreferences`: App settings (data source, notifications, theme)
 - `StepThresholds`: Configurable emotional state boundaries
 - `HealthGoals`: Target metrics for health tracking
 
 **Evolution System**:
+
 - `EvolutionRecord`: Single evolution event with appearance and metadata
 - `EmotionalState`: Enum of all possible Symbi states (9 total)
 
@@ -285,6 +306,7 @@ The application uses TypeScript with strict mode for type safety. Core type defi
 Symbi is designed to be accessible to all users, including those using assistive technologies.
 
 **WCAG 2.1 Level AA Compliance**:
+
 - ✅ Semantic roles for proper screen reader navigation (button, header, alert, radiogroup, list)
 - ✅ Descriptive labels for all interactive elements
 - ✅ Accessibility hints explaining complex interactions
@@ -295,11 +317,13 @@ Symbi is designed to be accessible to all users, including those using assistive
 - ✅ Live regions for loading and error states
 
 **Testing**:
+
 - iOS: VoiceOver compatible
 - Android: TalkBack compatible
 - Automated: React Native Testing Library with accessibility queries
 
 **Documentation**:
+
 - [docs/accessibility-compliance.md](docs/accessibility-compliance.md)
 - [docs/evolution-history-accessibility-update.md](docs/evolution-history-accessibility-update.md)
 

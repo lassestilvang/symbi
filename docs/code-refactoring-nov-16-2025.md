@@ -13,10 +13,12 @@ Performed comprehensive code analysis and refactoring of the Evolution History P
 **Solution**: Created centralized constants module.
 
 **Files Created**:
+
 - `src/constants/theme.ts` - Centralized theme constants
 - `src/constants/index.ts` - Barrel export
 
 **Impact**:
+
 - Reduced code duplication by ~150 lines
 - Single source of truth for theme values
 - Easier to maintain and update colors
@@ -29,6 +31,7 @@ Performed comprehensive code analysis and refactoring of the Evolution History P
 **Solution**: Created utility modules with reusable functions.
 
 **Files Created**:
+
 - `src/utils/dateHelpers.ts` - Date formatting utilities
 - `src/utils/metricHelpers.ts` - Metric operations and type-safe helpers
 - `src/utils/index.ts` - Barrel export
@@ -36,6 +39,7 @@ Performed comprehensive code analysis and refactoring of the Evolution History P
 **Functions Extracted**:
 
 **Date Helpers**:
+
 - `formatShortDate()` - "M/D" format
 - `formatMediumDate()` - "Mon DD" format
 - `formatFullDate()` - Full date with weekday
@@ -43,6 +47,7 @@ Performed comprehensive code analysis and refactoring of the Evolution History P
 - `formatDisplayDate()` - Display format with year
 
 **Metric Helpers**:
+
 - `getMetricValue()` - Type-safe metric extraction
 - `hasMetricValue()` - Validation helper
 - `filterByMetric()` - Filter data by metric availability
@@ -50,6 +55,7 @@ Performed comprehensive code analysis and refactoring of the Evolution History P
 - `getMetricConfig()` - Get metric configuration
 
 **Impact**:
+
 - Reduced duplication by ~100 lines
 - Improved type safety with `MetricType` type
 - Consistent formatting across all components
@@ -62,6 +68,7 @@ Performed comprehensive code analysis and refactoring of the Evolution History P
 **Improvements Made**:
 
 #### Performance Optimizations
+
 - ✅ Added `useMemo` for filtered data (prevents recalculation on every render)
 - ✅ Added `useMemo` for chart data transformation
 - ✅ Added `useMemo` for metric configuration
@@ -69,25 +76,32 @@ Performed comprehensive code analysis and refactoring of the Evolution History P
 - ✅ Added `useCallback` for haptic feedback handler
 
 #### Code Organization
+
 - ✅ Extracted `Tooltip` as separate component
 - ✅ Separated haptic feedback logic into reusable function
 - ✅ Improved imports with utility functions from `metricHelpers` and `dateHelpers`
 - ✅ Imported `HALLOWEEN_COLORS` from centralized constants
 
 #### Type Safety
+
 - ✅ Removed inline `HistoricalDataPoint` interface (now imported from types)
 - ✅ Changed `metricType` prop to use `MetricType` type
 - ✅ Better type inference with utility functions
 - ✅ Proper typing for `Tooltip` component props
 
 **Before**:
+
 ```typescript
 const getMetricValue = (point: HistoricalDataPoint): number => {
   switch (metricType) {
-    case 'steps': return point.steps;
-    case 'sleep': return point.sleepHours ?? 0;
-    case 'hrv': return point.hrv ?? 0;
-    default: return 0;
+    case 'steps':
+      return point.steps;
+    case 'sleep':
+      return point.sleepHours ?? 0;
+    case 'hrv':
+      return point.hrv ?? 0;
+    default:
+      return 0;
   }
 };
 
@@ -98,22 +112,22 @@ const filteredData = data.filter(point => {
 ```
 
 **After**:
+
 ```typescript
 // Memoized with utility function
-const filteredData = useMemo(
-  () => filterByMetric(data, metricType),
-  [data, metricType]
-);
+const filteredData = useMemo(() => filterByMetric(data, metricType), [data, metricType]);
 
 // Memoized chart data transformation
 const chartData = useMemo(
   () => ({
     labels: filteredData.map(point => formatShortDate(point.date)),
-    datasets: [{
-      data: filteredData.map(point => getMetricValue(point, metricType)),
-      color: (_opacity = 1) => color || config.color,
-      strokeWidth: 3,
-    }],
+    datasets: [
+      {
+        data: filteredData.map(point => getMetricValue(point, metricType)),
+        color: (_opacity = 1) => color || config.color,
+        strokeWidth: 3,
+      },
+    ],
   }),
   [filteredData, metricType, color, config.color]
 );
@@ -133,6 +147,7 @@ const handleDataPointClick = useCallback(
 ```
 
 **Impact**:
+
 - Reduced component complexity from ~200 lines to ~150 lines (main component)
 - Improved performance with memoization (prevents unnecessary recalculations)
 - Better separation of concerns (Tooltip extracted)
@@ -146,26 +161,31 @@ const handleDataPointClick = useCallback(
 **Improvements Made**:
 
 #### Centralized Constants
+
 - ✅ Imports `HALLOWEEN_COLORS` from `src/constants/theme.ts`
 - ✅ Imports `DECORATION_ICONS` from `src/constants/theme.ts`
 - ✅ Removed inline color and icon definitions
 
 #### Performance Optimizations
+
 - ✅ Wrapped component with `React.memo` to prevent unnecessary re-renders
 - ✅ Added `useMemo` for dynamic style calculation
 - ✅ Extracted `formatValue()` helper function for number formatting
 
 #### Accessibility Enhancements
+
 - ✅ Added comprehensive `accessibilityLabel` with full context
 - ✅ Added `accessibilityRole="summary"` for proper semantics
 - ✅ Supports `testID` prop for automated testing
 
 #### Code Quality
+
 - ✅ Better prop typing with `keyof typeof DECORATION_ICONS`
 - ✅ Automatic locale-specific number formatting (e.g., 8,542 instead of 8542)
 - ✅ Cleaner, more maintainable code structure
 
 **Before**:
+
 ```typescript
 const HALLOWEEN_COLORS = {
   primary: '#7C3AED',
@@ -195,6 +215,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
 ```
 
 **After**:
+
 ```typescript
 import { HALLOWEEN_COLORS, DECORATION_ICONS } from '../constants/theme';
 
@@ -237,6 +258,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ```
 
 **Impact**:
+
 - Eliminated ~30 lines of duplicated constants
 - Improved performance with React.memo (prevents re-renders when parent updates)
 - Better accessibility for screen readers
@@ -247,9 +269,11 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ### 5. Component Extraction
 
 **Extracted Components**:
+
 - `Tooltip` component from `HealthMetricsChart`
 
 **Benefits**:
+
 - Smaller, more focused components
 - Easier to test in isolation
 - Better code readability
@@ -258,6 +282,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ## Files Modified
 
 ### New Files Created (6)
+
 1. `src/constants/theme.ts` ✅
 2. `src/constants/index.ts` ✅
 3. `src/utils/dateHelpers.ts` ✅
@@ -266,6 +291,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 6. `docs/code-refactoring-nov-16-2025.md` ✅
 
 ### Files Updated (6)
+
 1. ✅ `src/components/HealthMetricsChart.tsx` - **COMPLETE**
    - Imports `HALLOWEEN_COLORS` from constants
    - Uses `metricHelpers` utilities (getMetricValue, filterByMetric, formatMetricValue, getMetricConfig)
@@ -287,6 +313,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ## Recommended Next Steps
 
 ### Immediate (Should be done now)
+
 1. ✅ **COMPLETE**: HealthMetricsChart refactored with all optimizations
 2. ✅ **COMPLETE**: StatisticsCard refactored with centralized constants and performance optimizations
 3. ⏳ Update remaining components to use centralized constants (EmotionalStateTimeline, EvolutionMilestoneCard, HealthDataTable, EvolutionHistoryScreen)
@@ -295,12 +322,14 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 6. ⏳ Update component exports in `src/components/index.ts`
 
 ### Short-term (Next sprint)
+
 1. Apply similar refactoring to other screens (MainScreen, etc.)
 2. Extract more common patterns (haptic feedback, error handling)
 3. Create custom hooks for repeated logic
 4. Add unit tests for utility functions
 
 ### Long-term (Future improvements)
+
 1. Consider creating a theme context for runtime theme switching
 2. Extract chart configuration to separate file
 3. Create a design system documentation
@@ -309,11 +338,13 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ## Performance Impact
 
 ### Before Refactoring
+
 - Multiple object recreations on every render
 - Duplicate calculations across components
 - No memoization of expensive operations
 
 ### After Refactoring
+
 - Memoized data transformations
 - Memoized event handlers
 - Shared constants (no recreation)
@@ -324,16 +355,19 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ## Code Quality Metrics
 
 ### Duplication Reduction
+
 - **Before**: ~250 lines of duplicated code
 - **After**: ~50 lines (centralized)
 - **Reduction**: 80%
 
 ### Component Complexity
+
 - **HealthMetricsChart Before**: ~200 lines, 5 responsibilities
 - **HealthMetricsChart After**: ~150 lines, 3 responsibilities
 - **Improvement**: 25% reduction, better SRP adherence
 
 ### Type Safety
+
 - Added `MetricType` type for better type checking
 - Removed inline interface definitions
 - Better type inference with utility functions
@@ -341,16 +375,19 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ## Testing Recommendations
 
 ### Unit Tests to Add
+
 1. `dateHelpers.test.ts` - Test all date formatting functions
 2. `metricHelpers.test.ts` - Test metric operations
 3. `HealthMetricsChart.test.tsx` - Update existing tests
 
 ### Integration Tests
+
 1. Test that all components render correctly with new imports
 2. Test that theme colors are consistent across components
 3. Test that date formatting is consistent
 
 ### Manual Testing
+
 1. Verify Evolution History page renders correctly
 2. Verify chart interactions work (tooltip, haptic feedback)
 3. Verify responsive layout still works
@@ -361,6 +398,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = React.memo(
 ### For Other Developers
 
 **Importing Theme Constants**:
+
 ```typescript
 // Old
 const HALLOWEEN_COLORS = {
@@ -373,6 +411,7 @@ import { HALLOWEEN_COLORS, STATE_COLORS } from '../constants/theme';
 ```
 
 **Using Date Helpers**:
+
 ```typescript
 // Old
 const date = new Date(dateString);
@@ -384,6 +423,7 @@ const formatted = formatShortDate(dateString);
 ```
 
 **Using Metric Helpers**:
+
 ```typescript
 // Old
 const value = point.sleepHours ?? 0;

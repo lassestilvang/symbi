@@ -50,7 +50,7 @@ const STATE_DISPLAY_NAMES: Record<EmotionalState, string> = {
   [EmotionalState.RESTED]: 'Rested',
 };
 
-export const HealthDataTable: React.FC<HealthDataTableProps> = ({ data, maxHeight }) => {
+export const HealthDataTable: React.FC<HealthDataTableProps> = React.memo(({ data, maxHeight }) => {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return `${date.getMonth() + 1}/${date.getDate()}`;
@@ -163,7 +163,7 @@ export const HealthDataTable: React.FC<HealthDataTableProps> = ({ data, maxHeigh
       </ScrollView>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

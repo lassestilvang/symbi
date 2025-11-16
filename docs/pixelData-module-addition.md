@@ -1,9 +1,11 @@
 # PixelData Module Addition
 
 ## Date
+
 November 16, 2025
 
 ## Summary
+
 Added `src/components/symbi/pixelData.ts` as a pure data module containing all pixel coordinate definitions for the 8-bit Symbi ghost rendering system.
 
 ## File Details
@@ -15,15 +17,18 @@ Added `src/components/symbi/pixelData.ts` as a pure data module containing all p
 ## Exports
 
 ### Types
+
 - `PixelCoordinate`: Type alias for `[x: number, y: number]` tuple
 - `GhostColors`: Interface defining color scheme (body, eyes, mouth, blush)
 
 ### Constants
+
 - `GHOST_GRID_SIZE`: 32 (pixel grid dimensions)
 - `GHOST_MIN_Y`: 6 (minimum Y coordinate)
 - `GHOST_MAX_Y`: 25 (maximum Y coordinate)
 
 ### Pixel Data Arrays
+
 - `ghostBodyPixels`: 400+ coordinates forming the main ghost body
 - `normalEyes`: 8 pixels (2x2 per eye)
 - `sadEyes`: 8 pixels (droopy, positioned lower)
@@ -38,12 +43,14 @@ Added `src/components/symbi/pixelData.ts` as a pure data module containing all p
 ## Design Characteristics
 
 ### Ghost Dimensions
+
 - **Grid**: 32x32 pixels
 - **Height**: 20 rows (Y: 6-25)
 - **Width**: 16 pixels (X: 8-23)
 - **Total Body Pixels**: ~400
 
 ### Positioning
+
 - **Top**: Y: 6 (rounded head)
 - **Eyes**: Y: 10-14 (varies by state)
 - **Mouth**: Y: 15-18 (varies by state)
@@ -51,6 +58,7 @@ Added `src/components/symbi/pixelData.ts` as a pure data module containing all p
 - **Bottom**: Y: 23-25 (wavy edge)
 
 ### Visual Features
+
 - Rounded top for classic ghost shape
 - Wavy bottom with 3 peaks for ethereal effect
 - Symmetrical left/right features
@@ -59,11 +67,13 @@ Added `src/components/symbi/pixelData.ts` as a pure data module containing all p
 ## Integration
 
 ### Used By
+
 - `src/components/symbi/ghostRenderer.ts` - Imports pixel arrays for rendering
 - `src/components/Symbi8BitCanvas.tsx` - Uses via ghostRenderer
 - `src/components/symbi/__tests__/pixelData.test.ts` - Unit tests
 
 ### Dependencies
+
 - `src/types/index.ts` - Imports `EmotionalState` enum (for documentation only)
 
 ## Benefits
@@ -85,6 +95,7 @@ Added `src/components/symbi/pixelData.ts` as a pure data module containing all p
 ## Testing
 
 Unit tests in `src/components/symbi/__tests__/pixelData.test.ts` verify:
+
 - All coordinates within 32x32 grid bounds
 - No duplicate pixels within arrays
 - Symmetrical left/right features
@@ -94,6 +105,7 @@ Unit tests in `src/components/symbi/__tests__/pixelData.test.ts` verify:
 ## Future Enhancements
 
 Potential additions to pixelData.ts:
+
 1. Animation frame variations for smooth transitions
 2. Particle effect coordinates for Active/Vibrant states
 3. Dripping animation frames for bottom edge

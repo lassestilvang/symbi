@@ -37,272 +37,275 @@ const STATE_COLORS: Record<string, string> = {
   Rested: '#8B5CF6',
 };
 
-export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = ({
-  data,
-  onItemPress,
-}) => {
-  const [selectedItem, setSelectedItem] = useState<HistoricalDataPoint | null>(null);
-  const { profile } = useUserPreferencesStore();
+export const EmotionalStateTimeline: React.FC<EmotionalStateTimelineProps> = React.memo(
+  ({ data, onItemPress }) => {
+    const [selectedItem, setSelectedItem] = useState<HistoricalDataPoint | null>(null);
+    const { profile } = useUserPreferencesStore();
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
-    const day = date.getDate();
-    return `${month} ${day}`;
-  };
+    const formatDate = (dateString: string): string => {
+      const date = new Date(dateString);
+      const month = date.toLocaleDateString('en-US', { month: 'short' });
+      const day = date.getDate();
+      return `${month} ${day}`;
+    };
 
-  const formatTime = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
-  };
+    const formatTime = (dateString: string): string => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { weekday: 'short' });
+    };
 
-  const formatFullDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
+    const formatFullDate = (dateString: string): string => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    };
 
-  const handleItemPress = async (item: HistoricalDataPoint) => {
-    // Trigger haptic feedback if enabled
-    if (profile?.preferences.hapticFeedbackEnabled) {
-      try {
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } catch (error) {
-        console.log('Haptic feedback not available:', error);
+    const handleItemPress = async (item: HistoricalDataPoint) => {
+      // Trigger haptic feedback if enabled
+      if (profile?.preferences.hapticFeedbackEnabled) {
+        try {
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } catch (error) {
+          console.log('Haptic feedback not available:', error);
+        }
       }
+
+      setSelectedItem(item);
+      onItemPress?.(item);
+    };
+
+    const closeModal = async () => {
+      // Trigger haptic feedback if enabled
+      if (profile?.preferences.hapticFeedbackEnabled) {
+        try {
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } catch (error) {
+          console.log('Haptic feedback not available:', error);
+        }
+      }
+
+      setSelectedItem(null);
+    };
+
+    if (data.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text
+            style={styles.emptyText}
+            accessibilityLabel="No emotional states recorded yet"
+            accessibilityRole="text">
+            👻 No emotional states recorded yet
+          </Text>
+        </View>
+      );
     }
 
-    setSelectedItem(item);
-    onItemPress?.(item);
-  };
-
-  const closeModal = async () => {
-    // Trigger haptic feedback if enabled
-    if (profile?.preferences.hapticFeedbackEnabled) {
-      try {
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      } catch (error) {
-        console.log('Haptic feedback not available:', error);
-      }
-    }
-
-    setSelectedItem(null);
-  };
-
-  if (data.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={styles.container}>
         <Text
-          style={styles.emptyText}
-          accessibilityLabel="No emotional states recorded yet"
-          accessibilityRole="text">
-          👻 No emotional states recorded yet
+          style={styles.title}
+          accessibilityRole="header"
+          accessibilityLabel="Emotional Timeline">
+          🕰️ Emotional Timeline
         </Text>
-      </View>
-    );
-  }
+        <ScrollView
+          style={styles.timeline}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
+          accessibilityRole="list">
+          {data.map((item, index) => {
+            const stateColor = STATE_COLORS[item.emotionalState] || HALLOWEEN_COLORS.primary;
+            const isLast = index === data.length - 1;
+            const accessibilityLabel = `${item.emotionalState} state on ${formatDate(item.date)}, ${formatTime(item.date)}. ${item.steps.toLocaleString()} steps${item.sleepHours !== undefined ? `, ${item.sleepHours.toFixed(1)} hours sleep` : ''}${item.hrv !== undefined ? `, ${item.hrv.toFixed(0)} milliseconds HRV` : ''}. Tap for details.`;
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title} accessibilityRole="header" accessibilityLabel="Emotional Timeline">
-        🕰️ Emotional Timeline
-      </Text>
-      <ScrollView
-        style={styles.timeline}
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
-        accessibilityRole="list">
-        {data.map((item, index) => {
-          const stateColor = STATE_COLORS[item.emotionalState] || HALLOWEEN_COLORS.primary;
-          const isLast = index === data.length - 1;
-          const accessibilityLabel = `${item.emotionalState} state on ${formatDate(item.date)}, ${formatTime(item.date)}. ${item.steps.toLocaleString()} steps${item.sleepHours !== undefined ? `, ${item.sleepHours.toFixed(1)} hours sleep` : ''}${item.hrv !== undefined ? `, ${item.hrv.toFixed(0)} milliseconds HRV` : ''}. Tap for details.`;
-
-          return (
-            <TouchableOpacity
-              key={`${item.date}-${index}`}
-              style={styles.timelineItem}
-              onPress={() => handleItemPress(item)}
-              activeOpacity={0.7}
-              accessible={true}
-              accessibilityLabel={accessibilityLabel}
-              accessibilityRole="button"
-              accessibilityHint="Opens detailed view of this emotional state">
-              <View style={styles.timelineLeft} accessibilityElementsHidden={true}>
-                <View style={[styles.dot, { backgroundColor: stateColor }]} />
-                {!isLast && <View style={styles.line} />}
-              </View>
-              <View style={[styles.timelineCard, { borderLeftColor: stateColor }]}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.ghost} accessibilityElementsHidden={true}>
-                    👻
-                  </Text>
-                  <View style={styles.cardHeaderText}>
-                    <Text style={[styles.stateName, { color: stateColor }]}>
-                      {item.emotionalState}
-                    </Text>
-                    <Text style={styles.dateText}>
-                      {formatDate(item.date)} • {formatTime(item.date)}
-                    </Text>
-                  </View>
+            return (
+              <TouchableOpacity
+                key={`${item.date}-${index}`}
+                style={styles.timelineItem}
+                onPress={() => handleItemPress(item)}
+                activeOpacity={0.7}
+                accessible={true}
+                accessibilityLabel={accessibilityLabel}
+                accessibilityRole="button"
+                accessibilityHint="Opens detailed view of this emotional state">
+                <View style={styles.timelineLeft} accessibilityElementsHidden={true}>
+                  <View style={[styles.dot, { backgroundColor: stateColor }]} />
+                  {!isLast && <View style={styles.line} />}
                 </View>
-                <View style={styles.cardMetrics}>
-                  <Text style={styles.metricText}>
-                    <Text accessibilityElementsHidden={true}>👣 </Text>
-                    {item.steps.toLocaleString()} steps
-                  </Text>
-                  {item.sleepHours !== undefined && (
-                    <Text style={styles.metricText}>
-                      <Text accessibilityElementsHidden={true}>😴 </Text>
-                      {item.sleepHours.toFixed(1)}h sleep
-                    </Text>
-                  )}
-                  {item.hrv !== undefined && (
-                    <Text style={styles.metricText}>
-                      <Text accessibilityElementsHidden={true}>❤️ </Text>
-                      {item.hrv.toFixed(0)}ms HRV
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      {/* Expanded State Information Modal */}
-      <Modal
-        visible={selectedItem !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={closeModal}
-        accessibilityViewIsModal={true}>
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={closeModal}
-          accessible={false}>
-          <TouchableOpacity
-            style={styles.modalContent}
-            activeOpacity={1}
-            onPress={e => e.stopPropagation()}
-            accessible={true}
-            accessibilityRole="alert"
-            accessibilityLabel={
-              selectedItem
-                ? `Emotional state details for ${selectedItem.emotionalState} on ${formatFullDate(selectedItem.date)}`
-                : 'Emotional state details'
-            }>
-            {selectedItem && (
-              <>
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle} accessibilityRole="header">
-                    Emotional State Details
-                  </Text>
-                  <TouchableOpacity
-                    onPress={closeModal}
-                    style={styles.modalCloseButton}
-                    accessibilityLabel="Close details"
-                    accessibilityRole="button"
-                    accessibilityHint="Closes the emotional state details dialog">
-                    <Text style={styles.modalCloseText} accessibilityElementsHidden={true}>
-                      ✕
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.modalBody}>
-                  <View style={styles.modalStateHeader}>
-                    <Text style={styles.modalGhost} accessibilityElementsHidden={true}>
+                <View style={[styles.timelineCard, { borderLeftColor: stateColor }]}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.ghost} accessibilityElementsHidden={true}>
                       👻
                     </Text>
-                    <View style={styles.modalStateInfo}>
-                      <Text
-                        style={[
-                          styles.modalStateName,
-                          {
-                            color:
-                              STATE_COLORS[selectedItem.emotionalState] || HALLOWEEN_COLORS.primary,
-                          },
-                        ]}
-                        accessibilityRole="header">
-                        {selectedItem.emotionalState}
+                    <View style={styles.cardHeaderText}>
+                      <Text style={[styles.stateName, { color: stateColor }]}>
+                        {item.emotionalState}
                       </Text>
-                      <Text style={styles.modalDate}>{formatFullDate(selectedItem.date)}</Text>
+                      <Text style={styles.dateText}>
+                        {formatDate(item.date)} • {formatTime(item.date)}
+                      </Text>
                     </View>
                   </View>
+                  <View style={styles.cardMetrics}>
+                    <Text style={styles.metricText}>
+                      <Text accessibilityElementsHidden={true}>👣 </Text>
+                      {item.steps.toLocaleString()} steps
+                    </Text>
+                    {item.sleepHours !== undefined && (
+                      <Text style={styles.metricText}>
+                        <Text accessibilityElementsHidden={true}>😴 </Text>
+                        {item.sleepHours.toFixed(1)}h sleep
+                      </Text>
+                    )}
+                    {item.hrv !== undefined && (
+                      <Text style={styles.metricText}>
+                        <Text accessibilityElementsHidden={true}>❤️ </Text>
+                        {item.hrv.toFixed(0)}ms HRV
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
 
-                  <View style={styles.modalDivider} accessibilityElementsHidden={true} />
+        {/* Expanded State Information Modal */}
+        <Modal
+          visible={selectedItem !== null}
+          transparent
+          animationType="fade"
+          onRequestClose={closeModal}
+          accessibilityViewIsModal={true}>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={closeModal}
+            accessible={false}>
+            <TouchableOpacity
+              style={styles.modalContent}
+              activeOpacity={1}
+              onPress={e => e.stopPropagation()}
+              accessible={true}
+              accessibilityRole="alert"
+              accessibilityLabel={
+                selectedItem
+                  ? `Emotional state details for ${selectedItem.emotionalState} on ${formatFullDate(selectedItem.date)}`
+                  : 'Emotional state details'
+              }>
+              {selectedItem && (
+                <>
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle} accessibilityRole="header">
+                      Emotional State Details
+                    </Text>
+                    <TouchableOpacity
+                      onPress={closeModal}
+                      style={styles.modalCloseButton}
+                      accessibilityLabel="Close details"
+                      accessibilityRole="button"
+                      accessibilityHint="Closes the emotional state details dialog">
+                      <Text style={styles.modalCloseText} accessibilityElementsHidden={true}>
+                        ✕
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
 
-                  <View style={styles.modalMetrics}>
-                    <View style={styles.modalMetricRow}>
-                      <View
-                        style={styles.modalMetricCard}
-                        accessible={true}
-                        accessibilityLabel={`Steps: ${selectedItem.steps.toLocaleString()}`}
-                        accessibilityRole="summary">
-                        <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
-                          👣
+                  <View style={styles.modalBody}>
+                    <View style={styles.modalStateHeader}>
+                      <Text style={styles.modalGhost} accessibilityElementsHidden={true}>
+                        👻
+                      </Text>
+                      <View style={styles.modalStateInfo}>
+                        <Text
+                          style={[
+                            styles.modalStateName,
+                            {
+                              color:
+                                STATE_COLORS[selectedItem.emotionalState] ||
+                                HALLOWEEN_COLORS.primary,
+                            },
+                          ]}
+                          accessibilityRole="header">
+                          {selectedItem.emotionalState}
                         </Text>
-                        <Text style={styles.modalMetricLabel}>Steps</Text>
-                        <Text style={styles.modalMetricValue}>
-                          {selectedItem.steps.toLocaleString()}
-                        </Text>
+                        <Text style={styles.modalDate}>{formatFullDate(selectedItem.date)}</Text>
                       </View>
-
-                      {selectedItem.sleepHours !== undefined && (
-                        <View
-                          style={styles.modalMetricCard}
-                          accessible={true}
-                          accessibilityLabel={`Sleep: ${selectedItem.sleepHours.toFixed(1)} hours`}
-                          accessibilityRole="summary">
-                          <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
-                            😴
-                          </Text>
-                          <Text style={styles.modalMetricLabel}>Sleep</Text>
-                          <Text style={styles.modalMetricValue}>
-                            {selectedItem.sleepHours.toFixed(1)}h
-                          </Text>
-                        </View>
-                      )}
                     </View>
 
-                    {selectedItem.hrv !== undefined && (
+                    <View style={styles.modalDivider} accessibilityElementsHidden={true} />
+
+                    <View style={styles.modalMetrics}>
                       <View style={styles.modalMetricRow}>
                         <View
                           style={styles.modalMetricCard}
                           accessible={true}
-                          accessibilityLabel={`Heart Rate Variability: ${selectedItem.hrv.toFixed(0)} milliseconds`}
+                          accessibilityLabel={`Steps: ${selectedItem.steps.toLocaleString()}`}
                           accessibilityRole="summary">
                           <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
-                            ❤️
+                            👣
                           </Text>
-                          <Text style={styles.modalMetricLabel}>Heart Rate Variability</Text>
+                          <Text style={styles.modalMetricLabel}>Steps</Text>
                           <Text style={styles.modalMetricValue}>
-                            {selectedItem.hrv.toFixed(0)}ms
+                            {selectedItem.steps.toLocaleString()}
                           </Text>
                         </View>
-                      </View>
-                    )}
-                  </View>
 
-                  <View style={styles.modalFooter}>
-                    <Text style={styles.modalFooterText} accessibilityElementsHidden={true}>
-                      Tap outside to close
-                    </Text>
+                        {selectedItem.sleepHours !== undefined && (
+                          <View
+                            style={styles.modalMetricCard}
+                            accessible={true}
+                            accessibilityLabel={`Sleep: ${selectedItem.sleepHours.toFixed(1)} hours`}
+                            accessibilityRole="summary">
+                            <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
+                              😴
+                            </Text>
+                            <Text style={styles.modalMetricLabel}>Sleep</Text>
+                            <Text style={styles.modalMetricValue}>
+                              {selectedItem.sleepHours.toFixed(1)}h
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+
+                      {selectedItem.hrv !== undefined && (
+                        <View style={styles.modalMetricRow}>
+                          <View
+                            style={styles.modalMetricCard}
+                            accessible={true}
+                            accessibilityLabel={`Heart Rate Variability: ${selectedItem.hrv.toFixed(0)} milliseconds`}
+                            accessibilityRole="summary">
+                            <Text style={styles.modalMetricIcon} accessibilityElementsHidden={true}>
+                              ❤️
+                            </Text>
+                            <Text style={styles.modalMetricLabel}>Heart Rate Variability</Text>
+                            <Text style={styles.modalMetricValue}>
+                              {selectedItem.hrv.toFixed(0)}ms
+                            </Text>
+                          </View>
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={styles.modalFooter}>
+                      <Text style={styles.modalFooterText} accessibilityElementsHidden={true}>
+                        Tap outside to close
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </>
-            )}
+                </>
+              )}
+            </TouchableOpacity>
           </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
-    </View>
-  );
-};
+        </Modal>
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {

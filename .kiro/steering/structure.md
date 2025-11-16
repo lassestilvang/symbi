@@ -93,16 +93,19 @@ src/
 ## Architecture Patterns
 
 ### Service Layer Pattern
+
 - All external integrations abstracted through service interfaces
 - Platform-specific implementations (HealthKit vs Google Fit)
 - Factory pattern for service instantiation based on platform
 
 ### Store Pattern
+
 - Zustand stores for reactive state management
 - Automatic persistence to AsyncStorage
 - Selector-based subscriptions to minimize re-renders
 
 ### Component Organization
+
 - Barrel exports via `index.ts` files
 - Co-located tests in `__tests__` directories
 - README.md files in major directories for documentation
@@ -110,12 +113,14 @@ src/
 ## Key Conventions
 
 ### File Naming
+
 - Components: PascalCase (e.g., `SymbiAnimation.tsx`)
 - Services: PascalCase (e.g., `HealthDataService.ts`)
 - Stores: camelCase (e.g., `healthDataStore.ts`)
 - Tests: `*.test.tsx` or `*.test.ts`
 
 ### Import Order
+
 1. React and React Native imports
 2. Third-party libraries
 3. Path alias imports (@components, @services, etc.)
@@ -123,17 +128,20 @@ src/
 5. Type imports
 
 ### State Management
+
 - Use Zustand stores for global state
 - Use React hooks (useState, useEffect) for local component state
 - Avoid prop drilling - use stores for deeply nested data
 
 ### Error Handling
+
 - Services return Result types or throw typed errors
 - UI components handle errors gracefully with fallbacks
 - All errors logged to ErrorReportingService
 - Health data sanitized from error reports
 
 ### Testing
+
 - Unit tests for services and utilities
 - Integration tests for data flows
 - Component tests using React Testing Library

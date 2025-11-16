@@ -3,18 +3,23 @@
 ## App Information
 
 ### App Name
+
 **Symbi - Your Health Companion**
 
 ### Short Description (80 characters max)
+
 Transform your health data into a living, Halloween-themed digital pet
 
 ### Package Name
+
 `com.symbi.app`
 
 ### Version
+
 1.0.0 (Version Code: 1)
 
 ### Content Rating
+
 Everyone
 
 ## Full Description (4000 characters max)
@@ -44,20 +49,20 @@ Symbi is more than just a health tracker—it's your personal digital pet that g
 
 **✨ Key Features**
 
-*Core Experience*
+_Core Experience_
 • Automatic step tracking via Google Fit or Health Connect
 • Three basic emotional states (Sad, Resting, Active)
 • Customizable activity thresholds to match your fitness level
 • Manual data entry mode for privacy-conscious users
 • Beautiful onboarding experience
 
-*AI-Powered Insights*
+_AI-Powered Insights_
 • Multi-metric health analysis (steps, sleep, HRV)
 • AI-driven emotional state detection with 6 additional states
 • Personalized wellness insights
 • Fallback to local processing if you prefer
 
-*Interactive & Evolving*
+_Interactive & Evolving_
 • Guided breathing exercises to calm your Symbi
 • Mindful minutes tracking
 • Generative evolution system—watch your Symbi transform
@@ -104,11 +109,13 @@ https://symbi.app/privacy-policy
 ## Graphic Assets
 
 ### App Icon
+
 - Size: 512x512 pixels
 - Format: PNG (32-bit)
 - Design: Symbi ghost character with purple gradient background
 
 ### Feature Graphic
+
 - Size: 1024x500 pixels
 - Format: PNG or JPEG
 - Design: Symbi character with app name and tagline
@@ -117,40 +124,49 @@ https://symbi.app/privacy-policy
 ### Screenshots
 
 **Phone Screenshots** (Required)
+
 - Minimum: 2 screenshots
 - Recommended: 4-8 screenshots
 - Format: PNG or JPEG
 - Dimensions: 16:9 or 9:16 aspect ratio
 
 **Screenshot 1: Main Screen**
+
 - Show Symbi in Active state with step count
 - Caption: "Meet Your Health Companion"
 
 **Screenshot 2: Emotional States**
+
 - Show multiple emotional states
 - Caption: "Your Symbi Reflects Your Wellness"
 
 **Screenshot 3: Health Data Integration**
+
 - Show Google Fit or Health Connect integration
 - Caption: "Seamlessly Connects to Your Health Data"
 
 **Screenshot 4: Customization**
+
 - Show threshold configuration
 - Caption: "Customize to Your Fitness Level"
 
 **Screenshot 5: Evolution**
+
 - Show evolution celebration or gallery
 - Caption: "Watch Your Symbi Evolve"
 
 **Screenshot 6: Privacy**
+
 - Show privacy settings or manual entry mode
 - Caption: "Your Data, Your Control"
 
 **Tablet Screenshots** (Optional)
+
 - 7-inch and 10-inch tablet layouts
 - Same content as phone screenshots
 
 ### Promo Video (Optional but Recommended)
+
 - Duration: 30 seconds to 2 minutes
 - Format: YouTube URL
 - Content: App walkthrough showing key features
@@ -183,6 +199,7 @@ https://symbi.app/privacy-policy
    - Deletion: Deleted with app uninstall
 
 **Data Security**:
+
 - ✅ Data is encrypted in transit (TLS 1.3)
 - ✅ Data is encrypted at rest (AES-256)
 - ✅ You can request data deletion
@@ -191,6 +208,7 @@ https://symbi.app/privacy-policy
 - ✅ Data is not used for advertising
 
 **Data Usage**:
+
 - App functionality: Health data used to power Symbi's emotional states
 - Analytics: Anonymous usage patterns (no health data included)
 - Optional AI features: Aggregated daily metrics only
@@ -200,16 +218,19 @@ https://symbi.app/privacy-policy
 ### Permissions Required
 
 **Read Permissions**:
+
 - `STEPS` - Daily step count
 - `SLEEP` - Sleep duration (Phase 2+)
 - `HEART_RATE_VARIABILITY_RMSSD` - HRV measurements (Phase 2+)
 
 **Write Permissions**:
+
 - `EXERCISE` - Mindful minutes sessions (Phase 3+)
 
 ### Health Connect Declaration
 
 Add to `AndroidManifest.xml`:
+
 ```xml
 <!-- Health Connect Permissions -->
 <uses-permission android:name="android.permission.health.READ_STEPS"/>
@@ -226,6 +247,7 @@ Add to `AndroidManifest.xml`:
 ### Health Connect Privacy Policy Requirements
 
 Must include in privacy policy:
+
 - What health data is collected
 - How health data is used
 - How health data is stored
@@ -237,6 +259,7 @@ Must include in privacy policy:
 ### Permissions Required
 
 Add to `AndroidManifest.xml`:
+
 ```xml
 <!-- Google Fit Permissions -->
 <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
@@ -246,6 +269,7 @@ Add to `AndroidManifest.xml`:
 ### OAuth 2.0 Scopes
 
 Required scopes:
+
 - `https://www.googleapis.com/auth/fitness.activity.read`
 - `https://www.googleapis.com/auth/fitness.sleep.read`
 - `https://www.googleapis.com/auth/fitness.heart_rate.read`
@@ -293,15 +317,18 @@ Start your journey with Symbi today! 👻💜
 ## Pricing and Distribution
 
 ### Pricing
+
 - **Price**: Free
 - **In-app purchases**: None
 - **Ads**: None
 
 ### Countries
+
 - **Distribution**: All available countries
 - **Exclude**: None
 
 ### Device Categories
+
 - **Phone**: Yes
 - **Tablet**: Yes
 - **Wear OS**: No
@@ -313,6 +340,7 @@ Start your journey with Symbi today! 👻💜
 **Special Access**: None required
 
 **Permissions Explanation**:
+
 - Activity Recognition: To read step count from Google Fit
 - Internet: For optional AI-powered features
 - Foreground Service: For background health data sync
@@ -320,10 +348,12 @@ Start your journey with Symbi today! 👻💜
 ## Target Audience and Content
 
 ### Target Age
+
 - **Target Age Group**: 13+
 - **Appeals to Children**: No
 
 ### Ads
+
 - **Contains Ads**: No
 - **Ad ID**: Not used
 
@@ -338,6 +368,7 @@ Start your journey with Symbi today! 👻💜
 ## Pre-Launch Report
 
 Before publishing, complete:
+
 - [ ] Run pre-launch report in Play Console
 - [ ] Test on multiple device types
 - [ ] Review crash reports
@@ -369,6 +400,7 @@ Before publishing, complete:
 **Status Monitoring**: Check Play Console regularly
 
 **If Rejected**:
+
 1. Read rejection reason in Play Console
 2. Address all policy violations
 3. Update app or metadata as needed

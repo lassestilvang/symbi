@@ -1,14 +1,17 @@
 # Symbi8BitCanvas Refactoring Summary
 
 ## Overview
+
 Refactored the `Symbi8BitCanvas` component to address code quality issues, improve performance, and enhance maintainability.
 
 ## Improvements Implemented
 
 ### 2. Performance - Function Recreation ✅
+
 **Problem**: Functions were recreated on every render, causing unnecessary re-renders.
 
-**Solution**: 
+**Solution**:
+
 - Added `useCallback` to `renderPixel` function
 - Extracted animation logic to custom hook with proper memoization
 - All callbacks now properly memoized with correct dependencies
@@ -23,9 +26,11 @@ const renderPixel = useCallback(
 ```
 
 ### 3. Memory Leak - Animation Cleanup ✅
+
 **Problem**: Animations weren't properly cleaned up on unmount or state changes.
 
 **Solution**:
+
 - Created `useSymbiAnimation` hook with proper cleanup
 - Track animation references for manual stopping
 - Cleanup in useEffect return functions
@@ -41,9 +46,11 @@ useEffect(() => {
 ```
 
 ### 4. Battery Drain - AppState Handling ✅
+
 **Problem**: Continuous animations drained battery when app was backgrounded.
 
 **Solution**:
+
 - Integrated AppState listener in `useSymbiAnimation` hook
 - Pause animations when app goes to background
 - Resume when app becomes active
@@ -59,15 +66,18 @@ const handleAppStateChange = (nextAppState: AppStateStatus) => {
 ```
 
 ### 5. Code Organization - Separation of Concerns ✅
+
 **Problem**: Component mixed rendering, animation, and data concerns.
 
 **Solution**:
+
 - Created `src/components/symbi/pixelData.ts` for all pixel coordinates
 - Created `src/components/symbi/ghostRenderer.ts` for rendering logic
 - Created `src/hooks/useSymbiAnimation.ts` for animation logic
 - Main component now focuses on composition
 
 **File Structure**:
+
 ```
 src/
 ├── components/
@@ -81,9 +91,11 @@ src/
 ```
 
 ### 6. Missing Error Handling ✅
+
 **Problem**: Silent failures with no user feedback.
 
 **Solution**:
+
 - Added development-mode logging for state changes
 - Proper null checks with early returns
 - Type-safe error handling throughout
@@ -98,9 +110,11 @@ useEffect(() => {
 ```
 
 ### 7. Type Safety - Missing Types ✅
+
 **Problem**: Implicit types and loose typing.
 
 **Solution**:
+
 - Created explicit `PixelCoordinate` type: `[x: number, y: number]`
 - Created `GhostColors` interface for color palettes
 - All functions properly typed with explicit return types
@@ -118,9 +132,11 @@ export interface GhostColors {
 ```
 
 ### 8. Duplicate Logic in Switch Statements ✅
+
 **Problem**: Similar switch patterns repeated across functions.
 
 **Solution**:
+
 - Consolidated state-to-appearance logic in `ghostRenderer.ts`
 - Consistent switch statement structure
 - Shared constants for colors
@@ -136,9 +152,11 @@ const COLORS = {
 ```
 
 ### 9. Extract Custom Hook ✅
+
 **Problem**: Animation logic embedded in component.
 
 **Solution**:
+
 - Created `useSymbiAnimation` hook
 - Encapsulates all animation state and logic
 - Reusable across components
@@ -152,9 +170,11 @@ export const useSymbiAnimation = (options: UseSymbiAnimationOptions) => {
 ```
 
 ### 10. Memoize Expensive Calculations ✅
+
 **Problem**: Recalculating colors and pixels on every render.
 
 **Solution**:
+
 - Used `useMemo` for colors, eye pixels, mouth pixels
 - Memoized `filteredBodyPixels` calculation
 - Memoized `pixelSize` calculation
@@ -168,9 +188,11 @@ const pixelSize = useMemo(() => size / PIXEL_GRID_SIZE, [size]);
 ```
 
 ### 11. Improve Readability - Magic Numbers ✅
+
 **Problem**: Unexplained numeric constants throughout code.
 
 **Solution**:
+
 - Created named constants in `ghostRenderer.ts`
 - Exported for reuse
 - Clear, descriptive names
@@ -189,9 +211,11 @@ const POKE_SCALE_UP = 1.1;
 ```
 
 ### 12. Add PropTypes Documentation ✅
+
 **Problem**: Unclear prop usage and expectations.
 
 **Solution**:
+
 - Added JSDoc comments to all props
 - Documented default values
 - Explained behavior and constraints
@@ -212,12 +236,14 @@ interface Symbi8BitCanvasProps {
 ## Performance Impact
 
 ### Before
+
 - Functions recreated every render
 - No memoization
 - Animations run continuously in background
 - Potential memory leaks
 
 ### After
+
 - Memoized expensive calculations
 - Proper animation cleanup
 - AppState-aware animation pausing
@@ -226,13 +252,13 @@ interface Symbi8BitCanvasProps {
 
 ## Code Metrics
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Component LOC | 374 | 145 | -61% |
-| Cyclomatic Complexity | 12 | 4 | -67% |
-| Memoized Calculations | 0 | 5 | +5 |
-| Custom Hooks | 0 | 1 | +1 |
-| Separate Modules | 1 | 4 | +3 |
+| Metric                | Before | After | Change |
+| --------------------- | ------ | ----- | ------ |
+| Component LOC         | 374    | 145   | -61%   |
+| Cyclomatic Complexity | 12     | 4     | -67%   |
+| Memoized Calculations | 0      | 5     | +5     |
+| Custom Hooks          | 0      | 1     | +1     |
+| Separate Modules      | 1      | 4     | +3     |
 
 ## Testing Recommendations
 

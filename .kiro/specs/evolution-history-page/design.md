@@ -49,6 +49,7 @@ MainScreen
 **Location**: `src/screens/EvolutionHistoryScreen.tsx`
 
 **Props**:
+
 ```typescript
 interface EvolutionHistoryScreenProps {
   navigation: {
@@ -59,6 +60,7 @@ interface EvolutionHistoryScreenProps {
 ```
 
 **State**:
+
 ```typescript
 interface EvolutionHistoryState {
   timeRange: '7d' | '30d' | '90d' | 'all';
@@ -71,6 +73,7 @@ interface EvolutionHistoryState {
 ```
 
 **Key Methods**:
+
 - `loadHistoricalData()`: Fetches health data from StorageService
 - `filterDataByTimeRange()`: Filters data based on selected time range
 - `calculateStatistics()`: Computes averages and dominant states
@@ -97,6 +100,7 @@ interface HistoricalDataPoint {
 **Location**: `src/components/StatisticsCard.tsx`
 
 **Props**:
+
 ```typescript
 interface StatisticsCardProps {
   icon: string; // Emoji icon
@@ -114,6 +118,7 @@ Displays a single statistic with Halloween-themed decorations.
 **Location**: `src/components/EmotionalStateTimeline.tsx`
 
 **Props**:
+
 ```typescript
 interface EmotionalStateTimelineProps {
   data: HistoricalDataPoint[];
@@ -128,6 +133,7 @@ Renders a vertical timeline showing emotional state changes with ghost icons and
 **Location**: `src/components/HealthMetricsChart.tsx`
 
 **Props**:
+
 ```typescript
 interface HealthMetricsChartProps {
   data: HistoricalDataPoint[];
@@ -144,6 +150,7 @@ Uses a charting library (react-native-chart-kit or victory-native) to render lin
 **Location**: `src/components/EvolutionMilestoneCard.tsx`
 
 **Props**:
+
 ```typescript
 interface EvolutionMilestoneCardProps {
   record: EvolutionRecord;
@@ -158,6 +165,7 @@ Displays a single evolution milestone with date, level, and appearance preview.
 **Location**: `src/components/HealthDataTable.tsx`
 
 **Props**:
+
 ```typescript
 interface HealthDataTableProps {
   data: HistoricalDataPoint[];
@@ -187,9 +195,7 @@ Renders a scrollable table with alternating row colors and color-coded emotional
 
 ```typescript
 // Transform HealthDataCache to HistoricalDataPoint[]
-function transformCacheToDataPoints(
-  cache: Record<string, HealthDataCache>
-): HistoricalDataPoint[] {
+function transformCacheToDataPoints(cache: Record<string, HealthDataCache>): HistoricalDataPoint[] {
   return Object.entries(cache)
     .map(([date, data]) => ({
       date,
@@ -221,32 +227,31 @@ function calculateStatistics(
 ): HistoryStatistics {
   // Calculate averages
   const averageSteps = data.reduce((sum, d) => sum + d.steps, 0) / data.length;
-  
+
   const sleepData = data.filter(d => d.sleepHours !== undefined);
-  const averageSleep = sleepData.length > 0
-    ? sleepData.reduce((sum, d) => sum + (d.sleepHours || 0), 0) / sleepData.length
-    : null;
-  
+  const averageSleep =
+    sleepData.length > 0
+      ? sleepData.reduce((sum, d) => sum + (d.sleepHours || 0), 0) / sleepData.length
+      : null;
+
   const hrvData = data.filter(d => d.hrv !== undefined);
-  const averageHRV = hrvData.length > 0
-    ? hrvData.reduce((sum, d) => sum + (d.hrv || 0), 0) / hrvData.length
-    : null;
-  
+  const averageHRV =
+    hrvData.length > 0 ? hrvData.reduce((sum, d) => sum + (d.hrv || 0), 0) / hrvData.length : null;
+
   // Find most frequent state
   const stateCounts = new Map<EmotionalState, number>();
   data.forEach(d => {
     stateCounts.set(d.emotionalState, (stateCounts.get(d.emotionalState) || 0) + 1);
   });
-  const mostFrequentState = Array.from(stateCounts.entries())
-    .sort((a, b) => b[1] - a[1])[0][0];
-  
+  const mostFrequentState = Array.from(stateCounts.entries()).sort((a, b) => b[1] - a[1])[0][0];
+
   // Evolution stats
   const totalEvolutions = evolutionRecords.length;
   const lastEvolution = evolutionRecords[0]; // Assuming sorted newest first
   const daysSinceLastEvolution = lastEvolution
     ? Math.floor((Date.now() - new Date(lastEvolution.timestamp).getTime()) / (1000 * 60 * 60 * 24))
     : 0;
-  
+
   return {
     averageSteps,
     averageSleep,
@@ -268,16 +273,16 @@ const HALLOWEEN_COLORS = {
   primary: '#7C3AED',
   primaryDark: '#5B21B6',
   primaryLight: '#9333EA',
-  
+
   // Accent colors
   orange: '#F97316',
   green: '#10B981',
   ghostWhite: '#F3F4F6',
-  
+
   // Background colors
   darkBg: '#1a1a2e',
   cardBg: '#16213e',
-  
+
   // State colors
   sad: '#DC2626',
   resting: '#7C3AED',
@@ -490,11 +495,13 @@ async function loadHistoricalDataWithFallback(): Promise<HistoricalDataPoint[]> 
 ### Data Persistence
 
 **Time Range Preference**:
+
 - Store selected time range in AsyncStorage
 - Key: `@symbi:history_time_range`
 - Restore on screen mount
 
 **Cache Management**:
+
 - Leverage existing 30-day rolling cache from StorageService
 - No additional caching needed for MVP
 - Consider implementing extended cache (90+ days) in future

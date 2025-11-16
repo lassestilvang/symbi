@@ -5,6 +5,7 @@ This document explains how to set up and configure Sentry for crash reporting an
 ## Overview
 
 Symbi uses Sentry for:
+
 - Crash reporting and error tracking
 - Performance monitoring
 - Breadcrumb logging for debugging
@@ -122,11 +123,13 @@ Configure alerts in Sentry dashboard to monitor app health:
 To get readable stack traces in production:
 
 1. Install Sentry CLI:
+
 ```bash
 npm install -g @sentry/cli
 ```
 
 2. Create `.sentryclirc` file:
+
 ```ini
 [defaults]
 url=https://sentry.io/
@@ -138,6 +141,7 @@ token=your-auth-token
 ```
 
 3. Upload source maps during build:
+
 ```bash
 sentry-cli releases files <release-version> upload-sourcemaps ./dist
 ```
@@ -222,12 +226,7 @@ errorReporting.trackUserAction('threshold_updated', {
 });
 
 // Custom breadcrumb
-errorReporting.addBreadcrumb(
-  'Health data fetched',
-  'health',
-  'info',
-  { dataType: 'steps' }
-);
+errorReporting.addBreadcrumb('Health data fetched', 'health', 'info', { dataType: 'steps' });
 ```
 
 ### Setting Context
@@ -263,12 +262,14 @@ The ErrorReportingService automatically sanitizes health data from error reports
 ### Example
 
 **Before sanitization:**
+
 ```
 Error: Failed to process health data
 Context: { steps: 8543, sleepHours: 7.5, hrv: 45 }
 ```
 
 **After sanitization:**
+
 ```
 Error: Failed to process health data
 Context: { steps: [REDACTED], sleepHours: [REDACTED], hrv: [REDACTED] }
@@ -375,16 +376,19 @@ Add a test button in development mode:
 ## Cost Management
 
 Sentry pricing is based on:
+
 - Number of events (errors/transactions)
 - Data retention period
 - Team size
 
 ### Free Tier Limits
+
 - 5,000 errors per month
 - 10,000 performance units per month
 - 30-day data retention
 
 ### Tips to Stay Within Limits
+
 1. Use sampling for performance monitoring (20%)
 2. Filter out noisy errors
 3. Set up proper error boundaries

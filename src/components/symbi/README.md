@@ -16,9 +16,11 @@ symbi/
 ### Module Responsibilities
 
 #### `pixelData.ts`
+
 **Purpose**: Pure data definitions with no business logic
 
 **Exports**:
+
 - `PixelCoordinate` - Type for [x, y] pixel coordinates
 - `GhostColors` - Interface for ghost color scheme
 - `GHOST_GRID_SIZE` - 32x32 pixel grid constant
@@ -29,6 +31,7 @@ symbi/
 - `blushPixels` - Cheek blush coordinates
 
 **Design Principles**:
+
 - Imports only from types module (EmotionalState)
 - Immutable data structures (const arrays)
 - Coordinates based on 32x32 grid
@@ -36,9 +39,11 @@ symbi/
 - Easy to modify for visual tweaks (e.g., smile and neutral mouths refined for balanced expressions)
 
 #### `ghostRenderer.ts`
+
 **Purpose**: Rendering logic and state-to-visual mappings
 
 **Exports**:
+
 - `getStateColors()` - Maps EmotionalState to color scheme
 - `getEyePixels()` - Selects eye pixels for state
 - `getMouthPixels()` - Selects mouth pixels for state
@@ -49,6 +54,7 @@ symbi/
 - `renderGhost()` - Main rendering function
 
 **Design Principles**:
+
 - Pure functions (no side effects except canvas drawing)
 - Centralized color constants
 - State-based rendering logic
@@ -100,36 +106,37 @@ console.log(`Blush: ${showBlush ? blushPixels.length : 0} pixels`);
 
 ## Emotional State Mappings
 
-| State | Eyes | Mouth | Body Color | Blush |
-|-------|------|-------|------------|-------|
-| SAD | Small, droopy | Frown | Dull (#E8E8E0) | None |
-| TIRED | Small, droopy | Frown | Dull (#E8E8E0) | None |
-| RESTING | Normal oval | Neutral | Standard (#F5F5F0) | None |
-| CALM | Normal oval | Neutral | Standard (#F5F5F0) | None |
-| ACTIVE | Large, bright | Smile | Bright (#FFFFFF) | Pink (#FF69B4) |
-| VIBRANT | Large, bright | Smile | Bright (#FFFFFF) | Pink (#FF69B4) |
-| RESTED | Large, bright | Smile | Standard (#F5F5F0) | Pink (#FF69B4) |
-| STRESSED | Wide | Worried | Medium (#F0F0E8) | Salmon (#FFA07A) |
-| ANXIOUS | Wide | Worried | Medium (#F0F0E8) | Salmon (#FFA07A) |
+| State    | Eyes          | Mouth   | Body Color         | Blush            |
+| -------- | ------------- | ------- | ------------------ | ---------------- |
+| SAD      | Small, droopy | Frown   | Dull (#E8E8E0)     | None             |
+| TIRED    | Small, droopy | Frown   | Dull (#E8E8E0)     | None             |
+| RESTING  | Normal oval   | Neutral | Standard (#F5F5F0) | None             |
+| CALM     | Normal oval   | Neutral | Standard (#F5F5F0) | None             |
+| ACTIVE   | Large, bright | Smile   | Bright (#FFFFFF)   | Pink (#FF69B4)   |
+| VIBRANT  | Large, bright | Smile   | Bright (#FFFFFF)   | Pink (#FF69B4)   |
+| RESTED   | Large, bright | Smile   | Standard (#F5F5F0) | Pink (#FF69B4)   |
+| STRESSED | Wide          | Worried | Medium (#F0F0E8)   | Salmon (#FFA07A) |
+| ANXIOUS  | Wide          | Worried | Medium (#F0F0E8)   | Salmon (#FFA07A) |
 
 ## Color Palette
 
 ```typescript
 const COLORS = {
-  CREAM_WHITE: '#F5F5F0',   // Base body color
-  DULL_WHITE: '#E8E8E0',    // Sad/tired state
-  BRIGHT_WHITE: '#FFFFFF',  // Active/vibrant state
-  MEDIUM_WHITE: '#F0F0E8',  // Stressed/anxious state
-  BLACK: '#000000',         // Eyes and mouth
-  LIGHT_PINK: '#FFB6C1',    // Base blush
-  HOT_PINK: '#FF69B4',      // Active blush
-  LIGHT_SALMON: '#FFA07A',  // Stressed blush
+  CREAM_WHITE: '#F5F5F0', // Base body color
+  DULL_WHITE: '#E8E8E0', // Sad/tired state
+  BRIGHT_WHITE: '#FFFFFF', // Active/vibrant state
+  MEDIUM_WHITE: '#F0F0E8', // Stressed/anxious state
+  BLACK: '#000000', // Eyes and mouth
+  LIGHT_PINK: '#FFB6C1', // Base blush
+  HOT_PINK: '#FF69B4', // Active blush
+  LIGHT_SALMON: '#FFA07A', // Stressed blush
 };
 ```
 
 ## Grid System
 
 The ghost is rendered on a **32x32 pixel grid**:
+
 - X-axis: 0-31 (left to right)
 - Y-axis: 0-31 (top to bottom)
 - Ghost occupies Y: 6-25 (taller version, 20 rows)
@@ -162,6 +169,7 @@ The ghost is rendered on a **32x32 pixel grid**:
 ### Unit Tests
 
 Test pixel data integrity:
+
 ```typescript
 describe('pixelData', () => {
   it('should have valid coordinates within 32x32 grid', () => {
@@ -176,6 +184,7 @@ describe('pixelData', () => {
 ```
 
 Test rendering logic:
+
 ```typescript
 describe('ghostRenderer', () => {
   it('should return correct eyes for each state', () => {
@@ -183,7 +192,7 @@ describe('ghostRenderer', () => {
     expect(getEyePixels(EmotionalState.ACTIVE)).toBe(happyEyes);
     expect(getEyePixels(EmotionalState.STRESSED)).toBe(stressedEyes);
   });
-  
+
   it('should show blush only for positive states', () => {
     expect(shouldShowBlush(EmotionalState.ACTIVE)).toBe(true);
     expect(shouldShowBlush(EmotionalState.SAD)).toBe(false);
@@ -243,6 +252,7 @@ When modifying pixel data:
 - `../Symbi8BitDemo.tsx` - Interactive demo component
 - `../../types/index.ts` - EmotionalState enum definition
 - `../../../docs/8bit-canvas-implementation.md` - Implementation summary
+
 # Symbi Ghost Rendering Module
 
 This module contains the pixel data and rendering logic for the 8-bit style Symbi ghost character.
@@ -250,7 +260,9 @@ This module contains the pixel data and rendering logic for the 8-bit style Symb
 ## Files
 
 ### `pixelData.ts`
+
 Contains all pixel coordinate definitions for the ghost character:
+
 - **ghostBodyPixels**: Main body shape (taller version with 32x32 grid)
 - **Eye variations**: normalEyes, sadEyes, happyEyes, stressedEyes
 - **Mouth variations**: smileMouth, frownMouth, neutralMouth, worriedMouth
@@ -259,7 +271,9 @@ Contains all pixel coordinate definitions for the ghost character:
 All coordinates are based on a 32x32 grid that scales to the actual canvas size.
 
 ### `ghostRenderer.ts`
+
 Rendering logic and state-to-appearance mapping:
+
 - **getStateColors()**: Maps emotional states to color palettes
 - **getEyePixels()**: Returns appropriate eye pixels for each state
 - **getMouthPixels()**: Returns appropriate mouth pixels for each state
@@ -272,37 +286,39 @@ Rendering logic and state-to-appearance mapping:
 ## Constants
 
 ```typescript
-PIXEL_GRID_SIZE = 32        // Base grid size
-GHOST_SIZE_RATIO = 0.7      // 70% of screen width
-MAX_GHOST_SIZE = 300        // Maximum size in pixels
+PIXEL_GRID_SIZE = 32; // Base grid size
+GHOST_SIZE_RATIO = 0.7; // 70% of screen width
+MAX_GHOST_SIZE = 300; // Maximum size in pixels
 ```
 
 ## Color Palette
 
 ### Base Colors
+
 - Body: `#F5F5F0` (Cream white)
 - Eyes: `#000000` (Black)
 - Mouth: `#000000` (Black)
 - Blush: `#FFB6C1` (Light pink)
 
 ### State-Specific Variations
+
 - **Sad/Tired**: Duller body (`#E8E8E0`)
 - **Active/Vibrant**: Brighter body (`#FFFFFF`), hot pink blush (`#FF69B4`)
 - **Stressed/Anxious**: Medium body (`#F0F0E8`), salmon blush (`#FFA07A`)
 
 ## Emotional State Mapping
 
-| State | Eyes | Mouth | Blush | Body Color |
-|-------|------|-------|-------|------------|
-| SAD | Droopy | Frown | No | Dull |
-| TIRED | Droopy | Frown | No | Dull |
-| RESTING | Normal | Neutral | No | Normal |
-| ACTIVE | Large | Smile | Yes | Bright |
-| VIBRANT | Large | Smile | Yes | Bright |
-| RESTED | Large | Smile | Yes | Normal |
-| STRESSED | Wide | Worried | Yes (salmon) | Medium |
-| ANXIOUS | Wide | Worried | Yes (salmon) | Medium |
-| CALM | Normal | Neutral | No | Normal |
+| State    | Eyes   | Mouth   | Blush        | Body Color |
+| -------- | ------ | ------- | ------------ | ---------- |
+| SAD      | Droopy | Frown   | No           | Dull       |
+| TIRED    | Droopy | Frown   | No           | Dull       |
+| RESTING  | Normal | Neutral | No           | Normal     |
+| ACTIVE   | Large  | Smile   | Yes          | Bright     |
+| VIBRANT  | Large  | Smile   | Yes          | Bright     |
+| RESTED   | Large  | Smile   | Yes          | Normal     |
+| STRESSED | Wide   | Worried | Yes (salmon) | Medium     |
+| ANXIOUS  | Wide   | Worried | Yes (salmon) | Medium     |
+| CALM     | Normal | Neutral | No           | Normal     |
 
 ## Usage
 

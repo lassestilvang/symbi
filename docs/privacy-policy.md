@@ -20,6 +20,7 @@ Symbi collects the following health metrics to power your digital companion:
 - **Mindful Minutes**: Duration of wellness activities you complete within the app (Phase 3+)
 
 **Important**: You have full control over what data we access. You can:
+
 - Grant or deny permissions at any time through your device settings
 - Use manual entry mode instead of automatic health data integration
 - Delete all collected data at any time
@@ -27,6 +28,7 @@ Symbi collects the following health metrics to power your digital companion:
 ### User Preferences
 
 We store your app preferences locally on your device:
+
 - Emotional state thresholds (customizable step count goals)
 - Notification, haptic feedback, and sound preferences
 - Data source selection (automatic vs. manual entry)
@@ -35,6 +37,7 @@ We store your app preferences locally on your device:
 ### Evolution History
 
 We store records of your Symbi's evolution events:
+
 - Evolution level and timestamp
 - Generated appearance images
 - Days in positive emotional states
@@ -42,6 +45,7 @@ We store records of your Symbi's evolution events:
 ### Account Information (Optional - Phase 3+)
 
 If you choose to enable cloud sync:
+
 - Email address (for account creation)
 - Anonymous user ID (generated automatically)
 - Encrypted authentication token
@@ -53,6 +57,7 @@ If you choose to enable cloud sync:
 **All health data processing happens locally on your device.** We do not send your raw health data to external servers except as described below.
 
 Your health data is used to:
+
 1. Calculate your Symbi's emotional state
 2. Display your daily activity progress
 3. Track evolution eligibility
@@ -61,6 +66,7 @@ Your health data is used to:
 ### AI Analysis (Phase 2+)
 
 When AI-powered emotional state analysis is enabled:
+
 - We send **aggregated daily metrics** (steps, sleep, HRV) to Google's Gemini API
 - Data is transmitted over encrypted connections (TLS 1.3)
 - **No personally identifiable information** is included in API requests
@@ -70,6 +76,7 @@ When AI-powered emotional state analysis is enabled:
 ### Evolution Image Generation (Phase 3+)
 
 When you trigger an evolution event:
+
 - We send a text prompt to Google's Gemini Image API describing your Symbi's evolution
 - **No health data or personal information** is included in the prompt
 - Generated images are stored locally on your device
@@ -78,6 +85,7 @@ When you trigger an evolution event:
 ### Cloud Sync (Optional - Phase 3+)
 
 If you create an account and enable cloud sync:
+
 - Your preferences and evolution history are encrypted and stored in the cloud
 - **Health data cache is NOT synced to the cloud** - it stays on your device
 - Cloud data is used only to restore your Symbi on new devices
@@ -127,6 +135,7 @@ We implement multiple layers of security to protect your sensitive health inform
 ### Minimal Data Collection
 
 We follow the principle of data minimization:
+
 - We only collect data necessary for app functionality
 - We don't collect location data, contacts, or other sensitive device information
 - We use anonymous device IDs instead of personal identifiers
@@ -185,6 +194,7 @@ Symbi is designed for users aged 13 and older. We do not knowingly collect perso
 ## Changes to This Privacy Policy
 
 We may update this Privacy Policy from time to time. We will notify you of any material changes by:
+
 - Displaying a notice in the app
 - Updating the "Last Updated" date at the top of this policy
 
@@ -193,6 +203,7 @@ Your continued use of Symbi after changes indicates acceptance of the updated po
 ## Data Breach Notification
 
 In the unlikely event of a data breach affecting your personal information, we will:
+
 - Notify you within 72 hours of discovering the breach
 - Provide details about what data was affected
 - Explain steps we're taking to address the breach
@@ -239,6 +250,7 @@ To exercise these rights, contact us using the information above.
 ## Legal Basis for Processing (GDPR)
 
 We process your personal data based on:
+
 - **Consent**: You explicitly consent to health data collection
 - **Legitimate Interest**: We have a legitimate interest in providing app functionality
 - **Contract**: Processing is necessary to provide services you requested
@@ -246,6 +258,7 @@ We process your personal data based on:
 ## Data Protection Officer
 
 For privacy-related inquiries, you can contact our Data Protection Officer at:
+
 - **Email**: [dpo@symbi.app]
 
 ---

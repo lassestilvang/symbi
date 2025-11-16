@@ -64,35 +64,42 @@ The core design philosophy centers on creating an emotional feedback loop: the u
 ### Technology Stack
 
 **Core Framework**: React Native 0.72+
+
 - Chosen for cross-platform development with single codebase
 - Native module support for HealthKit and Google Fit
 - Strong community and ecosystem
 
 **Animation Engine**: Lottie React Native
+
 - Vector-based animations for smooth, scalable visuals
 - Small file sizes for multiple emotional state animations
 - Easy to create and iterate on designs in After Effects
 
 **State Management**: React Context API + Zustand (lightweight)
+
 - Context API for global app state (user preferences, thresholds)
 - Zustand for reactive health data state updates
 - Minimal boilerplate compared to Redux
 
 **Local Storage**: AsyncStorage
+
 - Persist user preferences, thresholds, and cached health data
 - Simple key-value store suitable for app needs
 
 **Health Data Integration**:
+
 - iOS: `react-native-health` library for HealthKit access
 - Android: `react-native-google-fit` library for Google Fit access
 - Custom abstraction layer to unify both APIs
 
 **AI Integration (Phase 2)**: Gemini API
+
 - Model: `gemini-2.5-flash-preview-09-2025`
 - RESTful API calls with TLS 1.3 encryption
 - Prompt engineering for emotional state classification
 
 **Image Generation (Phase 3)**: Gemini Image API
+
 - Model: `gemini-2.5-flash-image-preview`
 - Generate evolved Symbi forms based on user progress
 
@@ -107,15 +114,15 @@ interface HealthDataService {
   // Initialization
   initialize(permissions: HealthPermissions): Promise<InitResult>;
   checkAuthorizationStatus(permissions: HealthPermissions): Promise<AuthStatus>;
-  
+
   // Data Retrieval
   getStepCount(startDate: Date, endDate: Date): Promise<number>;
   getSleepDuration(startDate: Date, endDate: Date): Promise<number>; // Phase 2
   getHeartRateVariability(startDate: Date, endDate: Date): Promise<number>; // Phase 2
-  
+
   // Data Writing (Phase 3)
   writeMindfulMinutes(duration: number, timestamp: Date): Promise<boolean>;
-  
+
   // Background Updates
   subscribeToUpdates(dataType: HealthDataType, callback: (data: any) => void): void;
   unsubscribeFromUpdates(dataType: HealthDataType): void;
@@ -130,7 +137,7 @@ enum HealthDataType {
   STEPS = 'steps',
   SLEEP = 'sleep',
   HRV = 'hrv',
-  MINDFUL_MINUTES = 'mindful_minutes'
+  MINDFUL_MINUTES = 'mindful_minutes',
 }
 
 interface InitResult {
@@ -141,6 +148,7 @@ interface InitResult {
 ```
 
 **Implementation Strategy**:
+
 - Create platform-specific implementations (`HealthKitService`, `GoogleFitService`)
 - Use factory pattern to instantiate correct service based on `Platform.OS`
 - Manual data entry mode uses `ManualHealthDataService` that reads from AsyncStorage
@@ -153,7 +161,7 @@ Determines the Symbi's emotional state based on health metrics and user-configur
 interface EmotionalStateCalculator {
   // Phase 1: Rule-based calculation
   calculateStateFromSteps(steps: number, thresholds: StepThresholds): EmotionalState;
-  
+
   // Phase 2: AI-based calculation
   calculateStateFromMultipleMetrics(
     metrics: HealthMetrics,
@@ -162,8 +170,8 @@ interface EmotionalStateCalculator {
 }
 
 interface StepThresholds {
-  sadThreshold: number;      // Default: 2000
-  activeThreshold: number;   // Default: 8000
+  sadThreshold: number; // Default: 2000
+  activeThreshold: number; // Default: 8000
 }
 
 interface HealthMetrics {
@@ -183,18 +191,19 @@ enum EmotionalState {
   SAD = 'sad',
   RESTING = 'resting',
   ACTIVE = 'active',
-  
+
   // Phase 2 additional states
   VIBRANT = 'vibrant',
   CALM = 'calm',
   TIRED = 'tired',
   STRESSED = 'stressed',
   ANXIOUS = 'anxious',
-  RESTED = 'rested'
+  RESTED = 'rested',
 }
 ```
 
 **Phase 1 Logic**:
+
 ```typescript
 calculateStateFromSteps(steps: number, thresholds: StepThresholds): EmotionalState {
   if (steps < thresholds.sadThreshold) return EmotionalState.SAD;
@@ -204,6 +213,7 @@ calculateStateFromSteps(steps: number, thresholds: StepThresholds): EmotionalSta
 ```
 
 **Phase 2 Logic**:
+
 - Batch health data once per day (e.g., 8:00 AM)
 - Construct prompt for Gemini API with metrics and goals
 - Parse AI response to extract emotional state label
@@ -227,6 +237,7 @@ interface SymbiAnimationComponent {
 ```
 
 **Animation Asset Structure**:
+
 ```
 assets/
   animations/
@@ -247,6 +258,7 @@ assets/
 ```
 
 **Visual Design Specifications**:
+
 - Base color: Purple (#7C3AED to #9333EA gradient)
 - Ghost shape: Rounded, floating with subtle bob animation
 - Scary elements:
@@ -259,6 +271,7 @@ assets/
   - Playful idle animations (blinking, looking around)
 
 **State-Specific Visual Cues**:
+
 - **Sad**: Drooping posture, dim eyes, slower bob animation, more dripping
 - **Resting**: Neutral posture, half-closed eyes, steady bob
 - **Active**: Upright posture, bright eyes, faster bob, particle effects
@@ -274,14 +287,9 @@ Handles communication with Gemini API for emotional state analysis.
 
 ```typescript
 interface AIBrainService {
-  analyzeHealthData(
-    metrics: HealthMetrics,
-    goals: HealthGoals
-  ): Promise<AIAnalysisResult>;
-  
-  generateEvolvedAppearance(
-    evolutionContext: EvolutionContext
-  ): Promise<string>; // Phase 3: Returns image URL
+  analyzeHealthData(metrics: HealthMetrics, goals: HealthGoals): Promise<AIAnalysisResult>;
+
+  generateEvolvedAppearance(evolutionContext: EvolutionContext): Promise<string>; // Phase 3: Returns image URL
 }
 
 interface AIAnalysisResult {
@@ -324,6 +332,7 @@ Respond with ONLY ONE WORD from the list above.
 ```
 
 **API Configuration**:
+
 - Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent`
 - Request timeout: 10 seconds
 - Retry strategy: 2 attempts with exponential backoff
@@ -344,7 +353,7 @@ interface InteractiveSessionManager {
 enum SessionType {
   BREATHING_EXERCISE = 'breathing',
   MEDITATION = 'meditation',
-  STRETCHING = 'stretching'
+  STRETCHING = 'stretching',
 }
 
 interface SessionResult {
@@ -356,6 +365,7 @@ interface SessionResult {
 ```
 
 **Breathing Exercise Implementation**:
+
 - Visual: Animated circle that expands (inhale) and contracts (exhale)
 - Audio: Optional calming background sounds
 - Duration: 1-5 minutes (user configurable)
@@ -395,12 +405,14 @@ interface EvolutionRecord {
 ```
 
 **Evolution Criteria**:
+
 - Cumulative 30 days in Active or Vibrant states
 - Days don't need to be consecutive
 - Each evolution is permanent and adds to gallery
 - Maximum 5 evolution levels
 
 **Image Generation Prompt**:
+
 ```typescript
 const EVOLUTION_PROMPT = `
 Generate an evolved version of a cute Halloween ghost creature (Symbi).
@@ -481,16 +493,19 @@ interface EvolutionRecord {
 ### Health Data Access Errors
 
 **Scenario**: User denies health data permissions
+
 - **Handling**: Show friendly explanation of why permissions are needed
 - **Fallback**: Offer manual data entry mode
 - **UI**: Display banner with "Enable Health Data" button
 
 **Scenario**: Health data unavailable (no data for today)
+
 - **Handling**: Use yesterday's data with visual indicator
 - **Fallback**: Show neutral Resting state
 - **UI**: Display "Waiting for today's data..." message
 
 **Scenario**: Background fetch fails
+
 - **Handling**: Retry with exponential backoff (1min, 5min, 15min)
 - **Fallback**: Use cached data from last successful fetch
 - **UI**: No user-facing error unless data is >24 hours old
@@ -498,16 +513,19 @@ interface EvolutionRecord {
 ### AI Service Errors
 
 **Scenario**: Gemini API timeout (>10 seconds)
+
 - **Handling**: Cancel request and fallback to Phase 1 rule-based logic
 - **Logging**: Log error for debugging
 - **UI**: No user-facing error (seamless fallback)
 
 **Scenario**: Gemini API returns invalid response
+
 - **Handling**: Parse response, if invalid use rule-based logic
 - **Retry**: Don't retry same request, wait for next scheduled analysis
 - **UI**: No user-facing error
 
 **Scenario**: Rate limit exceeded
+
 - **Handling**: Use cached emotional state from previous analysis
 - **Logging**: Log rate limit hit
 - **UI**: No user-facing error
@@ -515,11 +533,13 @@ interface EvolutionRecord {
 ### Network Errors
 
 **Scenario**: No internet connection
+
 - **Handling**: Use cached data and local calculations
 - **UI**: Show offline indicator in status bar
 - **Sync**: Queue any pending writes (mindful minutes) for later sync
 
 **Scenario**: Cloud sync failure (Phase 3)
+
 - **Handling**: Retry with exponential backoff
 - **Fallback**: Keep data local until connection restored
 - **UI**: Show sync status icon
@@ -527,6 +547,7 @@ interface EvolutionRecord {
 ### Evolution Generation Errors
 
 **Scenario**: Image generation fails
+
 - **Handling**: Retry up to 3 times
 - **Fallback**: Use previous evolution appearance
 - **UI**: Show "Evolution in progress..." message, then "Evolution will complete soon"
@@ -536,18 +557,21 @@ interface EvolutionRecord {
 ### Unit Tests
 
 **Health Data Service**:
+
 - Test platform detection and correct service instantiation
 - Mock HealthKit/Google Fit responses
 - Test data transformation and normalization
 - Test error handling for denied permissions
 
 **Emotional State Calculator**:
+
 - Test Phase 1 threshold logic with various step counts
 - Test Phase 2 AI response parsing
 - Test fallback logic when AI fails
 - Test edge cases (0 steps, extremely high steps)
 
 **Evolution System**:
+
 - Test day counting logic
 - Test eligibility calculation
 - Test evolution level progression
@@ -556,18 +580,21 @@ interface EvolutionRecord {
 ### Integration Tests
 
 **Health Data Flow**:
+
 - Test end-to-end data retrieval from HealthKit (iOS simulator)
 - Test end-to-end data retrieval from Google Fit (Android emulator)
 - Test manual data entry flow
 - Test background fetch triggering
 
 **AI Integration**:
+
 - Test Gemini API request/response cycle
 - Test prompt construction with various metrics
 - Test timeout and retry logic
 - Test fallback to rule-based calculation
 
 **Animation Transitions**:
+
 - Test smooth transitions between all emotional states
 - Test animation loading and caching
 - Test performance with rapid state changes
@@ -575,6 +602,7 @@ interface EvolutionRecord {
 ### End-to-End Tests (Manual)
 
 **Phase 1 MVP**:
+
 1. Fresh install → onboarding → permission grant → see Symbi
 2. Walk 1000 steps → verify Sad state
 3. Walk 5000 steps → verify Resting state
@@ -583,6 +611,7 @@ interface EvolutionRecord {
 6. Deny permissions → verify manual entry mode works
 
 **Phase 2 AI**:
+
 1. Enable Phase 2 features
 2. Provide sleep + HRV data
 3. Verify AI analysis runs once per day
@@ -590,6 +619,7 @@ interface EvolutionRecord {
 5. Simulate API failure → verify fallback to Phase 1
 
 **Phase 3 Interactive**:
+
 1. Get Symbi into Stressed state
 2. Tap "Calm your Symbi" button
 3. Complete breathing exercise
@@ -600,18 +630,21 @@ interface EvolutionRecord {
 ### Performance Tests
 
 **Battery Usage**:
+
 - Monitor battery drain over 24 hours
 - Target: <5% of total battery capacity
 - Test background fetch frequency
 - Test animation frame rate impact
 
 **Memory Usage**:
+
 - Monitor memory footprint during normal use
 - Target: <100MB RAM
 - Test for memory leaks during state transitions
 - Test Lottie animation memory usage
 
 **API Response Times**:
+
 - Measure Gemini API response time
 - Target: <5 seconds for 95th percentile
 - Test with poor network conditions
@@ -622,11 +655,13 @@ interface EvolutionRecord {
 ### Data Encryption
 
 **In Transit**:
+
 - All API calls to Gemini use TLS 1.3
 - Certificate pinning for Gemini API endpoints
 - No health data transmitted to third parties except Gemini (with user consent)
 
 **At Rest**:
+
 - AsyncStorage data encrypted using device keychain (iOS) / Keystore (Android)
 - Health data cache encrypted with AES-256
 - User preferences stored in encrypted storage
@@ -634,12 +669,14 @@ interface EvolutionRecord {
 ### Data Minimization
 
 **What We Store**:
+
 - Daily aggregated health metrics (steps, sleep, HRV)
 - Emotional state history (last 30 days)
 - User preferences and thresholds
 - Evolution records
 
 **What We Don't Store**:
+
 - Raw minute-by-minute health data
 - Personally identifiable information beyond device ID
 - Location data
@@ -648,11 +685,13 @@ interface EvolutionRecord {
 ### Data Retention
 
 **Local Storage**:
+
 - Health data cache: 30 days rolling window
 - Emotional state history: 90 days
 - Evolution records: Permanent (user can delete)
 
 **Remote Storage** (Phase 3):
+
 - Cloud sync data: Same as local
 - Deleted within 7 days of account deletion
 - User can export all data before deletion
@@ -660,6 +699,7 @@ interface EvolutionRecord {
 ### Permissions
 
 **iOS (Info.plist)**:
+
 ```xml
 <key>NSHealthShareUsageDescription</key>
 <string>Symbi uses your step count to reflect your activity in your digital pet's mood and appearance.</string>
@@ -672,6 +712,7 @@ interface EvolutionRecord {
 ```
 
 **Android (AndroidManifest.xml)**:
+
 ```xml
 <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 <uses-permission android:name="com.google.android.gms.permission.FITNESS_ACTIVITY_READ" />
@@ -683,12 +724,14 @@ interface EvolutionRecord {
 ### Background Fetch Strategy
 
 **iOS (HealthKit)**:
+
 - Use `HKObserverQuery` to receive notifications when new data is available
 - Set up background delivery for step count data type
 - Minimum fetch interval: 15 minutes
 - Batch updates to reduce wake-ups
 
 **Android (Google Fit)**:
+
 - Use `Recording API` for automatic background data collection
 - Set up `SensorListener` for step count updates
 - Use `WorkManager` for periodic data sync
@@ -697,6 +740,7 @@ interface EvolutionRecord {
 ### Animation Performance
 
 **Optimization Techniques**:
+
 - Preload all Lottie animations on app launch
 - Use `useNativeDriver: true` for transform animations
 - Reduce animation complexity for lower-end devices
@@ -706,12 +750,14 @@ interface EvolutionRecord {
 ### API Call Optimization
 
 **Gemini API**:
+
 - Batch daily analysis at fixed time (8:00 AM local time)
 - Cache results for 24 hours
 - Implement request deduplication
 - Use compression for request/response payloads
 
 **Image Generation** (Phase 3):
+
 - Generate evolution images asynchronously
 - Cache generated images locally
 - Use CDN for serving evolved appearances
@@ -722,12 +768,14 @@ interface EvolutionRecord {
 ### App Store Requirements
 
 **iOS App Store**:
+
 - HealthKit entitlement required
 - Privacy policy URL in App Store Connect
 - Screenshots showing health data usage
 - Age rating: 4+ (no objectionable content despite Halloween theme)
 
 **Google Play Store**:
+
 - Health Connect integration (Android 14+)
 - Privacy policy URL in Play Console
 - Data safety section completed
@@ -736,6 +784,7 @@ interface EvolutionRecord {
 ### Analytics and Monitoring
 
 **Key Metrics**:
+
 - Daily Active Users (DAU)
 - Health data permission grant rate
 - Average emotional state distribution
@@ -745,6 +794,7 @@ interface EvolutionRecord {
 - Crash rate and error frequency
 
 **Privacy-Preserving Analytics**:
+
 - Use anonymous device IDs
 - Aggregate metrics only (no individual tracking)
 - No health data sent to analytics service
@@ -753,6 +803,7 @@ interface EvolutionRecord {
 ### Crash Reporting
 
 **Tools**: Sentry or Firebase Crashlytics
+
 - Automatic crash reporting
 - Breadcrumb logging for debugging
 - Sanitize health data from crash reports
@@ -761,27 +812,32 @@ interface EvolutionRecord {
 ## Future Enhancements (Beyond Phase 3)
 
 ### Social Features
+
 - Share Symbi evolution milestones (without health data)
 - Friend challenges (step count competitions)
 - Symbi "playdates" (virtual meetups)
 
 ### Additional Health Metrics
+
 - Heart rate monitoring
 - Blood pressure tracking
 - Nutrition logging
 - Hydration tracking
 
 ### Gamification
+
 - Achievement system (badges for milestones)
 - Streak tracking (consecutive active days)
 - Leaderboards (optional, privacy-preserving)
 
 ### Customization
+
 - Unlock accessories for Symbi (hats, scarves, etc.)
 - Custom color themes beyond purple
 - Seasonal themes (Christmas, Easter, etc.)
 
 ### AI Enhancements
+
 - Personalized health recommendations
 - Predictive analytics (forecast tomorrow's state)
 - Natural language chat with Symbi
@@ -792,6 +848,7 @@ interface EvolutionRecord {
 This design provides a comprehensive blueprint for building Symbi across three development phases. The architecture prioritizes user privacy, battery efficiency, and cross-platform consistency while delivering an engaging, emotionally resonant experience. The phased approach allows for iterative validation of core concepts before investing in more complex AI and interactive features.
 
 Key success factors:
+
 1. **Immediate gratification**: Users see their Symbi react to their activity within minutes
 2. **Privacy transparency**: Clear explanations of data usage build trust
 3. **Delightful aesthetics**: The Halloween-themed Kiro ghost is memorable and unique

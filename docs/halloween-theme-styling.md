@@ -8,20 +8,21 @@ This document describes the Halloween theme styling enhancements applied to the 
 
 ```typescript
 const HALLOWEEN_COLORS = {
-  primary: '#7C3AED',        // Main purple
-  primaryDark: '#5B21B6',    // Dark purple for borders
-  primaryLight: '#9333EA',   // Light purple for highlights
-  orange: '#F97316',         // Accent orange
-  green: '#10B981',          // Accent green
-  darkBg: '#1a1a2e',        // Dark background
-  cardBg: '#16213e',        // Card background
-  ghostWhite: '#F3F4F6',    // Text color
+  primary: '#7C3AED', // Main purple
+  primaryDark: '#5B21B6', // Dark purple for borders
+  primaryLight: '#9333EA', // Light purple for highlights
+  orange: '#F97316', // Accent orange
+  green: '#10B981', // Accent green
+  darkBg: '#1a1a2e', // Dark background
+  cardBg: '#16213e', // Card background
+  ghostWhite: '#F3F4F6', // Text color
 };
 ```
 
 ## Typography Standards
 
 ### Headers
+
 - Font size: 20-24px
 - Font weight: bold
 - Color: primaryLight (#9333EA)
@@ -29,12 +30,14 @@ const HALLOWEEN_COLORS = {
 - Letter spacing: 0.5px
 
 ### Body Text
+
 - Font size: 14-16px
 - Font weight: 500
 - Color: ghostWhite (#F3F4F6)
 - Opacity: 0.7-0.9
 
 ### Labels
+
 - Font size: 12px
 - Font weight: 600
 - Color: ghostWhite
@@ -43,6 +46,7 @@ const HALLOWEEN_COLORS = {
 - Opacity: 0.7-0.9
 
 ### Values
+
 - Font size: 20-32px
 - Font weight: bold
 - Color: primaryLight (#9333EA)
@@ -78,6 +82,7 @@ elevation: 24,
 ## Decorative Elements
 
 ### Icons
+
 - Ghost: 👻 (timeline, empty states)
 - Pumpkin: 🎃 (statistics cards, milestones)
 - Tombstone: 🪦 (milestones)
@@ -86,6 +91,7 @@ elevation: 24,
 - Cauldron: 🧙 (milestones)
 
 ### Icon Placement
+
 - **Statistics Cards**: Decorative icon in top-right corner (opacity: 0.2)
 - **Timeline**: Ghost icon next to each state
 - **Milestones**: Badge icon in floating badge container
@@ -95,6 +101,7 @@ elevation: 24,
 ## Component-Specific Styling
 
 ### StatisticsCard
+
 - Enhanced purple glow shadow (12px radius)
 - Larger main icon (36px) with text shadow
 - Decorative icon in corner (28px, 20% opacity)
@@ -107,6 +114,7 @@ elevation: 24,
 - Responsive width support via optional `width` prop
 
 ### EvolutionMilestoneCard
+
 - Enhanced card shadow (12px radius)
 - Floating badge with strong glow (8px radius)
 - Badge size: 44x44px (accessibility)
@@ -114,6 +122,7 @@ elevation: 24,
 - Image container with border
 
 ### EmotionalStateTimeline
+
 - Timeline cards with purple glow (8px radius)
 - State names with text shadow
 - Modal with strongest glow (24px radius)
@@ -121,12 +130,14 @@ elevation: 24,
 - Enhanced dot indicators
 
 ### HealthMetricsChart
+
 - Title with text shadow
 - Tooltip with strong purple glow (16px radius)
 - Large value display with text shadow
 - Chart colors: purple, orange, green
 
 ### HealthDataTable
+
 - Table container with purple glow (8px radius)
 - Header row with shadow effect
 - Header text with text shadow
@@ -134,6 +145,7 @@ elevation: 24,
 - Alternating row colors
 
 ### EvolutionHistoryScreen
+
 - Header with purple glow shadow
 - Back button with rounded background
 - Title with bat emoji and text shadow
@@ -144,15 +156,18 @@ elevation: 24,
 ## Accessibility Features
 
 ### Touch Targets
+
 - Minimum size: 44x44px
 - Applied to: buttons, filter buttons, back button
 
 ### Text Contrast
+
 - All text meets 4.5:1 contrast ratio
 - White text (#F3F4F6) on dark backgrounds
 - Purple text (#9333EA) with sufficient contrast
 
 ### Visual Hierarchy
+
 - Text shadows enhance readability
 - Purple glows indicate interactivity
 - Consistent spacing and sizing
@@ -160,6 +175,7 @@ elevation: 24,
 ## Implementation Notes
 
 ### Text Shadows
+
 ```typescript
 textShadowColor: HALLOWEEN_COLORS.primary,
 textShadowOffset: { width: 0, height: 2 },
@@ -167,6 +183,7 @@ textShadowRadius: 4,
 ```
 
 ### Box Shadows
+
 ```typescript
 shadowColor: HALLOWEEN_COLORS.primary,
 shadowOffset: { width: 0, height: 6 },
@@ -176,6 +193,7 @@ elevation: 12, // Android
 ```
 
 ### Border Styling
+
 ```typescript
 borderWidth: 2,
 borderColor: HALLOWEEN_COLORS.primaryDark,
@@ -185,6 +203,7 @@ borderRadius: 12-16, // Rounded corners
 ## Future Enhancements
 
 Potential additions for Phase 2:
+
 - Animated spiderweb SVG patterns in corners
 - Particle effects on interactions
 - Gradient backgrounds with purple tones

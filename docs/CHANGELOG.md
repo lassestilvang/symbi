@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - **Accessibility Enhancement**: Evolution History Screen now WCAG 2.1 AA compliant (2025-11-16)
   - Added semantic roles (button, header, alert, radiogroup, radio, list) for proper screen reader navigation
   - Implemented descriptive accessibility labels for all interactive elements
@@ -38,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - See [.kiro/specs/evolution-history-page/](../.kiro/specs/evolution-history-page/)
 
 ### Changed
+
 - **StatisticsCard Component Refactoring** (2025-11-16)
   - Migrated to centralized theme constants (`HALLOWEEN_COLORS`, `DECORATION_ICONS` from `src/constants/theme.ts`)
   - Wrapped component with `React.memo` for performance optimization
@@ -79,12 +81,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - Phase 2 Multi-Metric Implementation
 
 ### Added
+
 - Multi-metric health data collection (steps, sleep, HRV)
 - Automatic fetching of sleep duration and HRV in `HealthDataUpdateService`
 - Graceful degradation when additional metrics unavailable
 - Backward compatibility with Phase 1 step-only tracking
 
 ### Documentation
+
 - Created comprehensive Phase 2 implementation guide
 - Updated health data integration summary
 - Added app store submission documentation
@@ -92,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.0] - Phase 1 MVP
 
 ### Added
+
 - Step tracking with HealthKit (iOS) and Google Fit (Android)
 - Manual data entry mode
 - Three emotional states (Sad, Resting, Active)
@@ -103,6 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings and account management
 
 ### Infrastructure
+
 - React Native with Expo setup
 - TypeScript configuration
 - Zustand state management
@@ -110,4 +116,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sentry crash reporting
 - Jest testing framework
 - ESLint and Prettier code quality tools
-

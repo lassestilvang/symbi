@@ -15,6 +15,7 @@ Updated the state change notification container positioning from relative to abs
 **File**: `src/screens/MainScreen.tsx`
 
 **Before**:
+
 ```typescript
 notificationContainer: {
   marginHorizontal: 20,
@@ -33,6 +34,7 @@ notificationContainer: {
 ```
 
 **After**:
+
 ```typescript
 notificationContainer: {
   position: 'absolute',
@@ -56,14 +58,18 @@ notificationContainer: {
 ## Rationale
 
 ### Problem
+
 The notification container was using relative positioning with margins, which:
+
 - Could be pushed down by content above it
 - Took up space in the layout flow
 - Could be obscured by other elements
 - Caused layout shifts when appearing/disappearing
 
 ### Solution
+
 Absolute positioning provides:
+
 - **Fixed Position**: Always appears at the same location (80px from top)
 - **No Layout Disruption**: Floats above content without affecting layout flow
 - **Guaranteed Visibility**: High z-index (1000) ensures it appears above all other content
@@ -72,12 +78,14 @@ Absolute positioning provides:
 ## Visual Impact
 
 ### Positioning Details
+
 - **Top**: 80px from screen top (positioned below the header)
 - **Horizontal**: 20px margins on left and right
 - **Z-Index**: 1000 (ensures visibility above all content)
 - **Width**: Stretches across screen with 20px margins
 
 ### User Experience
+
 - Notifications now appear as an overlay at the top of the screen
 - Does not push content down when appearing
 - Remains visible even when scrolling (within viewport)
@@ -86,6 +94,7 @@ Absolute positioning provides:
 ## Animation Behavior
 
 The animation sequence remains unchanged:
+
 ```typescript
 Animated.sequence([
   Animated.timing(notificationOpacity, {
@@ -99,10 +108,11 @@ Animated.sequence([
     duration: 300,
     useNativeDriver: true,
   }),
-])
+]);
 ```
 
 The notification:
+
 1. Fades in over 300ms
 2. Remains visible for 2 seconds
 3. Fades out over 300ms
@@ -111,6 +121,7 @@ The notification:
 ## Documentation Updates
 
 ### Files Updated
+
 1. **docs/mainscreen-complete-feature-documentation.md**
    - Added positioning details to "State Change Notifications" section
    - Added technical positioning explanation in "Animations" section
@@ -132,15 +143,18 @@ The notification:
 ## Requirements Impact
 
 This change enhances the implementation of:
+
 - **Requirement 4.5**: Smooth state transitions with visual feedback
 - **UX Best Practice**: Non-intrusive notifications that don't disrupt user flow
 
 ## Related Files
 
 ### Modified
+
 - `src/screens/MainScreen.tsx` - StyleSheet update
 
 ### Documentation
+
 - `docs/mainscreen-complete-feature-documentation.md` - Updated
 - `docs/mainscreen-notification-positioning-update.md` - Created
 

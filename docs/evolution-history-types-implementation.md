@@ -28,12 +28,14 @@ export interface HistoricalDataPoint {
 **Purpose**: Represents a single day's health data with emotional state for visualization purposes.
 
 **Use Cases**:
+
 - Timeline visualizations showing emotional state changes over time
 - Line charts displaying health metric trends (steps, sleep, HRV)
 - Data table displays with daily breakdowns
 - Historical analysis and pattern recognition
 
 **Key Features**:
+
 - Date stored as ISO string (YYYY-MM-DD) for consistent formatting
 - Optional sleep and HRV fields for graceful handling of Phase 1 data
 - Tracks calculation method to distinguish rule-based vs AI-determined states
@@ -55,12 +57,14 @@ export interface HistoryStatistics {
 **Purpose**: Contains aggregated statistics for a selected time range.
 
 **Use Cases**:
+
 - Summary cards displaying average metrics
 - Time range comparisons (7D vs 30D vs 90D vs All Time)
 - Evolution milestone tracking
 - User progress insights
 
 **Key Features**:
+
 - Nullable sleep and HRV averages for datasets without Phase 2 metrics
 - Most frequent emotional state calculation for dominant mood identification
 - Evolution tracking metrics for progress visualization
@@ -74,9 +78,7 @@ The new types integrate with existing data structures:
 
 ```typescript
 // Transform HealthDataCache to HistoricalDataPoint[]
-function transformCacheToDataPoints(
-  cache: Record<string, HealthDataCache>
-): HistoricalDataPoint[] {
+function transformCacheToDataPoints(cache: Record<string, HealthDataCache>): HistoricalDataPoint[] {
   return Object.entries(cache)
     .map(([date, data]) => ({
       date,
@@ -125,6 +127,7 @@ function calculateStatistics(
 ## Dependencies
 
 ### Already Installed
+
 - `react-native-chart-kit@^6.12.0` - For line charts and visualizations
 - `react-native-svg@^15.15.0` - Required by chart-kit for rendering
 
@@ -133,11 +136,13 @@ These dependencies were already present in `package.json` from previous work.
 ## Testing Considerations
 
 ### Type Safety
+
 - All new types are exported from `src/types/index.ts`
 - TypeScript strict mode ensures type safety throughout the codebase
 - Interfaces are compatible with existing `HealthDataCache` structure
 
 ### Data Validation
+
 - Optional fields (`sleepHours?`, `hrv?`) handle Phase 1 data gracefully
 - Nullable statistics fields (`averageSleep`, `averageHRV`) prevent errors with incomplete data
 - Date format (YYYY-MM-DD) is consistent with existing cache structure

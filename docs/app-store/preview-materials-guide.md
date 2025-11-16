@@ -18,17 +18,20 @@ This guide provides specifications and instructions for creating all visual asse
 ### Specifications
 
 **iOS App Store**
+
 - Size: 1024 x 1024 pixels
 - Format: PNG (no transparency)
 - Color Space: RGB
 - No rounded corners (iOS applies them automatically)
 
 **Google Play Store**
+
 - Size: 512 x 512 pixels
 - Format: PNG (32-bit with transparency)
 - Color Space: RGB
 
 **Android Adaptive Icon**
+
 - Foreground: 108 x 108 dp (432 x 432 pixels at xxxhdpi)
 - Background: 108 x 108 dp (432 x 432 pixels at xxxhdpi)
 - Safe zone: 66 x 66 dp (264 x 264 pixels at xxxhdpi)
@@ -36,6 +39,7 @@ This guide provides specifications and instructions for creating all visual asse
 ### Design Guidelines
 
 **Visual Elements:**
+
 - Symbi ghost character as the central element
 - Purple gradient background (#7C3AED to #9333EA)
 - Halloween-themed but cute aesthetic
@@ -43,6 +47,7 @@ This guide provides specifications and instructions for creating all visual asse
 - No text or UI elements
 
 **Design Concept:**
+
 ```
 ┌─────────────────────────┐
 │                         │
@@ -59,6 +64,7 @@ This guide provides specifications and instructions for creating all visual asse
 ```
 
 **Key Features:**
+
 - Symbi ghost in center
 - Expressive eyes (bright, friendly)
 - Slight dripping effect on edges
@@ -69,12 +75,14 @@ This guide provides specifications and instructions for creating all visual asse
 ### Tools
 
 **Recommended Design Tools:**
+
 - Figma (free, web-based)
 - Adobe Illustrator
 - Sketch
 - Affinity Designer
 
 **Icon Generators:**
+
 - [App Icon Generator](https://appicon.co/)
 - [MakeAppIcon](https://makeappicon.com/)
 - [Icon Kitchen](https://icon.kitchen/)
@@ -97,21 +105,25 @@ assets/
 #### Required Sizes
 
 **iPhone 6.7" Display** (iPhone 14 Pro Max, 15 Pro Max)
+
 - Size: 1290 x 2796 pixels
 - Quantity: 3-10 screenshots
 - Priority: High (most users)
 
 **iPhone 6.5" Display** (iPhone 11 Pro Max, XS Max)
+
 - Size: 1242 x 2688 pixels
 - Quantity: 3-10 screenshots
 - Priority: High
 
 **iPhone 5.5" Display** (iPhone 8 Plus)
+
 - Size: 1242 x 2208 pixels
 - Quantity: 3-10 screenshots
 - Priority: Medium (optional)
 
 **iPad Pro 12.9" Display**
+
 - Size: 2048 x 2732 pixels
 - Quantity: 3-10 screenshots
 - Priority: Low (optional, if supporting iPad)
@@ -119,36 +131,42 @@ assets/
 #### Screenshot Content
 
 **Screenshot 1: Main Screen - "Meet Your Health Companion"**
+
 - Show: Symbi in Active state with step count display
 - Highlight: Main animation, step counter, emotional state label
 - Caption: "Meet Your Health Companion"
 - Background: Clean, minimal UI
 
 **Screenshot 2: Emotional States - "Your Symbi Reflects Your Wellness"**
+
 - Show: 3-4 different emotional states side by side
 - Highlight: Sad, Resting, Active, Vibrant states
 - Caption: "Your Symbi Reflects Your Wellness"
 - Layout: Grid or carousel view
 
 **Screenshot 3: Health Integration - "Seamlessly Connects to Apple Health"**
+
 - Show: Apple Health permission screen or data sync view
 - Highlight: Health data types (steps, sleep, HRV)
 - Caption: "Seamlessly Connects to Apple Health"
 - Include: Privacy badge or lock icon
 
 **Screenshot 4: Customization - "Customize to Your Fitness Level"**
+
 - Show: Threshold configuration screen
 - Highlight: Adjustable sliders or input fields
 - Caption: "Customize to Your Fitness Level"
 - Show: Before/after threshold values
 
 **Screenshot 5: Evolution - "Watch Your Symbi Evolve"**
+
 - Show: Evolution celebration or gallery view
 - Highlight: Multiple evolution forms
 - Caption: "Watch Your Symbi Evolve"
 - Include: Progress indicator (30 days)
 
 **Screenshot 6: Privacy - "Your Data, Your Control"** (Optional)
+
 - Show: Privacy settings or manual entry mode
 - Highlight: Data export, deletion options
 - Caption: "Your Data, Your Control"
@@ -159,6 +177,7 @@ assets/
 #### Required Sizes
 
 **Phone Screenshots**
+
 - Minimum: 2 screenshots
 - Recommended: 4-8 screenshots
 - Aspect Ratio: 16:9 or 9:16
@@ -166,12 +185,14 @@ assets/
 - Format: PNG or JPEG
 
 **Tablet Screenshots** (Optional)
+
 - 7-inch: 1200 x 1920 pixels
 - 10-inch: 1600 x 2560 pixels
 
 #### Screenshot Content
 
 Use the same content as iOS screenshots, adapted for Android:
+
 - Replace "Apple Health" with "Google Fit" or "Health Connect"
 - Use Android UI patterns (Material Design)
 - Show Android-specific features if any
@@ -179,6 +200,7 @@ Use the same content as iOS screenshots, adapted for Android:
 ### Screenshot Design Tips
 
 **Best Practices:**
+
 1. Use device frames (optional but recommended)
 2. Add captions/text overlays for clarity
 3. Show real app content, not mockups
@@ -188,12 +210,14 @@ Use the same content as iOS screenshots, adapted for Android:
 7. Use high contrast for visibility
 
 **Tools for Creating Screenshots:**
+
 - [Figma](https://figma.com) - Design and mockups
 - [Previewed](https://previewed.app) - Device mockups
 - [Shotbot](https://shotbot.io) - Automated screenshots
 - [Screenshot Creator](https://www.applaunchpad.com) - Templates
 
 **Device Frames:**
+
 - [Facebook Design Resources](https://facebook.design/devices)
 - [Mockuphone](https://mockuphone.com)
 - [Screely](https://screely.com)
@@ -234,6 +258,7 @@ docs/app-store/screenshots/
 ### Design Guidelines
 
 **Content:**
+
 - Symbi character (prominent)
 - App name: "Symbi"
 - Tagline: "Your Health Companion" or "Transform Your Wellness Journey"
@@ -241,6 +266,7 @@ docs/app-store/screenshots/
 - Halloween-themed elements (subtle)
 
 **Layout:**
+
 ```
 ┌────────────────────────────────────────────────┐
 │                                                │
@@ -251,6 +277,7 @@ docs/app-store/screenshots/
 ```
 
 **Design Tips:**
+
 - Keep text large and readable
 - Use high contrast
 - Avoid clutter
@@ -270,6 +297,7 @@ docs/app-store/screenshots/
 ### Specifications
 
 **iOS App Preview**
+
 - Duration: 15-30 seconds
 - Format: .mov, .m4v, or .mp4
 - Resolution: Match screenshot dimensions
@@ -278,6 +306,7 @@ docs/app-store/screenshots/
 - Codec: H.264 or HEVC
 
 **Google Play Promo Video**
+
 - Duration: 30 seconds to 2 minutes
 - Format: YouTube URL
 - Orientation: Portrait or landscape
@@ -318,6 +347,7 @@ docs/app-store/screenshots/
 ### Video Production Tips
 
 **Recording:**
+
 - Use iOS Simulator or Android Emulator for clean recordings
 - Record at highest resolution
 - Use screen recording tools:
@@ -326,6 +356,7 @@ docs/app-store/screenshots/
   - Cross-platform: OBS Studio
 
 **Editing:**
+
 - Add smooth transitions
 - Include background music (royalty-free)
 - Add text overlays for key features
@@ -333,12 +364,14 @@ docs/app-store/screenshots/
 - Export at high quality
 
 **Tools:**
+
 - [iMovie](https://www.apple.com/imovie/) (Mac, free)
 - [DaVinci Resolve](https://www.blackmagicdesign.com/products/davinciresolve) (Free)
 - [Adobe Premiere Pro](https://www.adobe.com/products/premiere.html)
 - [Final Cut Pro](https://www.apple.com/final-cut-pro/)
 
 **Music Resources (Royalty-Free):**
+
 - [Epidemic Sound](https://www.epidemicsound.com)
 - [Artlist](https://artlist.io)
 - [YouTube Audio Library](https://www.youtube.com/audiolibrary)
@@ -375,16 +408,19 @@ App icon with download arrow
 ### Social Media Assets
 
 **Twitter/X Card**
+
 - Size: 1200 x 628 pixels
 - Format: PNG or JPEG
 - Content: App icon, tagline, key feature
 
 **Facebook/Instagram Post**
+
 - Size: 1080 x 1080 pixels (square)
 - Format: PNG or JPEG
 - Content: Symbi character, app name, download link
 
 **Instagram Story**
+
 - Size: 1080 x 1920 pixels
 - Format: PNG or JPEG
 - Content: Vertical layout, swipe-up CTA
@@ -392,6 +428,7 @@ App icon with download arrow
 ### Press Kit
 
 Create a press kit folder with:
+
 - App icon (various sizes)
 - Screenshots (all sizes)
 - Feature graphic
@@ -496,6 +533,7 @@ Thank you for using Symbi! 💜
 ## Production Checklist
 
 ### App Icon
+
 - [ ] iOS icon created (1024x1024)
 - [ ] Android icon created (512x512)
 - [ ] Adaptive icon created (432x432)
@@ -503,6 +541,7 @@ Thank you for using Symbi! 💜
 - [ ] Icons follow design guidelines
 
 ### Screenshots
+
 - [ ] iOS 6.7" screenshots created (5-8 screenshots)
 - [ ] iOS 6.5" screenshots created
 - [ ] Android phone screenshots created (4-8 screenshots)
@@ -511,12 +550,14 @@ Thank you for using Symbi! 💜
 - [ ] Screenshots reviewed for quality
 
 ### Feature Graphic (Android)
+
 - [ ] Feature graphic created (1024x500)
 - [ ] Text is readable
 - [ ] Branding is consistent
 - [ ] File size under 1MB
 
 ### Preview Video
+
 - [ ] Video script written
 - [ ] Video recorded (30 seconds)
 - [ ] Video edited with transitions
@@ -525,16 +566,19 @@ Thank you for using Symbi! 💜
 - [ ] Video uploaded to YouTube (for Android)
 
 ### Promotional Materials
+
 - [ ] Social media graphics created
 - [ ] Press kit assembled
 - [ ] Brand assets organized
 
 ### Release Notes
+
 - [ ] iOS release notes written
 - [ ] Android release notes written
 - [ ] Release notes reviewed for clarity
 
 ### Final Review
+
 - [ ] All assets reviewed by team
 - [ ] Assets tested on actual devices
 - [ ] File names and organization verified
@@ -545,21 +589,25 @@ Thank you for using Symbi! 💜
 ## Resources
 
 ### Design Inspiration
+
 - [App Store Screenshots Gallery](https://www.applaunchpad.com/app-store-screenshots/)
 - [Mobbin](https://mobbin.com) - Mobile design patterns
 - [Dribbble](https://dribbble.com) - Design inspiration
 
 ### Tools
+
 - [Figma](https://figma.com) - Design tool
 - [Sketch](https://www.sketch.com) - Design tool
 - [Canva](https://canva.com) - Quick graphics
 - [Previewed](https://previewed.app) - Device mockups
 
 ### Guidelines
+
 - [Apple App Store Guidelines](https://developer.apple.com/app-store/product-page/)
 - [Google Play Store Guidelines](https://developer.android.com/distribute/marketing-tools/device-art-generator)
 
 ### Support
+
 - Internal: Contact design team
 - External: Hire freelancer on Fiverr/Upwork if needed
 
@@ -568,6 +616,7 @@ Thank you for using Symbi! 💜
 ## Timeline
 
 **Estimated Time:**
+
 - App Icon: 2-4 hours
 - Screenshots: 4-8 hours
 - Feature Graphic: 1-2 hours
@@ -576,6 +625,7 @@ Thank you for using Symbi! 💜
 - **Total: 13-26 hours**
 
 **Recommended Schedule:**
+
 - Week 1: App icon and screenshots
 - Week 2: Feature graphic and video
 - Week 3: Promotional materials and review
