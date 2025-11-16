@@ -7,6 +7,7 @@
 - Project name: **Symbi**
 - Framework: Expo (React Native 0.81.5)
 - TypeScript version: 5.9.2
+- Main entry point: `App.tsx` with error reporting and responsive layout
 
 ### 2. Folder Structure
 ```
@@ -133,7 +134,10 @@ npm run pre-submit     # Run all pre-submission checks
 - The project uses Expo for easier cross-platform development
 - Native health integrations (HealthKit/Google Fit) will require ejecting to bare React Native or using Expo modules
 - All core type definitions follow the design document specifications
-- The Halloween theme (purple color palette) is reflected in the App.tsx placeholder
+- The Halloween theme (purple color palette #1a1a2e) is reflected in the App.tsx background
+- Error reporting is initialized automatically on app startup with proper cleanup
+- Web platform includes responsive layout with 600px max-width constraint
+- Global error handlers capture unhandled errors and promise rejections
 
 ## 🚀 Getting Started
 

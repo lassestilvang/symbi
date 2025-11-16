@@ -10,6 +10,18 @@ Symbi uses Sentry for:
 - Breadcrumb logging for debugging
 - Privacy-preserving error reports (health data is sanitized)
 
+### Initialization Architecture
+
+The error reporting system is initialized in `App.tsx` with the following features:
+
+- **Automatic Initialization**: Runs on app startup before any other components
+- **Environment Validation**: Validates environment configuration before initialization
+- **Global Error Handlers**: Captures unhandled errors and promise rejections
+- **Platform Tagging**: Automatically tags errors with platform (iOS/Android/Web) and version
+- **Proper Cleanup**: Restores original error handlers on component unmount
+- **Graceful Degradation**: App continues to function if Sentry initialization fails
+- **Initialization State**: Uses React state to prevent race conditions with error handlers
+
 ## Setup Instructions
 
 ### 1. Create Sentry Account
@@ -132,6 +144,33 @@ sentry-cli releases files <release-version> upload-sourcemaps ./dist
 
 For Expo/EAS builds, this is handled automatically with the Sentry Expo plugin.
 
+## Initialization Flow
+
+The error reporting system follows this initialization sequence:
+
+1. **App Component Mounts**: `App.tsx` renders and triggers useEffect
+2. **Environment Validation**: Validates Sentry environment configuration
+3. **Service Initialization**: Calls `ErrorReportingService.getInstance().initialize()`
+4. **Platform Tagging**: Sets platform and version tags for error context
+5. **Global Handlers Setup**: Registers global error and promise rejection handlers
+6. **Breadcrumb Logging**: Logs "App started" breadcrumb
+7. **State Update**: Sets `isInitialized` to true, allowing app to render
+8. **Cleanup Registration**: Returns cleanup function to restore handlers on unmount
+
+### Error Handler Chain
+
+```
+Error Occurs
+    ↓
+Global Error Handler (App.tsx)
+    ↓
+ErrorReportingService.captureException()
+    ↓
+Sentry SDK (with sanitization)
+    ↓
+Original Error Handler (preserved)
+```
+
 ## Usage in Code
 
 ### Basic Error Reporting
@@ -156,6 +195,16 @@ errorReporting.captureMessage('Something went wrong', 'warning', {
   userId: 'user123',
 });
 ```
+
+### Automatic Error Capture
+
+Errors are automatically captured in the following scenarios:
+
+1. **Unhandled Exceptions**: Any uncaught error in the app
+2. **Promise Rejections**: Unhandled promise rejections
+3. **Component Errors**: Errors in React component lifecycle
+
+No manual capture needed for these cases - they're handled by the global error handlers in `App.tsx`.
 
 ### Adding Breadcrumbs
 

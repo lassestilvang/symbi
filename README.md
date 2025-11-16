@@ -142,13 +142,40 @@ npm run pre-submit
 - **Android**: Health Connect/Google Fit permissions, Data Safety section, feature graphic
 - **Both**: Privacy policy hosted at https://symbi.app/privacy-policy
 
+## Architecture
+
+### Application Entry Point
+
+The `App.tsx` file serves as the main entry point with the following features:
+
+- **Error Reporting Initialization**: Sentry is initialized on app startup with proper cleanup handlers
+- **Global Error Handling**: Catches unhandled errors and promise rejections
+- **Platform Detection**: Automatically tags errors with platform information (iOS/Android/Web)
+- **Web Responsiveness**: Implements responsive layout with max-width constraint (600px) for web platform
+- **Graceful Degradation**: App continues to function even if error reporting fails to initialize
+
+### Layout Structure
+
+```
+SafeAreaProvider
+└── View (appContainer)
+    └── View (contentWrapper - max 600px on web)
+        └── AppNavigator
+```
+
+The app uses a centered layout on web with a dark background (#1a1a2e) matching the Halloween theme.
+
+**Detailed Architecture Documentation**: [docs/app-architecture.md](docs/app-architecture.md)
+
 ## Monitoring
 
 Crash reporting and monitoring is configured with Sentry:
 
 - **Setup Guide**: [docs/crash-reporting-setup.md](docs/crash-reporting-setup.md)
 - **Service**: `src/services/ErrorReportingService.ts`
+- **Initialization**: Automatic on app startup with environment validation
 - **Privacy**: Health data is automatically sanitized from error reports
+- **Cleanup**: Proper handler restoration on component unmount
 
 ## License
 
