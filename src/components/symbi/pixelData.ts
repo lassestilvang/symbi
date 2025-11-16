@@ -402,8 +402,9 @@ export const smileMouth: PixelCoordinate[] = [
   [15, 16],
   [16, 16],
   [17, 16],
+  [18, 16],
   [12, 15],
-  [18, 15],
+  [19, 15],
 ];
 
 /**
@@ -415,8 +416,9 @@ export const frownMouth: PixelCoordinate[] = [
   [15, 17],
   [16, 17],
   [17, 17],
+  [18, 17],
   [12, 18],
-  [18, 18],
+  [19, 18],
 ];
 
 /**
@@ -428,6 +430,7 @@ export const neutralMouth: PixelCoordinate[] = [
   [15, 16],
   [16, 16],
   [17, 16],
+  [18, 16],
 ];
 
 /**

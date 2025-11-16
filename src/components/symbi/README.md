@@ -25,7 +25,7 @@ symbi/
 - `GHOST_MIN_Y`, `GHOST_MAX_Y` - Y-axis boundaries for ghost body
 - `ghostBodyPixels` - Main body shape coordinates (taller version, 26 rows)
 - `normalEyes`, `sadEyes`, `happyEyes`, `stressedEyes` - Eye variations
-- `smileMouth`, `frownMouth`, `neutralMouth`, `worriedMouth` - Mouth variations
+- `smileMouth` (7 pixels), `frownMouth`, `neutralMouth` (6 pixels), `worriedMouth` - Mouth variations
 - `blushPixels` - Cheek blush coordinates
 
 **Design Principles**:
@@ -33,7 +33,7 @@ symbi/
 - Immutable data structures (const arrays)
 - Coordinates based on 32x32 grid
 - Taller ghost design (Y: 6-25) for better proportions
-- Easy to modify for visual tweaks
+- Easy to modify for visual tweaks (e.g., smile and neutral mouths refined for balanced expressions)
 
 #### `ghostRenderer.ts`
 **Purpose**: Rendering logic and state-to-visual mappings
@@ -45,7 +45,7 @@ symbi/
 - `shouldShowBlush()` - Determines if blush should render
 - `pixelOverlaps()` - Utility for pixel collision detection
 - `getFilteredBodyPixels()` - Filters body pixels to avoid overlaps
-- `drawPixelArt()` - Canvas drawing helper
+- `drawPixelArt()` - Canvas drawing helper with 10% pixel spacing for enhanced pixelated look
 - `renderGhost()` - Main rendering function
 
 **Design Principles**:
@@ -199,6 +199,9 @@ describe('ghostRenderer', () => {
 2. **Pure Functions**: All rendering functions are pure for easy memoization
 3. **Minimal Calculations**: Pre-computed pixel coordinates
 4. **Efficient Filtering**: `pixelOverlaps()` uses early return
+5. **Pixel Spacing**: Configurable gaps between pixels enhance pixelated aesthetic without performance cost
+   - Canvas rendering: 10% spacing for subtle separation
+   - React Native Views: 7% spacing for balanced clarity
 
 ### Memory Usage
 
@@ -262,7 +265,9 @@ Rendering logic and state-to-appearance mapping:
 - **getMouthPixels()**: Returns appropriate mouth pixels for each state
 - **shouldShowBlush()**: Determines if blush should be displayed
 - **renderGhost()**: Main rendering function (for canvas-based rendering)
-- **drawPixelArt()**: Helper for drawing pixel arrays
+- **drawPixelArt()**: Helper for drawing pixel arrays with 10% spacing between pixels
+
+**Note**: The React Native component (`Symbi8BitCanvas.tsx`) uses 7% pixel spacing for balanced visual clarity with View-based rendering, while canvas rendering uses 10% spacing for a more subtle effect.
 
 ## Constants
 

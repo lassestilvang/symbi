@@ -66,24 +66,30 @@ export const Symbi8BitCanvas: React.FC<Symbi8BitCanvasProps> = ({
   const pixelSize = useMemo(() => size / PIXEL_GRID_SIZE, [size]);
 
   /**
-   * Render individual pixel
+   * Render individual pixel with spacing for pixelated effect
    */
   const renderPixel = useCallback(
-    (x: number, y: number, color: string, key: string) => (
-      <View
-        key={key}
-        style={[
-          styles.pixel,
-          {
-            width: pixelSize,
-            height: pixelSize,
-            left: x * pixelSize,
-            top: y * pixelSize,
-            backgroundColor: color,
-          },
-        ]}
-      />
-    ),
+    (x: number, y: number, color: string, key: string) => {
+      // Add 7% spacing between pixels for a more pixelated look
+      const pixelGap = pixelSize * 0.07;
+      const adjustedPixelSize = pixelSize - pixelGap;
+
+      return (
+        <View
+          key={key}
+          style={[
+            styles.pixel,
+            {
+              width: adjustedPixelSize,
+              height: adjustedPixelSize,
+              left: x * pixelSize + pixelGap / 2,
+              top: y * pixelSize + pixelGap / 2,
+              backgroundColor: color,
+            },
+          ]}
+        />
+      );
+    },
     [pixelSize]
   );
 

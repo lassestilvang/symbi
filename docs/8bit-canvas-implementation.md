@@ -30,6 +30,24 @@ Pure data module containing all pixel coordinate definitions for the 8-bit ghost
 - Taller ghost design for better proportions
 - Positioned for optimal facial feature placement
 
+### src/components/symbi/ghostRenderer.ts
+
+Rendering logic and state-to-appearance mapping for canvas-based rendering.
+
+**Key Exports:**
+- `getStateColors()`: Maps emotional states to color palettes
+- `getEyePixels()`: Returns appropriate eye pixels for each state
+- `getMouthPixels()`: Returns appropriate mouth pixels for each state
+- `shouldShowBlush()`: Determines if blush should be displayed
+- `renderGhost()`: Main rendering function (for canvas-based rendering)
+- `drawPixelArt()`: Helper for drawing pixel arrays with 10% spacing between pixels for enhanced pixelated aesthetic
+
+**Rendering Features:**
+- Pure functions for testability
+- State-based color and feature selection
+- Pixel spacing (10% gap) for enhanced visual clarity
+- Efficient canvas drawing with minimal calculations
+
 ### Symbi8BitCanvas.tsx
 
 A pure React Native implementation that renders the Symbi ghost using individual View components as pixels.
@@ -69,6 +87,9 @@ Interactive demo component for testing the 8-bit ghost.
 - **Colors**: Cream white base (#F5F5F0) with state-dependent variations
 - **Features**: Eyes, mouth, optional blush on cheeks
 - **Pixel Count**: ~400 body pixels, varying facial features
+- **Pixel Spacing**: 
+  - Canvas rendering: 10% gap for subtle separation
+  - React Native Views: 20% gap for enhanced visual clarity
 
 ### Emotional State Variations
 
@@ -94,6 +115,7 @@ Interactive demo component for testing the 8-bit ghost.
 - **Rendering**: Efficient with React Native's native driver
 - **Animations**: Hardware accelerated transforms
 - **Bundle Size**: No external animation files required
+- **Pixel Spacing**: Configurable gaps between pixels enhance visual clarity without performance impact (10% for canvas, 20% for React Native Views)
 
 ## Advantages Over Lottie
 
@@ -172,6 +194,82 @@ import { EmotionalState } from './types';
 - Documented visual state variations
 - Added demo component instructions
 
+## Changelog
+
+### November 16, 2025 - Pixel Spacing Update
+
+**Change**: Increased pixel spacing in `Symbi8BitCanvas.tsx` from minimal to 20%
+
+**Files Modified**:
+- `src/components/Symbi8BitCanvas.tsx` - Updated `renderPixel()` function
+
+**Impact**:
+- Enhanced visual clarity with more pronounced pixel separation
+- Better retro aesthetic matching classic 8-bit games
+- No performance impact
+- Maintains consistency with canvas implementation philosophy (10% spacing)
+
+## Recent Updates
+
+### Smile Mouth Refinement (November 16, 2025)
+
+Shortened the smile mouth expression for a more balanced appearance:
+
+- **Change**: Reduced smile mouth from 8 pixels to 7 pixels
+- **Visual Impact**: Creates a more subtle, balanced smile for ACTIVE, VIBRANT, and RESTED states
+- **Implementation**: Commented out leftmost pixel coordinate `[12, 16]` in `smileMouth` array
+- **Affected States**: ACTIVE, VIBRANT, RESTED (positive emotional states)
+- **Pixel Count**: Now 7 pixels (previously 8), matching the symmetry of other mouth expressions
+
+### Neutral Mouth Refinement (November 16, 2025)
+
+Shortened the neutral mouth expression for a more subtle appearance:
+
+- **Change**: Reduced neutral mouth from 7 pixels to 6 pixels
+- **Visual Impact**: Creates a more understated, calm expression for RESTING and CALM states
+- **Implementation**: Commented out leftmost pixel coordinate `[12, 16]` in `neutralMouth` array
+- **Affected States**: RESTING, CALM (default neutral expression)
+
+### Pixel Spacing Enhancement (November 16, 2025)
+
+Enhanced pixel spacing in the React Native component to improve visual clarity:
+
+- **Visual Improvement**: Increased gaps between pixels create a more pronounced retro aesthetic
+- **Implementation**: Pixels are reduced with centered positioning
+- **Performance**: No measurable impact on rendering performance
+- **Change**: Updated from minimal spacing to 7% spacing in `Symbi8BitCanvas.tsx`
+
+**Spacing Variations Across Implementations**:
+- **Canvas rendering** (ghostRenderer.ts): 10% spacing for subtle separation
+- **React Native Views** (Symbi8BitCanvas.tsx): 7% spacing for balanced clarity and cohesion
+
+**Technical Details:**
+
+Canvas implementation (10% spacing):
+```typescript
+const pixelGap = pixelSize * 0.1;
+const adjustedPixelSize = pixelSize - pixelGap;
+ctx.fillRect(
+  x * pixelSize + pixelGap / 2,
+  y * pixelSize + pixelGap / 2,
+  adjustedPixelSize,
+  adjustedPixelSize
+);
+```
+
+React Native implementation (7% spacing - updated):
+```typescript
+const pixelGap = pixelSize * 0.07;
+const adjustedPixelSize = pixelSize - pixelGap;
+// Applied to View positioning for balanced visual separation
+left: x * pixelSize + pixelGap / 2,
+top: y * pixelSize + pixelGap / 2,
+width: adjustedPixelSize,
+height: adjustedPixelSize,
+```
+
+**Rationale**: The 7% spacing in the React Native implementation provides a balanced approach - enough separation to maintain the pixelated aesthetic while keeping the ghost cohesive and readable. This is slightly less than the canvas implementation's 10% to account for the different rendering characteristics of View components.
+
 ## Notes
 
-This implementation provides a lightweight alternative to Lottie animations while maintaining the core functionality of emotional state visualization. The 8-bit aesthetic offers a unique retro charm that complements the Halloween theme while being technically simpler and more performant.
+This implementation provides a lightweight alternative to Lottie animations while maintaining the core functionality of emotional state visualization. The 8-bit aesthetic offers a unique retro charm that complements the Halloween theme while being technically simpler and more performant. The pixel spacing enhancement further emphasizes the retro aesthetic without compromising performance.
