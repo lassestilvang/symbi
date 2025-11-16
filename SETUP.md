@@ -40,6 +40,7 @@
 - **react-native-screens** (v4.18.0) - Native screen components
 - **react-native-safe-area-context** (v5.6.2) - Safe area handling
 - **zustand** (v5.0.8) - State management
+- **js-yaml** (v4.1.1) - YAML parsing with security patches (enforced via overrides)
 
 ### 4. Development Tools Configured
 - **ESLint** (v9.39.1) - Code linting

@@ -354,7 +354,8 @@ thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 - [ ] Implement security logging
 - [ ] Set up security alerts
 - [ ] Monitor for suspicious activity
-- [ ] Regular security updates
+- [x] Regular security updates (js-yaml ^4.1.1 enforced via overrides)
+- [ ] Automated dependency vulnerability scanning
 
 ### Documentation
 - [ ] Security incident response plan
@@ -416,6 +417,7 @@ thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 - ✅ Data retention policies
 - ✅ Confirmation dialogs for destructive actions
 - ✅ Analytics opt-out
+- ✅ Dependency security (js-yaml vulnerability patched)
 
 ### Pending for Production
 - ⏳ Native certificate pinning implementation
@@ -450,3 +452,9 @@ thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 - GDPR: https://gdpr.eu/
 - CCPA: https://oag.ca.gov/privacy/ccpa
 - HIPAA: https://www.hhs.gov/hipaa/
+
+### Dependency Security
+- npm audit: Run `npm audit` to check for vulnerabilities
+- Snyk: https://snyk.io/ - Automated vulnerability scanning
+- GitHub Dependabot: Automated dependency updates
+- js-yaml security advisory: CVE-2021-32764 (patched in 4.1.0+)

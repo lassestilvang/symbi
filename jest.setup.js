@@ -1,3 +1,14 @@
+// Mock localStorage for Jest environment
+global.localStorage = {
+  getItem: jest.fn((key) => null),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+
+// Mock React Native __DEV__ global
+global.__DEV__ = true;
+
 // Mock AsyncStorage with in-memory storage
 let mockStorage = {};
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -163,4 +174,17 @@ jest.mock('expo-file-system', () => ({
 jest.mock('expo-sharing', () => ({
   isAvailableAsync: jest.fn(() => Promise.resolve(true)),
   shareAsync: jest.fn(() => Promise.resolve()),
+}));
+
+// Mock Sentry
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  addBreadcrumb: jest.fn(),
+  setUser: jest.fn(),
+  setContext: jest.fn(),
+  setTag: jest.fn(),
+  setExtra: jest.fn(),
+  withScope: jest.fn((callback) => callback({ setTag: jest.fn(), setExtra: jest.fn() })),
 }));

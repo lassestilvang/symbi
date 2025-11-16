@@ -86,6 +86,7 @@ npm run test:watch
 - **Navigation**: React Navigation
 - **Animations**: Lottie
 - **Storage**: AsyncStorage
+- **Security**: TLS 1.3, AES-256 encryption, dependency vulnerability management
 
 ## Phase Development
 
