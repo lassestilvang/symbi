@@ -1,32 +1,43 @@
-# Product Overview
+---
+inclusion: always
+---
 
-Symbi is a Halloween-themed biometric tamagotchi app that visualizes health data through a digital pet. The Symbi creature (a purple Kiro ghost with spooky elements) reflects the user's real-world health metrics through emotional states and animations.
+# Symbi Product Context
 
-## Core Concept
+Symbi is a Halloween-themed biometric tamagotchi app. A purple ghost creature ("Symbi") reflects user health metrics through emotional states and animations.
 
-Health data → Emotional state → Visual feedback → User motivation
+## Data Flow
 
-## Development Phases
+Health data → EmotionalStateCalculator → Symbi animation state → Visual feedback
 
-**Phase 1 (MVP)**: Step tracking with 3 emotional states (Sad, Resting, Active) using rule-based thresholds
+## Phases & Emotional States
 
-**Phase 2**: Multi-metric analysis (steps, sleep, HRV) with AI-powered emotional states via Gemini API
+| Phase | Metrics | States | Logic |
+|-------|---------|--------|-------|
+| 1 (MVP) | Steps | Sad, Resting, Active | Rule-based thresholds |
+| 2 | Steps, Sleep, HRV | +Vibrant, Calm, Tired, Stressed, Anxious, Rested | Gemini AI analysis |
+| 3 | All + Activities | Evolution system | Cloud sync enabled |
 
-**Phase 3**: Interactive wellness activities, generative evolution system, cloud sync
+## Implementation Rules
 
-## Key Features
+- Health data sources: HealthKit (iOS), Google Fit (Android), Manual entry
+- All health processing happens locally first (privacy-first)
+- Animations use Lottie JSON files in `src/assets/animations/`
+- 8-bit pixel ghost renderer available via `Symbi8BitCanvas` component
+- Background sync must be battery-efficient (<5% per 24 hours)
+- UI updates should feel immediate (<1 second perceived latency)
 
-- Cross-platform (iOS/Android) with HealthKit/Google Fit integration
-- Manual data entry mode for privacy-conscious users
-- Configurable thresholds for personalized experience
-- Lottie-based vector animations for smooth visuals
-- Battery-efficient background data fetching
-- Privacy-first architecture with local processing
+## Visual Design Constraints
 
-## Design Philosophy
+- Primary purple palette: `#7C3AED` to `#9333EA`
+- Halloween aesthetic: spooky but cute, never scary
+- Animation frame rate: 60 FPS active, 10 FPS backgrounded
+- Use `src/constants/theme.ts` for all color values
 
-- Immediate visual feedback (updates within seconds)
-- Cute yet spooky Halloween aesthetic (purple palette #7C3AED to #9333EA)
-- Privacy transparency with clear permission explanations
-- Progressive enhancement across phases
-- Offline-first with graceful degradation
+## Privacy Requirements
+
+- Never log raw health data to error reporting
+- Sanitize all data before Sentry/analytics
+- Explain permissions clearly before requesting
+- Support full offline functionality
+- Manual entry mode must be feature-complete alternative

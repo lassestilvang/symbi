@@ -1,122 +1,61 @@
+---
+inclusion: always
+---
+
 # Technology Stack
 
-## Core Framework
+## Core Dependencies
 
-- **React Native 0.81.5** with Expo ~54.0.22
-- **TypeScript 5.9.2** with strict mode enabled
-- **React 19.2.0**
+| Package | Version | Purpose |
+|---------|---------|---------|
+| React Native | 0.81.5 | Mobile framework via Expo ~54.0.22 |
+| TypeScript | 5.9.2 | Strict mode enabled - no `any` types |
+| React | 19.2.0 | UI library |
+| Zustand | 5.0.8 | State management |
+| React Navigation | 7.x | Native stack navigator |
+| Lottie React Native | 7.3.4 | Symbi animations |
 
-## Key Libraries
+## Code Style Rules
 
-### State Management
+When writing code, follow these conventions:
 
-- **Zustand 5.0.8** - Lightweight reactive state management
-- Stores: `healthDataStore`, `userPreferencesStore`, `symbiStateStore`
+- Use single quotes, require semicolons
+- 100 character max line width, 2 space indentation
+- Trailing commas (ES5 style), avoid arrow parens when possible
+- Always use path aliases: `@components/*`, `@services/*`, `@hooks/*`, `@types/*`, `@assets/*`
+- Use `import type` for type-only imports
 
-### Navigation
+## Platform-Specific Implementation
 
-- **React Navigation 7.x** - Native stack navigator
+**iOS**: HealthKit via `react-native-health`. Requires entitlement and background modes (fetch, processing). Min iOS 14.0.
 
-### Animations
+**Android**: Google Fit via `react-native-google-fit`. Requires ACTIVITY_RECOGNITION permission. Min API 26.
 
-- **Lottie React Native 7.3.4** - Vector animations for Symbi emotional states
-
-### Storage
-
-- **AsyncStorage 2.2.0** - Local persistence with encryption
-
-### Health Data
-
-- **react-native-health 1.19.0** - iOS HealthKit integration
-- **react-native-google-fit 0.22.1** - Android Google Fit integration
-
-### Monitoring
-
-- **Sentry React Native 7.5.0** - Crash reporting and error tracking
-
-### Utilities
-
-- **expo-crypto** - Encryption services
-- **expo-file-system** - File operations
-- **@react-native-community/netinfo** - Network status
-
-## Code Style
-
-### Prettier Configuration
-
-- Single quotes
-- Semicolons required
-- 100 character line width
-- 2 space indentation
-- Trailing commas (ES5)
-- Arrow parens: avoid
-
-### ESLint
-
-- TypeScript ESLint with strict rules
-- Prettier integration for formatting
-
-## Path Aliases
-
-```typescript
-@components/* → src/components/*
-@services/* → src/services/*
-@hooks/* → src/hooks/*
-@types/* → src/types/*
-@assets/* → src/assets/*
-```
-
-## Common Commands
-
-```bash
-# Development
-npm start              # Start Expo dev server
-npm run ios            # Run on iOS simulator
-npm run android        # Run on Android emulator
-npm run web            # Run in web browser
-
-# Code Quality
-npm run lint           # Run ESLint
-npm run lint:fix       # Fix ESLint issues
-npm run format         # Format with Prettier
-
-# Testing
-npm test               # Run Jest tests
-npm run test:coverage  # Run with coverage report
-npm run test:watch     # Watch mode
-
-# Pre-submission
-npm run pre-submit     # Run all checks before submission
-```
-
-## Build Configuration
-
-### iOS (app.json)
-
-- Bundle ID: `com.symbi.app`
-- HealthKit entitlement required
-- Background modes: fetch, processing
-- Minimum iOS: 14.0
-
-### Android (app.json)
-
-- Package: `com.symbi.app`
-- Permissions: ACTIVITY_RECOGNITION, health data access
-- Minimum Android: 8.0 (API 26)
+**Both**: Bundle ID/Package is `com.symbi.app`.
 
 ## API Integration
 
-### Gemini API (Phase 2+)
+Gemini API (Phase 2+):
+- Analysis: `gemini-2.5-flash-preview-09-2025`
+- Images: `gemini-2.5-flash-image-preview`
+- 10 second timeout with fallback, TLS 1.3 required
+- Rate limit: 1 request/24 hours/user
 
-- Model: `gemini-2.5-flash-preview-09-2025` for analysis
-- Model: `gemini-2.5-flash-image-preview` for evolution images
-- TLS 1.3 encryption required
-- 10 second timeout with fallback logic
-- Rate limit: 1 request per 24 hours per user
+## Performance Constraints
 
-## Performance Targets
+| Metric | Target |
+|--------|--------|
+| Memory | <100MB |
+| Battery | <5% per 24 hours |
+| Animation FPS | 60 active, 10 backgrounded |
+| API response | <5s (p95) |
 
-- Memory usage: <100MB
-- Battery consumption: <5% per 24 hours
-- Animation frame rate: 60 FPS (10 FPS when backgrounded)
-- API response time: <5 seconds (95th percentile)
+## Commands Reference
+
+```bash
+npm start          # Expo dev server
+npm run lint:fix   # Fix linting issues
+npm run format     # Prettier formatting
+npm test           # Jest tests
+npm run pre-submit # All checks before submission
+```
