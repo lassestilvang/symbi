@@ -79,7 +79,7 @@ import { HealthMetricsChart } from './components';
 <HealthMetricsChart
   data={historicalData}
   metricType="steps"
-  onDataPointPress={(point) => console.log(point)}
+  onDataPointPress={point => console.log(point)}
   width={350}
   testID="steps-chart"
 />;
@@ -121,7 +121,7 @@ import { EmotionalStateTimeline } from './components';
 
 <EmotionalStateTimeline
   data={historicalData}
-  onItemPress={(item) => console.log(item)}
+  onItemPress={item => console.log(item)}
   testID="timeline"
 />;
 ```
@@ -158,11 +158,7 @@ A card component for displaying evolution milestones with appearance previews.
 ```tsx
 import { EvolutionMilestoneCard } from './components';
 
-<EvolutionMilestoneCard
-  record={evolutionRecord}
-  badgeIcon="tombstone"
-  testID="milestone-card"
-/>;
+<EvolutionMilestoneCard record={evolutionRecord} badgeIcon="tombstone" testID="milestone-card" />;
 ```
 
 **Props:**
@@ -197,11 +193,7 @@ A scrollable table component displaying daily health metrics in tabular format.
 ```tsx
 import { HealthDataTable } from './components';
 
-<HealthDataTable
-  data={historicalData}
-  maxHeight={400}
-  testID="data-table"
-/>;
+<HealthDataTable data={historicalData} maxHeight={400} testID="data-table" />;
 ```
 
 **Props:**
@@ -413,33 +405,33 @@ All components use a centralized color palette defined in `src/constants/theme.t
 
 ```typescript
 HALLOWEEN_COLORS = {
-  primary: '#7C3AED',        // Main purple
-  primaryDark: '#5B21B6',    // Dark purple for borders
-  primaryLight: '#9333EA',   // Light purple for highlights
-  orange: '#F97316',         // Accent orange
-  green: '#10B981',          // Accent green
-  darkBg: '#1a1a2e',        // Dark background
-  cardBg: '#16213e',        // Card background
-  ghostWhite: '#F3F4F6',    // Light text/ghost color
-  rowEven: '#1a1a2e',       // Table even rows
-  rowOdd: '#16213e',        // Table odd rows
-}
+  primary: '#7C3AED', // Main purple
+  primaryDark: '#5B21B6', // Dark purple for borders
+  primaryLight: '#9333EA', // Light purple for highlights
+  orange: '#F97316', // Accent orange
+  green: '#10B981', // Accent green
+  darkBg: '#1a1a2e', // Dark background
+  cardBg: '#16213e', // Card background
+  ghostWhite: '#F3F4F6', // Light text/ghost color
+  rowEven: '#1a1a2e', // Table even rows
+  rowOdd: '#16213e', // Table odd rows
+};
 ```
 
 ### Emotional State Colors
 
 ```typescript
 STATE_COLORS = {
-  sad: '#DC2626',           // Red
-  resting: '#7C3AED',       // Purple
-  active: '#10B981',        // Green
-  vibrant: '#F59E0B',       // Amber
-  calm: '#3B82F6',          // Blue
-  tired: '#6B7280',         // Gray
-  stressed: '#EF4444',      // Red-orange
-  anxious: '#F97316',       // Orange
-  rested: '#8B5CF6',        // Light purple
-}
+  sad: '#DC2626', // Red
+  resting: '#7C3AED', // Purple
+  active: '#10B981', // Green
+  vibrant: '#F59E0B', // Amber
+  calm: '#3B82F6', // Blue
+  tired: '#6B7280', // Gray
+  stressed: '#EF4444', // Red-orange
+  anxious: '#F97316', // Orange
+  rested: '#8B5CF6', // Light purple
+};
 ```
 
 ### Metric Configuration
@@ -450,23 +442,23 @@ Each health metric has associated styling configuration:
 METRIC_CONFIG = {
   steps: {
     label: 'Steps',
-    color: '#7C3AED',       // Purple
+    color: '#7C3AED', // Purple
     suffix: '',
     decimals: 0,
   },
   sleep: {
     label: 'Sleep (hours)',
-    color: '#F97316',       // Orange
+    color: '#F97316', // Orange
     suffix: 'h',
     decimals: 1,
   },
   hrv: {
     label: 'HRV (ms)',
-    color: '#10B981',       // Green
+    color: '#10B981', // Green
     suffix: 'ms',
     decimals: 0,
   },
-}
+};
 ```
 
 ### Decoration Icons
@@ -479,7 +471,7 @@ DECORATION_ICONS = {
   pumpkin: '🎃',
   tombstone: '🪦',
   bat: '🦇',
-}
+};
 ```
 
 ### Usage in Components
@@ -501,7 +493,7 @@ const styles = StyleSheet.create({
 });
 
 // Use decoration icons
-<Text>{DECORATION_ICONS.ghost}</Text>
+<Text>{DECORATION_ICONS.ghost}</Text>;
 ```
 
 For complete theme documentation, see `docs/halloween-theme-colors.md`.

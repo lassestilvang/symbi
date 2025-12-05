@@ -5,12 +5,19 @@
 ```
 src/
 ├── components/          # Reusable UI components
-│   ├── SymbiAnimation.tsx          # Main Symbi creature animation
+│   ├── SymbiAnimation.tsx          # Main Symbi creature animation (Lottie)
 │   ├── Symbi8BitCanvas.tsx         # 8-bit pixel art ghost renderer
 │   ├── Symbi8BitDemo.tsx           # Demo component for 8-bit ghost
+│   ├── SymbiAnimationDemo.tsx      # Demo for Lottie animations
 │   ├── BreathingExercise.tsx       # Interactive breathing UI
 │   ├── EvolutionCelebration.tsx    # Evolution event UI
 │   ├── ThresholdConfigScreen.tsx   # Threshold configuration
+│   ├── StatisticsCard.tsx          # Metric display with Halloween decorations
+│   ├── HealthMetricsChart.tsx      # Interactive line charts with tooltips
+│   ├── EmotionalStateTimeline.tsx  # Scrollable timeline with state indicators
+│   ├── EvolutionMilestoneCard.tsx  # Evolution achievement cards
+│   ├── HealthDataTable.tsx         # Scrollable data table
+│   ├── ProgressiveImage.tsx        # Progressive image loading
 │   ├── symbi/                      # 8-bit ghost rendering system
 │   │   ├── pixelData.ts            # Pixel coordinate definitions
 │   │   ├── ghostRenderer.ts        # Rendering logic and state mappings
@@ -24,14 +31,17 @@ src/
 │   ├── SettingsScreen.tsx          # App settings and preferences
 │   ├── ManualEntryScreen.tsx       # Manual health data input
 │   ├── AccountScreen.tsx           # User account management
-│   ├── EvolutionGalleryScreen.tsx  # Evolution history viewer
+│   ├── EvolutionGalleryScreen.tsx  # Evolution gallery viewer
+│   ├── EvolutionHistoryScreen.tsx  # Historical data visualizations
 │   ├── PrivacyPolicyScreen.tsx     # Privacy policy display
 │   ├── onboarding/                 # Onboarding flow screens
 │   │   ├── OnboardingFlow.tsx
 │   │   ├── WelcomeScreen.tsx
 │   │   ├── HealthDataExplanationScreen.tsx
 │   │   ├── PermissionRequestScreen.tsx
-│   │   └── ManualEntryExplanationScreen.tsx
+│   │   ├── ManualEntryExplanationScreen.tsx
+│   │   ├── ProgressIndicator.tsx
+│   │   └── index.ts
 │   ├── __tests__/                  # Screen tests
 │   └── index.ts
 │
@@ -40,19 +50,30 @@ src/
 │   ├── HealthKitService.ts         # iOS HealthKit implementation
 │   ├── GoogleFitService.ts         # Android Google Fit implementation
 │   ├── ManualHealthDataService.ts  # Manual entry implementation
+│   ├── HealthDataUpdateService.ts  # Multi-metric data fetching
 │   ├── EmotionalStateCalculator.ts # State determination logic
 │   ├── AIBrainService.ts           # Gemini API integration
+│   ├── DailyAIAnalysisService.ts   # Daily AI analysis scheduling
 │   ├── EvolutionSystem.ts          # Evolution tracking and triggers
 │   ├── InteractiveSessionManager.ts # Wellness activity management
 │   ├── CloudSyncService.ts         # Cloud synchronization (Phase 3)
+│   ├── CloudAPIService.ts          # Cloud API client
 │   ├── StorageService.ts           # AsyncStorage wrapper
 │   ├── SecureStorageService.ts     # Encrypted storage
 │   ├── EncryptionService.ts        # Encryption utilities
+│   ├── SecureAPIService.ts         # Secure API communication
+│   ├── AuthService.ts              # Authentication service
 │   ├── PermissionService.ts        # Permission handling
 │   ├── ErrorReportingService.ts    # Sentry integration
 │   ├── PerformanceMonitor.ts       # Performance tracking
+│   ├── MemoryMonitor.ts            # Memory usage monitoring
 │   ├── AnalyticsService.ts         # Privacy-preserving analytics
 │   ├── BackgroundSyncService.ts    # Background data fetching
+│   ├── BackgroundTaskConfig.ts     # Background task configuration
+│   ├── DataManagementService.ts    # Data export/import management
+│   ├── ImageCacheManager.ts        # Image caching for evolutions
+│   ├── RequestDeduplicator.ts      # API request deduplication
+│   ├── FirebaseConfig.ts           # Firebase configuration
 │   ├── __tests__/                  # Service tests
 │   └── index.ts
 │
@@ -60,18 +81,37 @@ src/
 │   ├── healthDataStore.ts          # Health metrics and emotional state
 │   ├── userPreferencesStore.ts     # User settings and thresholds
 │   ├── symbiStateStore.ts          # Symbi creature state
+│   ├── README.md                   # Store documentation
 │   └── index.ts
 │
 ├── hooks/               # Custom React hooks
-│   └── useSymbiAnimation.ts        # Animation logic for 8-bit ghost
+│   ├── useSymbiAnimation.ts        # Animation logic for 8-bit ghost
+│   ├── useBackgroundSync.ts        # Background sync management
+│   ├── useEvolutionProgress.ts     # Evolution progress tracking
+│   ├── useHealthDataInitialization.ts # Health data init on mount
+│   ├── useNetworkStatus.ts         # Network connectivity status
+│   ├── useStateChangeNotification.ts # State change notifications
+│   └── index.ts                    # Barrel exports
 │
 ├── navigation/          # React Navigation setup
 │   └── AppNavigator.tsx            # Main navigation stack
 │
 ├── types/               # TypeScript type definitions
-│   └── index.ts                    # Shared types and interfaces
+│   ├── index.ts                    # Shared types and interfaces
+│   └── result.ts                   # Result type for error handling
+│
+├── constants/           # Application constants
+│   ├── theme.ts                    # Halloween colors, state colors, metric config
+│   └── index.ts                    # Barrel exports
+│
+├── utils/               # Utility functions
+│   ├── dateHelpers.ts              # Date formatting utilities
+│   ├── metricHelpers.ts            # Type-safe metric operations
+│   └── index.ts                    # Barrel exports
 │
 ├── assets/              # Static assets
+│   ├── images/
+│   │   └── tamagotchi-frame.png    # Tamagotchi-style frame
 │   └── animations/
 │       ├── phase1/                 # Basic emotional states
 │       │   ├── sad.json

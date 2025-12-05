@@ -4,7 +4,7 @@
 
 This document provides a comprehensive index of all documentation files in the Symbi project, organized by category.
 
-Last Updated: November 16, 2025
+Last Updated: December 5, 2025
 
 ## Quick Start
 
@@ -14,10 +14,12 @@ Last Updated: November 16, 2025
 ## Architecture & Design
 
 ### Core Architecture
+
 - [app-architecture.md](./app-architecture.md) - Application architecture, initialization flow, and patterns
 - [implementation-plan.md](./implementation-plan.md) - Development roadmap and phase planning
 
 ### Feature Documentation
+
 - [evolution-history-implementation-summary.md](./evolution-history-implementation-summary.md) - Evolution History page implementation (516 lines)
 - [evolution-history-types-implementation.md](./evolution-history-types-implementation.md) - Type definitions for historical data
 - [health-data-integration-summary.md](./health-data-integration-summary.md) - Health data integration overview
@@ -27,38 +29,46 @@ Last Updated: November 16, 2025
 ## Component Documentation
 
 ### Components
+
 - [src/components/README.md](../src/components/README.md) - Component library documentation
 - [src/components/symbi/README.md](../src/components/symbi/README.md) - 8-bit ghost rendering system
 
 ### Screens
+
 - [src/screens/README.md](../src/screens/README.md) - Screen components documentation
 
 ### State Management
+
 - [src/stores/README.md](../src/stores/README.md) - Zustand stores documentation
 
 ## Code Quality & Refactoring
 
 ### Recent Refactoring (Nov 16, 2025)
+
 - [code-refactoring-nov-16-2025.md](./code-refactoring-nov-16-2025.md) - Comprehensive refactoring summary (458 lines)
 - [healthmetricschart-refactoring-nov-16.md](./healthmetricschart-refactoring-nov-16.md) - HealthMetricsChart optimization (326 lines)
 - [manual-health-data-service-refactoring.md](./manual-health-data-service-refactoring.md) - ManualHealthDataService improvements
 - [symbi-canvas-refactoring.md](./symbi-canvas-refactoring.md) - 8-bit canvas refactoring
 
 ### Code Reviews
+
 - [code-review-8bit-ghost.md](./code-review-8bit-ghost.md) - 8-bit ghost implementation review
 
 ## UI/UX & Design
 
 ### Theme & Styling
+
 - [halloween-theme-colors.md](./halloween-theme-colors.md) - Color palette documentation (257 lines)
 - [halloween-theme-styling.md](./halloween-theme-styling.md) - Styling patterns and best practices (240 lines)
 
 ### Responsive Design
+
 - [evolution-history-responsive-layout.md](./evolution-history-responsive-layout.md) - Responsive layout strategies (143 lines)
 - [evolution-gallery-responsive-layout.md](./evolution-gallery-responsive-layout.md) - Gallery layout optimization (303 lines)
 - [mainscreen-responsive-layout-update.md](./mainscreen-responsive-layout-update.md) - MainScreen responsive improvements
 
 ### MainScreen Documentation
+
 - [mainscreen-complete-feature-documentation.md](./mainscreen-complete-feature-documentation.md) - Complete feature documentation
 - [mainscreen-documentation-update-nov-16.md](./mainscreen-documentation-update-nov-16.md) - Recent updates
 - [mainscreen-ui-refactor.md](./mainscreen-ui-refactor.md) - UI refactoring details
@@ -99,15 +109,18 @@ Last Updated: November 16, 2025
 ## App Store Submission
 
 ### Main Guides
+
 - [app-store/README.md](./app-store/README.md) - App store submission overview
 - [app-store/QUICK-REFERENCE.md](./app-store/QUICK-REFERENCE.md) - Quick reference guide
 - [app-store/submission-guide.md](./app-store/submission-guide.md) - Submission procedures
 
 ### Metadata
+
 - [app-store/ios-metadata.md](./app-store/ios-metadata.md) - iOS App Store metadata
 - [app-store/android-metadata.md](./app-store/android-metadata.md) - Google Play Store metadata
 
 ### Assets
+
 - [app-store/app-icon-design-spec.md](./app-store/app-icon-design-spec.md) - App icon specifications
 - [app-store/preview-materials-guide.md](./app-store/preview-materials-guide.md) - Preview materials guide
 
@@ -167,12 +180,14 @@ Comprehensive documentation for the Evolution History feature:
 ## Documentation by Phase
 
 ### Phase 1 (MVP)
+
 - Basic health data integration
 - Step tracking
 - 3 emotional states
 - Rule-based state calculation
 
 ### Phase 2 (Current)
+
 - Multi-metric tracking (steps, sleep, HRV)
 - 9 emotional states
 - AI-powered state calculation
@@ -180,6 +195,7 @@ Comprehensive documentation for the Evolution History feature:
 - Data visualizations
 
 ### Phase 3 (Planned)
+
 - Interactive wellness activities
 - Generative evolution system
 - Cloud synchronization
