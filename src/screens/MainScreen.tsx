@@ -348,15 +348,15 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
 
         {/* Symbi Ghost with Tamagotchi Frame - Now with Cosmetics (Requirement 5.5) */}
         <View style={styles.symbiContainer}>
-          {isLoading ? (
-            <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
-          ) : (
-            <View style={styles.tamagotchiFrame}>
-              <ImageBackground
-                source={tamagotchiFrameImage}
-                style={styles.frameImage}
-                resizeMode="contain">
-                <View style={styles.ghostScreenArea}>
+          <View style={styles.tamagotchiFrame}>
+            <ImageBackground
+              source={tamagotchiFrameImage}
+              style={styles.frameImage}
+              resizeMode="contain">
+              <View style={styles.ghostScreenArea}>
+                {isLoading || isInitializing ? (
+                  <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
+                ) : (
                   <CosmeticRenderer
                     key={`ghost-${emotionalState}`}
                     emotionalState={emotionalState}
@@ -364,10 +364,10 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
                     onPoke={handleSymbiPoke}
                     showCosmetics={true}
                   />
-                </View>
-              </ImageBackground>
-            </View>
-          )}
+                )}
+              </View>
+            </ImageBackground>
+          </View>
         </View>
 
         {/* Manual Entry Button */}
