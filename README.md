@@ -122,7 +122,7 @@ Detailed documentation is available in the `/docs` folder:
 
 ## License
 
-Private project — All rights reserved
+MIT License — see [LICENSE](LICENSE) for details
 
 ---
 
