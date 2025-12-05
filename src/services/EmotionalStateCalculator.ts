@@ -10,47 +10,38 @@ import { AIBrainService } from './AIBrainService';
  *
  * Requirements: 3.1, 4.1, 4.2, 4.3, 5.3, 5.4, 6.4
  */
-export class EmotionalStateCalculator {
-  private static aiBrainService: AIBrainService | null = null;
 
-  /**
-   * Initialize the calculator with AI Brain Service
-   * @param apiKey - Gemini API key for AI analysis
-   */
-  static initializeAI(apiKey: string): void {
-    this.aiBrainService = new AIBrainService(apiKey);
-  }
+/** Default thresholds for step-based calculation */
+const DEFAULT_THRESHOLDS: StepThresholds = {
+  sadThreshold: 2000,
+  activeThreshold: 8000,
+};
+
+/**
+ * Instance-based calculator with dependency injection
+ * Preferred for new code - allows better testing and flexibility
+ */
+export class EmotionalStateCalculatorInstance {
+  constructor(private aiBrainService?: AIBrainService) {}
 
   /**
    * Check if AI analysis is available
    */
-  static isAIAvailable(): boolean {
-    return this.aiBrainService !== null;
+  isAIAvailable(): boolean {
+    return this.aiBrainService !== undefined;
   }
+
   /**
    * Calculate emotional state from step count using threshold logic (Phase 1)
-   *
-   * @param steps - Daily step count
-   * @param thresholds - User-configured thresholds
-   * @returns EmotionalState enum value
-   *
-   * Logic:
-   * - steps < sadThreshold → SAD
-   * - sadThreshold ≤ steps < activeThreshold → RESTING
-   * - steps ≥ activeThreshold → ACTIVE
    */
-  static calculateStateFromSteps(steps: number, thresholds: StepThresholds): EmotionalState {
-    // Handle edge cases
-    if (steps < 0) {
-      steps = 0;
-    }
+  calculateStateFromSteps(steps: number, thresholds: StepThresholds): EmotionalState {
+    const normalizedSteps = Math.max(0, steps);
 
-    // Apply threshold logic
-    if (steps < thresholds.sadThreshold) {
+    if (normalizedSteps < thresholds.sadThreshold) {
       return EmotionalState.SAD;
     }
 
-    if (steps < thresholds.activeThreshold) {
+    if (normalizedSteps < thresholds.activeThreshold) {
       return EmotionalState.RESTING;
     }
 
@@ -59,51 +50,36 @@ export class EmotionalStateCalculator {
 
   /**
    * Calculate emotional state from multiple health metrics using AI (Phase 2)
-   *
-   * @param metrics - Health metrics (steps, sleep, HRV)
-   * @param goals - User's health goals
-   * @param thresholds - Optional thresholds for fallback calculation
-   * @returns Promise<EmotionalState>
-   *
-   * This method attempts to use AI analysis if available, otherwise falls back to rule-based logic
    */
-  static async calculateStateFromMultipleMetrics(
+  async calculateStateFromMultipleMetrics(
     metrics: HealthMetrics,
     goals: HealthGoals,
     thresholds?: StepThresholds
   ): Promise<EmotionalState> {
-    // If AI is available, try to use it
     if (this.aiBrainService) {
       try {
-        console.log('Using AI analysis for emotional state calculation');
+        if (__DEV__) {
+          console.log('Using AI analysis for emotional state calculation');
+        }
         const result = await this.aiBrainService.analyzeHealthData(metrics, goals);
         return result.emotionalState;
       } catch (error) {
-        console.error('AI analysis failed, falling back to rule-based:', error);
-        // Fall through to rule-based calculation
+        if (__DEV__) {
+          console.error('AI analysis failed, falling back to rule-based:', error);
+        }
       }
     }
 
-    // Fallback to Phase 1 rule-based logic
-    console.log('Using rule-based calculation for emotional state');
-    const defaultThresholds: StepThresholds = thresholds || {
-      sadThreshold: 2000,
-      activeThreshold: 8000,
-    };
-
-    return this.calculateStateFromSteps(metrics.steps, defaultThresholds);
+    if (__DEV__) {
+      console.log('Using rule-based calculation for emotional state');
+    }
+    return this.calculateStateFromSteps(metrics.steps, thresholds || DEFAULT_THRESHOLDS);
   }
 
   /**
    * Calculate emotional state with enhanced rule-based logic using multiple metrics
-   * This provides a more nuanced calculation without AI when sleep and HRV data is available
-   *
-   * @param metrics - Health metrics (steps, sleep, HRV)
-   * @param goals - User's health goals
-   * @param thresholds - Step thresholds
-   * @returns EmotionalState
    */
-  static calculateStateFromMultipleMetricsRuleBased(
+  calculateStateFromMultipleMetricsRuleBased(
     metrics: HealthMetrics,
     goals: HealthGoals,
     thresholds: StepThresholds
@@ -111,11 +87,8 @@ export class EmotionalStateCalculator {
     const { steps, sleepHours, hrv } = metrics;
     const { targetSteps, targetSleepHours } = goals;
 
-    // Calculate percentages of goals met
     const stepPercentage = (steps / targetSteps) * 100;
     const sleepPercentage = sleepHours ? (sleepHours / targetSleepHours) * 100 : null;
-
-    // Enhanced logic using multiple metrics
 
     // Vibrant: Exceeding goals across the board
     if (stepPercentage > 100 && sleepPercentage && sleepPercentage > 90 && hrv && hrv > 60) {
@@ -149,5 +122,79 @@ export class EmotionalStateCalculator {
 
     // Fall back to Phase 1 step-based logic
     return this.calculateStateFromSteps(steps, thresholds);
+  }
+}
+
+/**
+ * Static class for backward compatibility
+ * @deprecated Use EmotionalStateCalculatorInstance with dependency injection instead
+ */
+export class EmotionalStateCalculator {
+  private static instance: EmotionalStateCalculatorInstance | null = null;
+
+  /**
+   * Initialize the calculator with AI Brain Service
+   * @param apiKey - Gemini API key for AI analysis
+   */
+  static initializeAI(apiKey: string): void {
+    const aiBrainService = new AIBrainService(apiKey);
+    this.instance = new EmotionalStateCalculatorInstance(aiBrainService);
+  }
+
+  /**
+   * Get or create the calculator instance
+   */
+  private static getInstance(): EmotionalStateCalculatorInstance {
+    if (!this.instance) {
+      this.instance = new EmotionalStateCalculatorInstance();
+    }
+    return this.instance;
+  }
+
+  /**
+   * Check if AI analysis is available
+   */
+  static isAIAvailable(): boolean {
+    return this.getInstance().isAIAvailable();
+  }
+
+  /**
+   * Calculate emotional state from step count using threshold logic (Phase 1)
+   */
+  static calculateStateFromSteps(steps: number, thresholds: StepThresholds): EmotionalState {
+    return this.getInstance().calculateStateFromSteps(steps, thresholds);
+  }
+
+  /**
+   * Calculate emotional state from multiple health metrics using AI (Phase 2)
+   */
+  static async calculateStateFromMultipleMetrics(
+    metrics: HealthMetrics,
+    goals: HealthGoals,
+    thresholds?: StepThresholds
+  ): Promise<EmotionalState> {
+    return this.getInstance().calculateStateFromMultipleMetrics(metrics, goals, thresholds);
+  }
+
+  /**
+   * Calculate emotional state with enhanced rule-based logic using multiple metrics
+   */
+  static calculateStateFromMultipleMetricsRuleBased(
+    metrics: HealthMetrics,
+    goals: HealthGoals,
+    thresholds: StepThresholds
+  ): EmotionalState {
+    return this.getInstance().calculateStateFromMultipleMetricsRuleBased(
+      metrics,
+      goals,
+      thresholds
+    );
+  }
+
+  /**
+   * Reset the instance (useful for testing)
+   */
+  static reset(): void {
+    this.instance = null;
   }
 }

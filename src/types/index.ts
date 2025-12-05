@@ -5,6 +5,9 @@
  * Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.4, 8.4
  */
 
+// Re-export Result type utilities
+export { Result, success, failure, isSuccess, isFailure, unwrap, unwrapOr } from './result';
+
 // ============================================================================
 // Enums
 // ============================================================================

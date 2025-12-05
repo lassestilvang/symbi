@@ -13,12 +13,14 @@ Optimized the Evolution Gallery Screen's responsive layout by reducing the maxim
 **File**: `src/screens/EvolutionGalleryScreen.tsx`
 
 ### Initial Change (MAX_CONTAINER_WIDTH)
+
 ```typescript
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const MAX_CONTAINER_WIDTH = 400; // Changed from 500
 ```
 
 ### Migration to ScrollView (November 16, 2025)
+
 Replaced FlatList with ScrollView for more direct layout control:
 
 ```typescript
@@ -33,7 +35,7 @@ Replaced FlatList with ScrollView for more direct layout control:
 />
 
 // After (ScrollView)
-<ScrollView 
+<ScrollView
   style={styles.scrollView}
   contentContainerStyle={styles.scrollContent}
   showsVerticalScrollIndicator={false}>
@@ -58,6 +60,7 @@ Replaced FlatList with ScrollView for more direct layout control:
 **Rationale**: ScrollView provides more explicit control over the layout hierarchy and centering behavior. With FlatList's `columnWrapperStyle`, achieving proper centering on larger screens was complex. ScrollView allows us to use a simple wrapper pattern where the content is constrained to `MAX_CONTAINER_WIDTH` and centered naturally.
 
 ### Layout Structure
+
 The new layout uses a clear hierarchy:
 
 ```typescript
@@ -78,6 +81,7 @@ row: {
 ```
 
 **Benefits**:
+
 - Simpler centering logic (no need for columnWrapperStyle tricks)
 - More predictable layout behavior across screen sizes
 - Easier to maintain and understand
@@ -100,11 +104,11 @@ row: {
 
 ## Impact by Device
 
-| Device Type   | Screen Width | Container Width | Card Width | Behavior                    |
-| ------------- | ------------ | --------------- | ---------- | --------------------------- |
-| Mobile Phones | < 400px      | Full width      | Dynamic    | Unchanged (full width)      |
-| Small Tablets | 400-500px    | 400px           | ~170px     | Now constrained, centered   |
-| Large Tablets | > 500px      | 400px           | ~170px     | Better proportions, centered|
+| Device Type   | Screen Width | Container Width | Card Width | Behavior                     |
+| ------------- | ------------ | --------------- | ---------- | ---------------------------- |
+| Mobile Phones | < 400px      | Full width      | Dynamic    | Unchanged (full width)       |
+| Small Tablets | 400-500px    | 400px           | ~170px     | Now constrained, centered    |
+| Large Tablets | > 500px      | 400px           | ~170px     | Better proportions, centered |
 
 ## Benefits
 
@@ -269,6 +273,7 @@ ScrollView provides better control over the layout hierarchy compared to FlatLis
 - **ScrollView Approach**: Explicit row-by-row rendering with clear wrapper hierarchy
 
 **Benefits**:
+
 1. **Simpler Centering**: `scrollContent` centers the `contentWrapper`, which constrains to 400px
 2. **More Predictable**: No special FlatList column wrapper behavior to account for
 3. **Easier Maintenance**: Clear parent-child relationships in the layout tree

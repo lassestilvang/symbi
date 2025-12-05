@@ -390,6 +390,7 @@ const HALLOWEEN_COLORS = {
 Comprehensive test suite covering:
 
 **Data Transformation Tests**:
+
 - ✅ Transform cache to data points correctly
 - ✅ Sort data points by date in ascending order
 - ✅ Handle cache with missing optional fields (sleep, HRV)
@@ -398,6 +399,7 @@ Comprehensive test suite covering:
 - ✅ Handle malformed cache data gracefully
 
 **Time Range Filtering Tests**:
+
 - ✅ Filter data for 7 days range
 - ✅ Filter data for 30 days range
 - ✅ Filter data for 90 days range
@@ -405,6 +407,7 @@ Comprehensive test suite covering:
 - ✅ Handle empty data array
 
 **Statistics Calculation Tests**:
+
 - ✅ Calculate average steps correctly
 - ✅ Calculate average sleep when available
 - ✅ Return null for average sleep when no data available
@@ -418,6 +421,7 @@ Comprehensive test suite covering:
 - ✅ Round average steps to whole number
 
 **Error Handling Tests**:
+
 - ✅ Handle malformed cache data gracefully
 - ✅ Handle edge case with single data point
 - ✅ Handle evolution records with no last evolution

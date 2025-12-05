@@ -14,22 +14,22 @@ Main color palette for the application.
 import { HALLOWEEN_COLORS } from '../constants/theme';
 
 // Primary colors
-HALLOWEEN_COLORS.primary        // '#7C3AED' - Main purple
-HALLOWEEN_COLORS.primaryDark    // '#5B21B6' - Dark purple
-HALLOWEEN_COLORS.primaryLight   // '#9333EA' - Light purple
+HALLOWEEN_COLORS.primary; // '#7C3AED' - Main purple
+HALLOWEEN_COLORS.primaryDark; // '#5B21B6' - Dark purple
+HALLOWEEN_COLORS.primaryLight; // '#9333EA' - Light purple
 
 // Accent colors
-HALLOWEEN_COLORS.orange         // '#F97316' - Orange accent
-HALLOWEEN_COLORS.green          // '#10B981' - Green accent
+HALLOWEEN_COLORS.orange; // '#F97316' - Orange accent
+HALLOWEEN_COLORS.green; // '#10B981' - Green accent
 
 // Background colors
-HALLOWEEN_COLORS.darkBg         // '#1a1a2e' - Dark background
-HALLOWEEN_COLORS.cardBg         // '#16213e' - Card background
-HALLOWEEN_COLORS.ghostWhite     // '#F3F4F6' - Light text
+HALLOWEEN_COLORS.darkBg; // '#1a1a2e' - Dark background
+HALLOWEEN_COLORS.cardBg; // '#16213e' - Card background
+HALLOWEEN_COLORS.ghostWhite; // '#F3F4F6' - Light text
 
 // Table colors
-HALLOWEEN_COLORS.rowEven        // '#1a1a2e' - Even row
-HALLOWEEN_COLORS.rowOdd         // '#16213e' - Odd row
+HALLOWEEN_COLORS.rowEven; // '#1a1a2e' - Even row
+HALLOWEEN_COLORS.rowOdd; // '#16213e' - Odd row
 ```
 
 **Usage Example:**
@@ -53,15 +53,15 @@ Color mapping for emotional states.
 ```typescript
 import { STATE_COLORS } from '../constants/theme';
 
-STATE_COLORS.sad        // '#DC2626' - Red
-STATE_COLORS.resting    // '#7C3AED' - Purple
-STATE_COLORS.active     // '#10B981' - Green
-STATE_COLORS.vibrant    // '#F59E0B' - Amber
-STATE_COLORS.calm       // '#3B82F6' - Blue
-STATE_COLORS.tired      // '#6B7280' - Gray
-STATE_COLORS.stressed   // '#EF4444' - Red-orange
-STATE_COLORS.anxious    // '#F97316' - Orange
-STATE_COLORS.rested     // '#8B5CF6' - Light purple
+STATE_COLORS.sad; // '#DC2626' - Red
+STATE_COLORS.resting; // '#7C3AED' - Purple
+STATE_COLORS.active; // '#10B981' - Green
+STATE_COLORS.vibrant; // '#F59E0B' - Amber
+STATE_COLORS.calm; // '#3B82F6' - Blue
+STATE_COLORS.tired; // '#6B7280' - Gray
+STATE_COLORS.stressed; // '#EF4444' - Red-orange
+STATE_COLORS.anxious; // '#F97316' - Orange
+STATE_COLORS.rested; // '#8B5CF6' - Light purple
 ```
 
 **Usage Example:**
@@ -80,22 +80,22 @@ Configuration for health metrics.
 import { METRIC_CONFIG } from '../constants/theme';
 
 // Steps configuration
-METRIC_CONFIG.steps.label      // "Steps"
-METRIC_CONFIG.steps.color      // "#7C3AED"
-METRIC_CONFIG.steps.suffix     // ""
-METRIC_CONFIG.steps.decimals   // 0
+METRIC_CONFIG.steps.label; // "Steps"
+METRIC_CONFIG.steps.color; // "#7C3AED"
+METRIC_CONFIG.steps.suffix; // ""
+METRIC_CONFIG.steps.decimals; // 0
 
 // Sleep configuration
-METRIC_CONFIG.sleep.label      // "Sleep"
-METRIC_CONFIG.sleep.color      // "#F97316"
-METRIC_CONFIG.sleep.suffix     // "h"
-METRIC_CONFIG.sleep.decimals   // 1
+METRIC_CONFIG.sleep.label; // "Sleep"
+METRIC_CONFIG.sleep.color; // "#F97316"
+METRIC_CONFIG.sleep.suffix; // "h"
+METRIC_CONFIG.sleep.decimals; // 1
 
 // HRV configuration
-METRIC_CONFIG.hrv.label        // "HRV"
-METRIC_CONFIG.hrv.color        // "#10B981"
-METRIC_CONFIG.hrv.suffix       // "ms"
-METRIC_CONFIG.hrv.decimals     // 0
+METRIC_CONFIG.hrv.label; // "HRV"
+METRIC_CONFIG.hrv.color; // "#10B981"
+METRIC_CONFIG.hrv.suffix; // "ms"
+METRIC_CONFIG.hrv.decimals; // 0
 ```
 
 **Usage Example:**
@@ -112,10 +112,10 @@ Halloween-themed decoration icons.
 ```typescript
 import { DECORATION_ICONS } from '../constants/theme';
 
-DECORATION_ICONS.ghost      // '👻'
-DECORATION_ICONS.pumpkin    // '🎃'
-DECORATION_ICONS.tombstone  // '🪦'
-DECORATION_ICONS.bat        // '🦇'
+DECORATION_ICONS.ghost; // '👻'
+DECORATION_ICONS.pumpkin; // '🎃'
+DECORATION_ICONS.tombstone; // '🪦'
+DECORATION_ICONS.bat; // '🦇'
 ```
 
 **Usage Example:**
@@ -140,11 +140,11 @@ import {
 } from '../utils/dateHelpers';
 
 // Format examples for "2025-11-16"
-formatShortDate('2025-11-16')      // "11/16"
-formatMediumDate('2025-11-16')     // "Nov 16"
-formatFullDate('2025-11-16')       // "Monday, November 16, 2025"
-formatWeekday('2025-11-16')        // "Mon"
-formatDisplayDate(new Date())      // "Nov 16, 2025"
+formatShortDate('2025-11-16'); // "11/16"
+formatMediumDate('2025-11-16'); // "Nov 16"
+formatFullDate('2025-11-16'); // "Monday, November 16, 2025"
+formatWeekday('2025-11-16'); // "Mon"
+formatDisplayDate(new Date()); // "Nov 16, 2025"
 ```
 
 **Use Cases:**
@@ -227,9 +227,9 @@ const sleepData = filterByMetric(allData, 'sleep');
 Format a metric value with appropriate precision and suffix.
 
 ```typescript
-formatMetricValue(8542, 'steps');    // "8542"
-formatMetricValue(7.5, 'sleep');     // "7.5h"
-formatMetricValue(65, 'hrv');        // "65ms"
+formatMetricValue(8542, 'steps'); // "8542"
+formatMetricValue(7.5, 'sleep'); // "7.5h"
+formatMetricValue(65, 'hrv'); // "65ms"
 ```
 
 ### getMetricConfig
@@ -249,15 +249,15 @@ import { filterByMetric, formatMetricValue, getMetricConfig } from '../utils/met
 const ChartComponent = ({ data, metricType }) => {
   // Filter data for the metric
   const filteredData = filterByMetric(data, metricType);
-  
+
   // Get metric configuration
   const config = getMetricConfig(metricType);
-  
+
   // Format values for display
-  const formattedValues = filteredData.map(point => 
+  const formattedValues = filteredData.map(point =>
     formatMetricValue(getMetricValue(point, metricType), metricType)
   );
-  
+
   return (
     <View>
       <Text style={{ color: config.color }}>{config.label}</Text>
@@ -272,6 +272,7 @@ const ChartComponent = ({ data, metricType }) => {
 ### 1. Always Use Centralized Constants
 
 ❌ **Don't:**
+
 ```typescript
 const styles = StyleSheet.create({
   container: {
@@ -281,6 +282,7 @@ const styles = StyleSheet.create({
 ```
 
 ✅ **Do:**
+
 ```typescript
 import { HALLOWEEN_COLORS } from '../constants/theme';
 
@@ -294,12 +296,14 @@ const styles = StyleSheet.create({
 ### 2. Use Type-Safe Metric Operations
 
 ❌ **Don't:**
+
 ```typescript
 const value = point.sleepHours || 0; // Unsafe
 const formatted = `${value.toFixed(1)}h`; // Manual formatting
 ```
 
 ✅ **Do:**
+
 ```typescript
 import { getMetricValue, formatMetricValue } from '../utils/metricHelpers';
 
@@ -310,12 +314,14 @@ const formatted = formatMetricValue(value, 'sleep');
 ### 3. Consistent Date Formatting
 
 ❌ **Don't:**
+
 ```typescript
 const date = new Date(dateString);
 const formatted = `${date.getMonth() + 1}/${date.getDate()}`; // Manual formatting
 ```
 
 ✅ **Do:**
+
 ```typescript
 import { formatShortDate } from '../utils/dateHelpers';
 
@@ -325,6 +331,7 @@ const formatted = formatShortDate(dateString);
 ### 4. Memoize Expensive Operations
 
 ✅ **Do:**
+
 ```typescript
 import { useMemo } from 'react';
 import { filterByMetric } from '../utils/metricHelpers';
@@ -348,10 +355,10 @@ import { HALLOWEEN_COLORS, STATE_COLORS, METRIC_CONFIG } from '../constants/them
 
 ```typescript
 // Before
-backgroundColor: '#7C3AED'
+backgroundColor: '#7C3AED';
 
 // After
-backgroundColor: HALLOWEEN_COLORS.primary
+backgroundColor: HALLOWEEN_COLORS.primary;
 ```
 
 ### Step 3: Import Utilities

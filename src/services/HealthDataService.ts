@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { Platform } from 'react-native';
-import { HealthDataType } from '../types';
+import { HealthDataType, DataSource } from '../types';
 
 export interface HealthPermissions {
   read: HealthDataType[];
@@ -20,8 +19,14 @@ export enum AuthStatus {
   NOT_DETERMINED = 'not_determined',
 }
 
+/**
+ * Type-safe callback types for health data updates
+ */
+export type HealthDataValue = number | { value: number; timestamp: Date };
+export type HealthDataCallback = (data: HealthDataValue) => void;
+
 export abstract class HealthDataService {
-  protected updateCallbacks: Map<HealthDataType, (data: any) => void> = new Map();
+  protected updateCallbacks: Map<HealthDataType, HealthDataCallback> = new Map();
 
   abstract initialize(permissions: HealthPermissions): Promise<InitResult>;
   abstract checkAuthorizationStatus(permissions: HealthPermissions): Promise<AuthStatus>;
@@ -30,7 +35,7 @@ export abstract class HealthDataService {
   abstract getHeartRateVariability(startDate: Date, endDate: Date): Promise<number>;
   abstract writeMindfulMinutes(duration: number, timestamp: Date): Promise<boolean>;
 
-  subscribeToUpdates(dataType: HealthDataType, callback: (data: any) => void): void {
+  subscribeToUpdates(dataType: HealthDataType, callback: HealthDataCallback): void {
     this.updateCallbacks.set(dataType, callback);
   }
 
@@ -38,7 +43,7 @@ export abstract class HealthDataService {
     this.updateCallbacks.delete(dataType);
   }
 
-  protected notifyUpdate(dataType: HealthDataType, data: any): void {
+  protected notifyUpdate(dataType: HealthDataType, data: HealthDataValue): void {
     const callback = this.updateCallbacks.get(dataType);
     if (callback) {
       callback(data);
@@ -46,26 +51,29 @@ export abstract class HealthDataService {
   }
 }
 
-// Factory function to create platform-specific health data service
-export function createHealthDataService(
-  dataSource?: 'healthkit' | 'googlefit' | 'manual'
-): HealthDataService {
+/**
+ * Factory function to create platform-specific health data service
+ *
+ * @param dataSource - Optional data source override
+ * @returns Platform-appropriate HealthDataService implementation
+ */
+export function createHealthDataService(dataSource?: DataSource): HealthDataService {
   // If manual is explicitly requested, return ManualHealthDataService
   if (dataSource === 'manual') {
     const { ManualHealthDataService } = require('./ManualHealthDataService');
-    return new ManualHealthDataService();
+    return new ManualHealthDataService() as HealthDataService;
   }
 
   // Otherwise, use platform-specific service
   if (Platform.OS === 'ios') {
     const { HealthKitService } = require('./HealthKitService');
-    return new HealthKitService();
+    return new HealthKitService() as HealthDataService;
   } else if (Platform.OS === 'android') {
     const { GoogleFitService } = require('./GoogleFitService');
-    return new GoogleFitService();
+    return new GoogleFitService() as HealthDataService;
   } else {
     // Fallback to manual for unsupported platforms (web, etc.)
     const { ManualHealthDataService } = require('./ManualHealthDataService');
-    return new ManualHealthDataService();
+    return new ManualHealthDataService() as HealthDataService;
   }
 }

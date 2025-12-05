@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserProfile, HealthDataCache, EvolutionRecord } from '../types';
 
@@ -162,11 +161,11 @@ export class StorageService {
     }
 
     if (typeof obj === 'object') {
-      const result: any = {};
-      for (const [key, value] of Object.entries(obj)) {
+      const result: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
         result[key] = this.deserializeDates(value);
       }
-      return result;
+      return result as T;
     }
 
     return obj;
