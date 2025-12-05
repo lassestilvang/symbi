@@ -6,14 +6,14 @@ inclusion: always
 
 ## Core Dependencies
 
-| Package             | Version  | Purpose                            |
-| ------------------- | -------- | ---------------------------------- |
-| React Native        | 0.81.5   | Mobile framework via Expo ~54.0.22 |
-| TypeScript          | 5.9.2    | Strict mode, no `any` types        |
-| React               | 19.2.0   | UI library                         |
-| Zustand             | 5.0.8    | State management                   |
-| React Navigation    | 7.x      | Native stack navigator             |
-| Lottie React Native | 7.3.4    | Symbi animations                   |
+| Package             | Version | Purpose                            |
+| ------------------- | ------- | ---------------------------------- |
+| React Native        | 0.81.5  | Mobile framework via Expo ~54.0.22 |
+| TypeScript          | 5.9.2   | Strict mode, no `any` types        |
+| React               | 19.2.0  | UI library                         |
+| Zustand             | 5.0.8   | State management                   |
+| React Navigation    | 7.x     | Native stack navigator             |
+| Lottie React Native | 7.3.4   | Symbi animations                   |
 
 ## TypeScript Rules (Strict)
 
@@ -37,32 +37,32 @@ Arrow parens: avoid when possible
 
 Always use these instead of relative imports:
 
-| Alias           | Maps to              |
-| --------------- | -------------------- |
-| `@components/*` | `src/components/*`   |
-| `@services/*`   | `src/services/*`     |
-| `@hooks/*`      | `src/hooks/*`        |
-| `@types/*`      | `src/types/*`        |
-| `@assets/*`     | `src/assets/*`       |
+| Alias           | Maps to            |
+| --------------- | ------------------ |
+| `@components/*` | `src/components/*` |
+| `@services/*`   | `src/services/*`   |
+| `@hooks/*`      | `src/hooks/*`      |
+| `@types/*`      | `src/types/*`      |
+| `@assets/*`     | `src/assets/*`     |
 
 ## Platform Implementation
 
-| Platform | Health API           | Min Version | Key Permission          |
-| -------- | -------------------- | ----------- | ----------------------- |
-| iOS      | `react-native-health`| iOS 14.0    | HealthKit entitlement   |
-| Android  | `react-native-google-fit` | API 26 | ACTIVITY_RECOGNITION    |
+| Platform | Health API                | Min Version | Key Permission        |
+| -------- | ------------------------- | ----------- | --------------------- |
+| iOS      | `react-native-health`     | iOS 14.0    | HealthKit entitlement |
+| Android  | `react-native-google-fit` | API 26      | ACTIVITY_RECOGNITION  |
 
 Bundle ID: `com.symbi.app`
 
 ## Gemini API (Phase 2+)
 
-| Setting      | Value                              |
-| ------------ | ---------------------------------- |
-| Analysis     | `gemini-2.5-flash-preview-09-2025` |
-| Images       | `gemini-2.5-flash-image-preview`   |
-| Timeout      | 10 seconds with fallback           |
-| Rate limit   | 1 request per 24 hours per user    |
-| Security     | TLS 1.3 required                   |
+| Setting    | Value                              |
+| ---------- | ---------------------------------- |
+| Analysis   | `gemini-2.5-flash-preview-09-2025` |
+| Images     | `gemini-2.5-flash-image-preview`   |
+| Timeout    | 10 seconds with fallback           |
+| Rate limit | 1 request per 24 hours per user    |
+| Security   | TLS 1.3 required                   |
 
 ## Performance Targets
 
@@ -75,10 +75,10 @@ Bundle ID: `com.symbi.app`
 
 ## Commands
 
-| Command              | Purpose                    |
-| -------------------- | -------------------------- |
-| `npm start`          | Expo dev server            |
-| `npm run lint:fix`   | Fix linting issues         |
-| `npm run format`     | Prettier formatting        |
-| `npm test`           | Jest tests                 |
-| `npm run pre-submit` | All checks before submit   |
+| Command              | Purpose                  |
+| -------------------- | ------------------------ |
+| `npm start`          | Expo dev server          |
+| `npm run lint:fix`   | Fix linting issues       |
+| `npm run format`     | Prettier formatting      |
+| `npm test`           | Jest tests               |
+| `npm run pre-submit` | All checks before submit |

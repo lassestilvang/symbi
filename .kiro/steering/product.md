@@ -14,11 +14,11 @@ The Symbi character visually represents the user's wellness. When implementing f
 
 ## Emotional States by Phase
 
-| Phase | Metrics | Available States | Processing |
-|-------|---------|------------------|------------|
-| 1 (MVP) | Steps | Sad, Resting, Active | Rule-based thresholds in `EmotionalStateCalculator` |
-| 2 | Steps, Sleep, HRV | +Vibrant, Calm, Tired, Stressed, Anxious, Rested | Gemini AI analysis |
-| 3 | All + Activities | Evolution system | Cloud sync enabled |
+| Phase   | Metrics           | Available States                                 | Processing                                          |
+| ------- | ----------------- | ------------------------------------------------ | --------------------------------------------------- |
+| 1 (MVP) | Steps             | Sad, Resting, Active                             | Rule-based thresholds in `EmotionalStateCalculator` |
+| 2       | Steps, Sleep, HRV | +Vibrant, Calm, Tired, Stressed, Anxious, Rested | Gemini AI analysis                                  |
+| 3       | All + Activities  | Evolution system                                 | Cloud sync enabled                                  |
 
 When adding new emotional states, add corresponding Lottie animations to `src/assets/animations/phase{N}/`.
 
@@ -40,11 +40,11 @@ All three sources must provide equivalent functionality. Manual entry is not a d
 
 ## Visual Design Rules
 
-| Element | Specification |
-|---------|---------------|
+| Element        | Specification                           |
+| -------------- | --------------------------------------- |
 | Primary colors | `#7C3AED` to `#9333EA` (purple palette) |
-| Aesthetic | Spooky but cute, never scary |
-| Color source | Always use `src/constants/theme.ts` |
+| Aesthetic      | Spooky but cute, never scary            |
+| Color source   | Always use `src/constants/theme.ts`     |
 
 ## Privacy Requirements (Non-Negotiable)
 
@@ -57,11 +57,11 @@ All three sources must provide equivalent functionality. Manual entry is not a d
 
 ## Performance Targets
 
-| Metric | Target | Enforcement |
-|--------|--------|-------------|
-| Memory | <100MB | Monitor via `MemoryMonitor` service |
-| Battery | <5% per 24 hours | Limit background sync frequency |
-| UI latency | <1 second perceived | Use optimistic updates |
+| Metric     | Target              | Enforcement                         |
+| ---------- | ------------------- | ----------------------------------- |
+| Memory     | <100MB              | Monitor via `MemoryMonitor` service |
+| Battery    | <5% per 24 hours    | Limit background sync frequency     |
+| UI latency | <1 second perceived | Use optimistic updates              |
 
 ## When Modifying Symbi Behavior
 

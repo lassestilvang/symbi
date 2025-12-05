@@ -19,6 +19,7 @@ import { CosmeticRenderer } from '../components/CosmeticRenderer';
 import { BreathingExercise } from '../components/BreathingExercise';
 import { EvolutionCelebration } from '../components/EvolutionCelebration';
 import { StreakDisplay } from '../components/StreakDisplay';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 import { HabitatManager, HabitatManagerHandle } from '../components/habitat';
 import { useHealthDataStore } from '../stores/healthDataStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
@@ -76,7 +77,14 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   // Store hooks
   const { emotionalState, healthMetrics, lastUpdated, isLoading, error, setError, clearError } =
     useHealthDataStore();
-  const { profile } = useUserPreferencesStore();
+  const { profile, updatePreferences } = useUserPreferencesStore();
+
+  // Tutorial state - show only on first visit
+  const showTutorial = profile?.preferences.hasSeenTutorial === false;
+
+  const handleTutorialComplete = useCallback(async () => {
+    await updatePreferences({ hasSeenTutorial: true });
+  }, [updatePreferences]);
 
   // Gamification store hooks (Requirements: 2.4, 5.5)
   const { currentStreak, longestStreak, initialize: initializeStreak } = useStreakStore();
@@ -362,8 +370,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           )}
         </View>
 
-
-
         {/* Manual Entry Button */}
         {profile?.preferences.dataSource === 'manual' && (
           <View style={styles.manualEntryContainer}>
@@ -410,7 +416,8 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
               <View style={styles.inlineThresholdDivider} />
               <View style={styles.inlineThresholdItem}>
                 <Text style={styles.inlineThresholdValue}>
-                  {thresholds.sadThreshold.toLocaleString()} - {thresholds.activeThreshold.toLocaleString()}
+                  {thresholds.sadThreshold.toLocaleString()} -{' '}
+                  {thresholds.activeThreshold.toLocaleString()}
                 </Text>
                 <Text style={styles.inlineThresholdLabel}>Resting</Text>
               </View>
@@ -474,8 +481,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
             <Text style={styles.quickAccessText}>Customize</Text>
           </TouchableOpacity>
         </View>
-
-
 
         {/* Evolution Progress Indicator */}
         {evolutionEligibility && (
@@ -543,6 +548,9 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           lastUpdated={formattedLastUpdated}
         />
       )}
+
+      {/* Tutorial Overlay - shows only on first visit */}
+      <TutorialOverlay visible={showTutorial} onComplete={handleTutorialComplete} />
     </View>
   );
 };

@@ -31,6 +31,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   soundEnabled: true,
   theme: 'auto',
   analyticsEnabled: true,
+  hasSeenTutorial: false,
 };
 
 const DEFAULT_THRESHOLDS: StepThresholds = {
