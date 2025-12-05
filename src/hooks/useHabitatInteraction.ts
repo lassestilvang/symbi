@@ -50,12 +50,12 @@ interface EffectConfig {
 
 const EFFECT_CONFIGS: Record<InteractionEffectType, EffectConfig> = {
   burst: {
-    duration: EFFECT_DURATION_MS,
-    particleCount: 12,
+    duration: EFFECT_DURATION_MS * 1.5, // Longer duration for bigger effect
+    particleCount: 16, // More particles
   },
   ripple: {
     duration: EFFECT_DURATION_MS,
-    maxRadius: 150,
+    maxRadius: 200, // Bigger ripple
   },
   glow: {
     duration: EFFECT_DURATION_MS,
