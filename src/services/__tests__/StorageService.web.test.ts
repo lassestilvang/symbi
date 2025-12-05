@@ -2,6 +2,7 @@
  * Web-specific storage tests to verify AsyncStorage persistence
  */
 import { StorageService } from '../StorageService';
+import { EmotionalState } from '../../types';
 
 describe('StorageService - Web Persistence', () => {
   beforeEach(async () => {
@@ -42,8 +43,8 @@ describe('StorageService - Web Persistence', () => {
       '2025-11-16': {
         date: '2025-11-16',
         steps: 5000,
-        emotionalState: 'resting',
-        calculationMethod: 'rule-based',
+        emotionalState: EmotionalState.RESTING,
+        calculationMethod: 'rule-based' as const,
         lastUpdated: new Date('2025-11-16T12:00:00Z'),
       },
     };

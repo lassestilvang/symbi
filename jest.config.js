@@ -65,6 +65,7 @@ module.exports = {
 
   // Setup files
   setupFiles: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setupAfterEnv.js'],
 
   // Use jsdom environment for React Native Testing Library
   testEnvironment: 'jsdom',

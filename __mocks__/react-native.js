@@ -119,6 +119,9 @@ const ReactNative = {
     React.createElement('ActivityIndicator', { ...props, ref })
   ),
   Image: React.forwardRef((props, ref) => React.createElement('Image', { ...props, ref })),
+  ImageBackground: React.forwardRef((props, ref) =>
+    React.createElement('ImageBackground', { ...props, ref }, props.children)
+  ),
   FlatList: React.forwardRef((props, ref) => React.createElement('FlatList', { ...props, ref })),
   SectionList: React.forwardRef((props, ref) =>
     React.createElement('SectionList', { ...props, ref })
