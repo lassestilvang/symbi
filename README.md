@@ -7,7 +7,7 @@
 ## Features
 
 - **Health-Responsive Ghost**: Your Symbi's mood changes based on your daily steps, sleep, and heart rate variability
-- **Multiple Data Sources**: Connect to Apple HealthKit, Google Fit, or enter data manually
+- **Multiple Data Sources**: Connect to Apple HealthKit, Google Fit, or enter data manually (steps, sleep, HRV)
 - **9 Emotional States**: From Sad to Vibrant, watch your ghost react to your wellness
 - **Evolution System**: Maintain healthy habits and watch your Symbi evolve
 - **8-Bit Pixel Art**: Retro-style ghost rendered in a classic Tamagotchi frame

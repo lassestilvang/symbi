@@ -206,14 +206,49 @@ import { MainScreen } from './screens';
 
 ### ManualEntryScreen
 
-Allows users to manually enter their daily step count when not using automatic health data tracking.
+Allows users to manually enter their daily health metrics when not using automatic health data tracking. Supports Phase 2 multi-metric entry.
 
 **Features:**
 
-- Input validation (0-100,000 steps)
-- Automatic emotional state calculation
-- Saves to local storage
-- Updates health data store
+- Multi-metric input: steps (required), sleep hours (optional), HRV (optional)
+- Input validation with user-friendly error messages:
+  - Steps: 0-100,000 (required)
+  - Sleep: 0-24 hours (optional)
+  - HRV: 0-200 ms (optional)
+- Automatic emotional state calculation using user's configured thresholds
+- Saves to ManualHealthDataService with per-metric persistence
+- Updates health data store with calculation method tracking
+- Keyboard-avoiding layout for comfortable input
+- Disabled state during submission to prevent double-saves
+- Helpful tip box guiding users to find their metrics
+- Halloween-themed styling consistent with app design
+
+**UI Layout:**
+
+- Title and subtitle header
+- Three input groups with emoji labels:
+  - 👟 Step Count (Required)
+  - 😴 Sleep Duration (Optional)
+  - ❤️ Heart Rate Variability (Optional)
+- Each input shows valid range hint
+- Submit button (disabled until steps entered)
+- Tip box with guidance on finding health data
+
+**Data Flow:**
+
+```
+User Input
+   ↓
+Validation (per-metric ranges)
+   ↓
+ManualHealthDataService.save*() for each metric
+   ↓
+EmotionalStateCalculator.calculateStateFromSteps()
+   ↓
+healthDataStore.updateHealthData()
+   ↓
+Navigation.goBack()
+```
 
 **Usage:**
 
@@ -222,7 +257,7 @@ import { ManualEntryScreen } from './screens';
 
 <ManualEntryScreen
   onComplete={() => {
-    // Navigate back or show success
+    // Optional callback after successful save
   }}
 />;
 ```
@@ -509,4 +544,4 @@ import { EvolutionGalleryScreen } from './screens';
 - Add data deletion with confirmation
 - Create privacy policy page
 - Add theme switching (light/dark/auto)
-- Implement Phase 2 multi-metric manual entry
+- ~~Implement Phase 2 multi-metric manual entry~~ ✅ Completed
