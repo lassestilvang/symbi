@@ -26,37 +26,42 @@ export const PermissionRequestScreen: React.FC<PermissionRequestScreenProps> = (
 
         <View style={styles.permissionCard}>
           <Text style={styles.permissionIcon}>👟</Text>
-          <Text style={styles.permissionTitle}>Step Count</Text>
-          <Text style={styles.permissionDescription}>
-            We use your daily step count to determine Symbi's emotional state. More steps mean a
-            happier Symbi!
-          </Text>
+          <View style={styles.permissionContent}>
+            <Text style={styles.permissionTitle}>Step Count</Text>
+            <Text style={styles.permissionDescription}>
+              Daily steps determine Symbi's mood. More steps = happier Symbi!
+            </Text>
+          </View>
         </View>
 
         <View style={styles.permissionCard}>
           <Text style={styles.permissionIcon}>😴</Text>
-          <Text style={styles.permissionTitle}>Sleep Data</Text>
-          <Text style={styles.permissionDescription}>
-            We use your sleep data to know if your Symbi is well-rested and energized.
-          </Text>
+          <View style={styles.permissionContent}>
+            <Text style={styles.permissionTitle}>Sleep Data</Text>
+            <Text style={styles.permissionDescription}>
+              Sleep quality helps Symbi feel well-rested and energized.
+            </Text>
+          </View>
         </View>
 
         <View style={styles.permissionCard}>
           <Text style={styles.permissionIcon}>❤️</Text>
-          <Text style={styles.permissionTitle}>Heart Rate Variability</Text>
-          <Text style={styles.permissionDescription}>
-            We use your heart rate variability to understand your stress levels and overall
-            wellbeing.
-          </Text>
+          <View style={styles.permissionContent}>
+            <Text style={styles.permissionTitle}>Heart Rate Variability</Text>
+            <Text style={styles.permissionDescription}>
+              HRV helps understand your stress levels and wellbeing.
+            </Text>
+          </View>
         </View>
 
         <View style={styles.permissionCard}>
           <Text style={styles.permissionIcon}>🧘</Text>
-          <Text style={styles.permissionTitle}>Mindful Minutes (Write)</Text>
-          <Text style={styles.permissionDescription}>
-            When you complete breathing exercises with Symbi, we'll record mindful minutes to your
-            health data.
-          </Text>
+          <View style={styles.permissionContent}>
+            <Text style={styles.permissionTitle}>Mindful Minutes (Write)</Text>
+            <Text style={styles.permissionDescription}>
+              Breathing exercises record mindful minutes to your health data.
+            </Text>
+          </View>
         </View>
 
         <View style={styles.infoBox}>
@@ -108,6 +113,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingTop: 60,
     paddingBottom: 32,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   title: {
     fontSize: 28,
@@ -124,26 +132,29 @@ const styles = StyleSheet.create({
   },
   permissionCard: {
     backgroundColor: '#2d2d44',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 24,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    flexDirection: 'row',
     alignItems: 'center',
   },
   permissionIcon: {
-    fontSize: 48,
-    marginBottom: 12,
+    fontSize: 28,
+    marginRight: 12,
+  },
+  permissionContent: {
+    flex: 1,
   },
   permissionTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '600',
     color: '#9333ea',
-    marginBottom: 12,
+    marginBottom: 4,
   },
   permissionDescription: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#d8b4fe',
-    textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 18,
   },
   infoBox: {
     backgroundColor: '#2d2d44',
@@ -183,6 +194,9 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 32,
     paddingBottom: 48,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   backButton: {
     paddingVertical: 12,
