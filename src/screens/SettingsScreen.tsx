@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,10 @@ import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
 import { DataManagementService } from '../services/DataManagementService';
 import { AnalyticsService } from '../services/AnalyticsService';
+import { SceneSelector } from '../components/habitat';
+import { loadScenePreference } from '../services/HabitatPreferencesService';
+import type { SceneType } from '../types/habitat';
+import { SCENE_REGISTRY } from '../constants/habitatScenes';
 
 interface SettingsScreenProps {
   navigation?: {
@@ -37,6 +41,12 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 }) => {
   const { profile, updatePreferences, setDataSource } = useUserPreferencesStore();
   const [isChangingDataSource, setIsChangingDataSource] = useState(false);
+  const [currentScene, setCurrentScene] = useState<SceneType>('haunted-forest');
+
+  // Load current scene preference on mount
+  useEffect(() => {
+    loadScenePreference().then(setCurrentScene);
+  }, []);
 
   if (!profile) {
     return (
@@ -247,6 +257,25 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </View>
         )}
 
+        {/* Habitat Scene Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Habitat Scene</Text>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Current Scene</Text>
+              <Text style={styles.settingValue}>{SCENE_REGISTRY[currentScene]?.name}</Text>
+            </View>
+          </View>
+
+          <View style={styles.sceneSelectorContainer}>
+            <SceneSelector
+              initialScene={currentScene}
+              onSceneChange={scene => setCurrentScene(scene)}
+            />
+          </View>
+        </View>
+
         {/* Preferences Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preferences</Text>
@@ -456,6 +485,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#dc2626',
+  },
+  sceneSelectorContainer: {
+    marginTop: 12,
+    backgroundColor: '#2d2d44',
+    padding: 16,
+    borderRadius: 12,
   },
   footer: {
     alignItems: 'center',

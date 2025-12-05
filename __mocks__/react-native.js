@@ -22,11 +22,33 @@ const ReactNative = {
     removeEventListener: jest.fn(),
   },
 
+  // useWindowDimensions hook
+  useWindowDimensions: jest.fn(() => ({ width: 375, height: 667, scale: 2, fontScale: 1 })),
+
   // AppState
   AppState: {
     currentState: 'active',
     addEventListener: jest.fn(() => ({ remove: jest.fn() })),
     removeEventListener: jest.fn(),
+  },
+
+  // Easing
+  Easing: {
+    linear: jest.fn(t => t),
+    ease: jest.fn(t => t),
+    quad: jest.fn(t => t * t),
+    cubic: jest.fn(t => t * t * t),
+    poly: jest.fn(() => t => t),
+    sin: jest.fn(t => Math.sin(t)),
+    circle: jest.fn(t => t),
+    exp: jest.fn(t => t),
+    elastic: jest.fn(() => t => t),
+    back: jest.fn(() => t => t),
+    bounce: jest.fn(t => t),
+    bezier: jest.fn(() => t => t),
+    in: jest.fn(easing => easing),
+    out: jest.fn(easing => easing),
+    inOut: jest.fn(easing => easing),
   },
 
   // Animated
@@ -44,6 +66,31 @@ const ReactNative = {
       interpolate: jest.fn(() => ({ setValue: jest.fn() })),
       animate: jest.fn(),
       _value: value,
+    })),
+    multiply: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 1,
+    })),
+    add: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 0,
+    })),
+    subtract: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 0,
+    })),
+    divide: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 1,
+    })),
+    modulo: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 0,
     })),
     timing: jest.fn(() => ({
       start: jest.fn(callback => callback && callback({ finished: true })),

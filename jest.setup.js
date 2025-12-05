@@ -133,4 +133,3 @@ jest.mock('@sentry/react-native', () => ({
   setExtra: jest.fn(),
   withScope: jest.fn(callback => callback({ setTag: jest.fn(), setExtra: jest.fn() })),
 }));
-

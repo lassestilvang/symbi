@@ -8,6 +8,40 @@
 // Re-export Result type utilities
 export { Result, success, failure, isSuccess, isFailure, unwrap, unwrapOr } from './result';
 
+// Re-export Habitat types
+export type {
+  SceneType,
+  TimePhase,
+  QualityLevel,
+  AmbientElementType,
+  ParticleType,
+  InteractionEffectType,
+  HabitatConfig,
+  HabitatManagerProps,
+  SceneRendererProps,
+  Position,
+  Dimensions,
+  TimePhaseColors,
+  TimePhaseConfig,
+  TimeManagerConfig,
+  SceneModifiers,
+  QualitySettings,
+  PerformanceMetrics,
+  ParallaxLayerProps,
+  LayerDefinition,
+  LayerElement,
+  AnimationConfig,
+  AmbientElementProps,
+  AmbientElementDefinition,
+  ParticleSystemProps,
+  Particle,
+  ParticleConfig,
+  SceneDefinition,
+  InteractionEffect,
+  HabitatState,
+  HabitatPreferences,
+} from './habitat';
+
 // ============================================================================
 // Enums
 // ============================================================================

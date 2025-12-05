@@ -10,3 +10,14 @@ export { useHealthDataInitialization } from './useHealthDataInitialization';
 export { useStateChangeNotification } from './useStateChangeNotification';
 export { useNetworkStatus } from './useNetworkStatus';
 export { useBackgroundSync } from './useBackgroundSync';
+export { usePerformanceMonitor } from './usePerformanceMonitor';
+export type {
+  UsePerformanceMonitorOptions,
+  UsePerformanceMonitorResult,
+} from './usePerformanceMonitor';
+export { useHabitatInteraction } from './useHabitatInteraction';
+export type {
+  AnimatedInteractionEffect,
+  UseHabitatInteractionOptions,
+  UseHabitatInteractionResult,
+} from './useHabitatInteraction';

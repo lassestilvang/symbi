@@ -6,14 +6,14 @@ inclusion: always
 
 ## Core Dependencies
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| React Native | 0.81.5 | Mobile framework via Expo ~54.0.22 |
-| TypeScript | 5.9.2 | Strict mode enabled - no `any` types |
-| React | 19.2.0 | UI library |
-| Zustand | 5.0.8 | State management |
-| React Navigation | 7.x | Native stack navigator |
-| Lottie React Native | 7.3.4 | Symbi animations |
+| Package             | Version | Purpose                              |
+| ------------------- | ------- | ------------------------------------ |
+| React Native        | 0.81.5  | Mobile framework via Expo ~54.0.22   |
+| TypeScript          | 5.9.2   | Strict mode enabled - no `any` types |
+| React               | 19.2.0  | UI library                           |
+| Zustand             | 5.0.8   | State management                     |
+| React Navigation    | 7.x     | Native stack navigator               |
+| Lottie React Native | 7.3.4   | Symbi animations                     |
 
 ## Code Style Rules
 
@@ -36,6 +36,7 @@ When writing code, follow these conventions:
 ## API Integration
 
 Gemini API (Phase 2+):
+
 - Analysis: `gemini-2.5-flash-preview-09-2025`
 - Images: `gemini-2.5-flash-image-preview`
 - 10 second timeout with fallback, TLS 1.3 required
@@ -43,12 +44,12 @@ Gemini API (Phase 2+):
 
 ## Performance Constraints
 
-| Metric | Target |
-|--------|--------|
-| Memory | <100MB |
-| Battery | <5% per 24 hours |
+| Metric        | Target                     |
+| ------------- | -------------------------- |
+| Memory        | <100MB                     |
+| Battery       | <5% per 24 hours           |
 | Animation FPS | 60 active, 10 backgrounded |
-| API response | <5s (p95) |
+| API response  | <5s (p95)                  |
 
 ## Commands Reference
 

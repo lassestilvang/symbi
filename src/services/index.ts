@@ -61,3 +61,12 @@ export {
   getMillisecondsUntilNextAnalysis,
   shouldSync,
 } from './BackgroundTaskConfig';
+
+// Habitat Services
+export {
+  HabitatPreferencesService,
+  saveScenePreference,
+  loadScenePreference,
+  clearScenePreference,
+  getDefaultScene,
+} from './HabitatPreferencesService';

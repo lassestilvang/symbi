@@ -12,11 +12,11 @@ Health data → EmotionalStateCalculator → Symbi animation state → Visual fe
 
 ## Phases & Emotional States
 
-| Phase | Metrics | States | Logic |
-|-------|---------|--------|-------|
-| 1 (MVP) | Steps | Sad, Resting, Active | Rule-based thresholds |
-| 2 | Steps, Sleep, HRV | +Vibrant, Calm, Tired, Stressed, Anxious, Rested | Gemini AI analysis |
-| 3 | All + Activities | Evolution system | Cloud sync enabled |
+| Phase   | Metrics           | States                                           | Logic                 |
+| ------- | ----------------- | ------------------------------------------------ | --------------------- |
+| 1 (MVP) | Steps             | Sad, Resting, Active                             | Rule-based thresholds |
+| 2       | Steps, Sleep, HRV | +Vibrant, Calm, Tired, Stressed, Anxious, Rested | Gemini AI analysis    |
+| 3       | All + Activities  | Evolution system                                 | Cloud sync enabled    |
 
 ## Implementation Rules
 

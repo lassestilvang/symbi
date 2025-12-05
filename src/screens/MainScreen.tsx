@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,10 +11,13 @@ import {
   Animated,
   Modal,
   ImageBackground,
+  Pressable,
+  GestureResponderEvent,
 } from 'react-native';
 import { Symbi8BitCanvas } from '../components/Symbi8BitCanvas';
 import { BreathingExercise } from '../components/BreathingExercise';
 import { EvolutionCelebration } from '../components/EvolutionCelebration';
+import { HabitatManager, HabitatManagerHandle } from '../components/habitat';
 import { useHealthDataStore } from '../stores/healthDataStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import {
@@ -92,6 +95,9 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
 
   // Background sync
   useBackgroundSync({ enabled: !isInitializing });
+
+  // Habitat ref for triggering effects
+  const habitatRef = useRef<HabitatManagerHandle>(null);
 
   // Local state
   const [showBreathingExercise, setShowBreathingExercise] = useState(false);
@@ -241,216 +247,272 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
     await handleRefresh();
   }, [clearError, handleRefresh]);
 
+  /**
+   * Handle habitat background interaction
+   * Requirement: 7.1 - Click/tap triggers localized particle burst
+   */
+  const handleHabitatInteraction = useCallback((point: { x: number; y: number }) => {
+    if (__DEV__) {
+      console.log('Habitat interaction at:', point);
+    }
+  }, []);
+
+  /**
+   * Handle screen tap for habitat particle effects
+   * Triggers burst effect at tap location
+   */
+  const handleScreenTap = useCallback(
+    (event: GestureResponderEvent) => {
+      const { locationX, locationY } = event.nativeEvent;
+      habitatRef.current?.triggerBackgroundTap({ x: locationX, y: locationY });
+    },
+    []
+  );
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={HALLOWEEN_COLORS.primaryLight}
-          colors={[HALLOWEEN_COLORS.primaryLight]}
-        />
-      }>
-      {/* Header with settings button */}
-      <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Symbi</Text>
-          {isOffline && (
-            <View style={styles.offlineIndicator}>
-              <Text style={styles.offlineText}>📡 Offline</Text>
+    <View style={styles.screenContainer}>
+      {/* Habitat Background - positioned behind all content */}
+      {/* Requirements: 1.1, 7.3 - Render animated background, handle interactions */}
+      <HabitatManager
+        ref={habitatRef}
+        emotionalState={emotionalState}
+        isVisible={true}
+        onInteraction={handleHabitatInteraction}
+        reducedMotion={false}
+      />
+
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={HALLOWEEN_COLORS.primaryLight}
+            colors={[HALLOWEEN_COLORS.primaryLight]}
+          />
+        }>
+        {/* Header with settings button */}
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Symbi</Text>
+            {isOffline && (
+              <View style={styles.offlineIndicator}>
+                <Text style={styles.offlineText}>📡 Offline</Text>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={handleOpenSettings}
+            accessibilityLabel="Open settings">
+            <Text style={styles.settingsIcon}>⚙️</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Error message */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>⚠️ {error}</Text>
+          </View>
+        )}
+
+        {/* State change notification */}
+        {stateChangeNotification && (
+          <Animated.View style={[styles.notificationContainer, { opacity: notificationOpacity }]}>
+            <Text style={styles.notificationText}>✨ {stateChangeNotification}</Text>
+          </Animated.View>
+        )}
+
+        {/* Symbi Ghost with Tamagotchi Frame */}
+        <View style={styles.symbiContainer}>
+          {isLoading ? (
+            <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
+          ) : (
+            <View style={styles.tamagotchiFrame}>
+              <ImageBackground
+                source={tamagotchiFrameImage}
+                style={styles.frameImage}
+                resizeMode="contain">
+                <View style={styles.ghostScreenArea}>
+                  <Symbi8BitCanvas
+                    key={`ghost-${emotionalState}`}
+                    emotionalState={emotionalState}
+                    size={Math.min(SCREEN_WIDTH * 0.5, 220)}
+                    onPoke={handleSymbiPoke}
+                  />
+                </View>
+              </ImageBackground>
             </View>
           )}
         </View>
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={handleOpenSettings}
-          accessibilityLabel="Open settings">
-          <Text style={styles.settingsIcon}>⚙️</Text>
-        </TouchableOpacity>
-      </View>
 
-      {/* Error message */}
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>⚠️ {error}</Text>
+        {/* Emotional State Label */}
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateName}>{stateName}</Text>
+          {__DEV__ && (
+            <Text style={styles.debugText}>
+              Debug: {emotionalState} | Steps: {healthMetrics.steps}
+            </Text>
+          )}
         </View>
-      )}
 
-      {/* State change notification */}
-      {stateChangeNotification && (
-        <Animated.View style={[styles.notificationContainer, { opacity: notificationOpacity }]}>
-          <Text style={styles.notificationText}>✨ {stateChangeNotification}</Text>
-        </Animated.View>
-      )}
-
-      {/* Symbi Ghost with Tamagotchi Frame */}
-      <View style={styles.symbiContainer}>
-        {isLoading ? (
-          <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
-        ) : (
-          <View style={styles.tamagotchiFrame}>
-            <ImageBackground
-              source={tamagotchiFrameImage}
-              style={styles.frameImage}
-              resizeMode="contain">
-              <View style={styles.ghostScreenArea}>
-                <Symbi8BitCanvas
-                  key={`ghost-${emotionalState}`}
-                  emotionalState={emotionalState}
-                  size={Math.min(SCREEN_WIDTH * 0.5, 220)}
-                  onPoke={handleSymbiPoke}
-                />
-              </View>
-            </ImageBackground>
+        {/* Manual Entry Button */}
+        {profile?.preferences.dataSource === 'manual' && (
+          <View style={styles.manualEntryContainer}>
+            <TouchableOpacity
+              style={styles.manualEntryButton}
+              onPress={handleNavigateToManualEntry}>
+              <Text style={styles.manualEntryButtonText}>📝 Enter Steps Manually</Text>
+            </TouchableOpacity>
           </View>
         )}
-      </View>
 
-      {/* Emotional State Label */}
-      <View style={styles.stateContainer}>
-        <Text style={styles.stateName}>{stateName}</Text>
-        {__DEV__ && (
-          <Text style={styles.debugText}>
-            Debug: {emotionalState} | Steps: {healthMetrics.steps}
-          </Text>
-        )}
-      </View>
+        {/* Test Buttons (DEV only) */}
+        {__DEV__ && <TestButtons />}
 
-      {/* Manual Entry Button */}
-      {profile?.preferences.dataSource === 'manual' && (
-        <View style={styles.manualEntryContainer}>
-          <TouchableOpacity style={styles.manualEntryButton} onPress={handleNavigateToManualEntry}>
-            <Text style={styles.manualEntryButtonText}>📝 Enter Steps Manually</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Test Buttons (DEV only) */}
-      {__DEV__ && <TestButtons />}
-
-      {/* Health Metrics Display */}
-      <View style={styles.metricsContainer}>
-        <View style={styles.metricCard}>
-          <Text style={styles.metricLabel}>Steps Today</Text>
-          <Text style={styles.metricValue}>{healthMetrics.steps.toLocaleString()}</Text>
-          <Text style={styles.metricSubtext}>
-            Goal: {thresholds.activeThreshold.toLocaleString()}
-          </Text>
-        </View>
-
-        {/* Phase 2: Sleep and HRV metrics */}
-        {(healthMetrics.sleepHours !== undefined || healthMetrics.hrv !== undefined) && (
-          <View style={styles.additionalMetricsRow}>
-            {healthMetrics.sleepHours !== undefined && (
-              <View style={styles.smallMetricCard}>
-                <Text style={styles.smallMetricIcon}>😴</Text>
-                <Text style={styles.smallMetricLabel}>Sleep</Text>
-                <Text style={styles.smallMetricValue}>{healthMetrics.sleepHours.toFixed(1)}h</Text>
-              </View>
-            )}
-
-            {healthMetrics.hrv !== undefined && (
-              <View style={styles.smallMetricCard}>
-                <Text style={styles.smallMetricIcon}>❤️</Text>
-                <Text style={styles.smallMetricLabel}>HRV</Text>
-                <Text style={styles.smallMetricValue}>{Math.round(healthMetrics.hrv)}ms</Text>
-              </View>
-            )}
+        {/* Health Metrics Display */}
+        <View style={styles.metricsContainer}>
+          <View style={styles.metricCard}>
+            <Text style={styles.metricLabel}>Steps Today</Text>
+            <Text style={styles.metricValue}>{healthMetrics.steps.toLocaleString()}</Text>
+            <Text style={styles.metricSubtext}>
+              Goal: {thresholds.activeThreshold.toLocaleString()}
+            </Text>
           </View>
-        )}
-      </View>
 
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBarBackground}>
-          <View
-            style={[
-              styles.progressBarFill,
-              {
-                width: `${progress}%`,
-                backgroundColor: progressColor,
-              },
-            ]}
+          {/* Phase 2: Sleep and HRV metrics */}
+          {(healthMetrics.sleepHours !== undefined || healthMetrics.hrv !== undefined) && (
+            <View style={styles.additionalMetricsRow}>
+              {healthMetrics.sleepHours !== undefined && (
+                <View style={styles.smallMetricCard}>
+                  <Text style={styles.smallMetricIcon}>😴</Text>
+                  <Text style={styles.smallMetricLabel}>Sleep</Text>
+                  <Text style={styles.smallMetricValue}>
+                    {healthMetrics.sleepHours.toFixed(1)}h
+                  </Text>
+                </View>
+              )}
+
+              {healthMetrics.hrv !== undefined && (
+                <View style={styles.smallMetricCard}>
+                  <Text style={styles.smallMetricIcon}>❤️</Text>
+                  <Text style={styles.smallMetricLabel}>HRV</Text>
+                  <Text style={styles.smallMetricValue}>{Math.round(healthMetrics.hrv)}ms</Text>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+
+        {/* Progress Bar */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBarBackground}>
+            <View
+              style={[
+                styles.progressBarFill,
+                {
+                  width: `${progress}%`,
+                  backgroundColor: progressColor,
+                },
+              ]}
+            />
+          </View>
+          <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+        </View>
+
+        {/* Threshold Indicators */}
+        <View style={styles.thresholdsContainer}>
+          <View style={styles.thresholdItem}>
+            <Text style={styles.thresholdLabel}>Sad</Text>
+            <Text style={styles.thresholdValue}>
+              &lt; {thresholds.sadThreshold.toLocaleString()}
+            </Text>
+          </View>
+          <View style={styles.thresholdItem}>
+            <Text style={styles.thresholdLabel}>Resting</Text>
+            <Text style={styles.thresholdValue}>
+              {thresholds.sadThreshold.toLocaleString()} -{' '}
+              {thresholds.activeThreshold.toLocaleString()}
+            </Text>
+          </View>
+          <View style={styles.thresholdItem}>
+            <Text style={styles.thresholdLabel}>Active</Text>
+            <Text style={styles.thresholdValue}>
+              &gt; {thresholds.activeThreshold.toLocaleString()}
+            </Text>
+          </View>
+        </View>
+
+        {/* Evolution Progress Indicator */}
+        {evolutionEligibility && (
+          <EvolutionProgressSection
+            evolutionEligibility={evolutionEligibility}
+            showEvolutionNotification={showEvolutionNotification}
+            isEvolutionInProgress={isEvolutionInProgress}
+            onTriggerEvolution={handleTriggerEvolution}
+            onNavigateToHistory={handleNavigateToEvolutionHistory}
           />
-        </View>
-        <Text style={styles.progressText}>{Math.round(progress)}%</Text>
-      </View>
+        )}
 
-      {/* Threshold Indicators */}
-      <View style={styles.thresholdsContainer}>
-        <View style={styles.thresholdItem}>
-          <Text style={styles.thresholdLabel}>Sad</Text>
-          <Text style={styles.thresholdValue}>&lt; {thresholds.sadThreshold.toLocaleString()}</Text>
-        </View>
-        <View style={styles.thresholdItem}>
-          <Text style={styles.thresholdLabel}>Resting</Text>
-          <Text style={styles.thresholdValue}>
-            {thresholds.sadThreshold.toLocaleString()} -{' '}
-            {thresholds.activeThreshold.toLocaleString()}
-          </Text>
-        </View>
-        <View style={styles.thresholdItem}>
-          <Text style={styles.thresholdLabel}>Active</Text>
-          <Text style={styles.thresholdValue}>
-            &gt; {thresholds.activeThreshold.toLocaleString()}
-          </Text>
-        </View>
-      </View>
+        {/* Calm your Symbi Button */}
+        {shouldShowCalmButton && (
+          <TouchableOpacity
+            style={styles.calmButton}
+            onPress={handleStartBreathingExercise}
+            accessibilityLabel="Calm your Symbi">
+            <Text style={styles.calmButtonText}>🧘 Calm your Symbi</Text>
+          </TouchableOpacity>
+        )}
 
-      {/* Evolution Progress Indicator */}
-      {evolutionEligibility && (
-        <EvolutionProgressSection
-          evolutionEligibility={evolutionEligibility}
-          showEvolutionNotification={showEvolutionNotification}
-          isEvolutionInProgress={isEvolutionInProgress}
-          onTriggerEvolution={handleTriggerEvolution}
-          onNavigateToHistory={handleNavigateToEvolutionHistory}
-        />
-      )}
-
-      {/* Calm your Symbi Button */}
-      {shouldShowCalmButton && (
+        {/* Configure Thresholds Button */}
         <TouchableOpacity
-          style={styles.calmButton}
-          onPress={handleStartBreathingExercise}
-          accessibilityLabel="Calm your Symbi">
-          <Text style={styles.calmButtonText}>🧘 Calm your Symbi</Text>
+          style={styles.configureButton}
+          onPress={handleConfigureThresholds}
+          accessibilityLabel="Configure thresholds">
+          <Text style={styles.configureButtonText}>⚡ Configure Thresholds</Text>
         </TouchableOpacity>
-      )}
 
-      {/* Configure Thresholds Button */}
-      <TouchableOpacity
-        style={styles.configureButton}
-        onPress={handleConfigureThresholds}
-        accessibilityLabel="Configure thresholds">
-        <Text style={styles.configureButtonText}>⚡ Configure Thresholds</Text>
-      </TouchableOpacity>
+        {/* Last Updated */}
+        <Text style={styles.lastUpdated}>Last updated: {formattedLastUpdated}</Text>
 
-      {/* Last Updated */}
-      <Text style={styles.lastUpdated}>Last updated: {formattedLastUpdated}</Text>
+        {/* Breathing Exercise Modal */}
+        <Modal visible={showBreathingExercise} animationType="slide" presentationStyle="fullScreen">
+          <BreathingExercise
+            sessionManager={sessionManager}
+            duration={5}
+            onComplete={handleBreathingComplete}
+            onCancel={handleBreathingCancel}
+          />
+        </Modal>
 
-      {/* Breathing Exercise Modal */}
-      <Modal visible={showBreathingExercise} animationType="slide" presentationStyle="fullScreen">
-        <BreathingExercise
-          sessionManager={sessionManager}
-          duration={5}
-          onComplete={handleBreathingComplete}
-          onCancel={handleBreathingCancel}
-        />
-      </Modal>
+        {/* Evolution Celebration Modal */}
+        {evolutionResult && (
+          <EvolutionCelebration
+            visible={showEvolutionCelebration}
+            evolutionLevel={evolutionResult.evolutionLevel}
+            appearanceUrl={evolutionResult.newAppearanceUrl}
+            onClose={handleEvolutionCelebrationClose}
+          />
+        )}
+      </ScrollView>
 
-      {/* Evolution Celebration Modal */}
-      {evolutionResult && (
-        <EvolutionCelebration
-          visible={showEvolutionCelebration}
-          evolutionLevel={evolutionResult.evolutionLevel}
-          appearanceUrl={evolutionResult.newAppearanceUrl}
-          onClose={handleEvolutionCelebrationClose}
-        />
-      )}
-    </ScrollView>
+      {/* Floating Action Button for Habitat Interaction */}
+      <Pressable
+        style={styles.fab}
+        onPress={() => {
+          // Trigger burst at random position in upper half of screen
+          const x = Math.random() * SCREEN_WIDTH;
+          const y = 100 + Math.random() * 300;
+          if (__DEV__) {
+            console.log('[MainScreen] FAB pressed, triggering burst at:', { x, y });
+          }
+          habitatRef.current?.triggerBackgroundTap({ x, y });
+        }}
+        accessibilityLabel="Trigger habitat effect">
+        <Text style={styles.fabText}>✨</Text>
+      </Pressable>
+    </View>
   );
 };
 
@@ -569,9 +631,13 @@ const EvolutionProgressSection: React.FC<EvolutionProgressSectionProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screenContainer: {
     flex: 1,
     backgroundColor: HALLOWEEN_COLORS.darkBg,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent', // Allow habitat to show through
   },
   contentContainer: {
     paddingBottom: 40,
@@ -941,5 +1007,21 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.captionSize,
     color: TEXT_COLORS.muted,
     marginBottom: LAYOUT.horizontalPadding,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: HALLOWEEN_COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.card,
+    zIndex: 1000,
+  },
+  fabText: {
+    fontSize: 24,
   },
 });

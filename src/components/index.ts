@@ -10,3 +10,8 @@ export { HealthMetricsChart } from './HealthMetricsChart';
 export { EmotionalStateTimeline } from './EmotionalStateTimeline';
 export { EvolutionMilestoneCard } from './EvolutionMilestoneCard';
 export { HealthDataTable } from './HealthDataTable';
+
+// Habitat components
+export { ParallaxLayer, AnimatedParallaxLayer } from './habitat';
+export { AmbientElement } from './habitat';
+export { ParticleSystem } from './habitat';
