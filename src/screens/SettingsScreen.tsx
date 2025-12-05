@@ -21,6 +21,7 @@ import { SCENE_REGISTRY } from '../constants/habitatScenes';
 interface SettingsScreenProps {
   navigation?: {
     goBack: () => void;
+    navigate: (screen: string) => void;
   };
   onReplayOnboarding: () => void;
   onNavigateToThresholds: () => void;
@@ -256,6 +257,23 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             </TouchableOpacity>
           </View>
         )}
+
+        {/* Gamification Section (Requirements 1.3, 5.1) */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Achievements & Customization</Text>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation?.navigate('Achievements')}>
+            <Text style={styles.buttonText}>🏆 View Achievements</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 12 }]}
+            onPress={() => navigation?.navigate('CustomizationStudio')}>
+            <Text style={styles.buttonText}>🎨 Customize Symbi</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Habitat Scene Section */}
         <View style={styles.section}>

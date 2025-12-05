@@ -10,6 +10,25 @@ export { HealthMetricsChart } from './HealthMetricsChart';
 export { EmotionalStateTimeline } from './EmotionalStateTimeline';
 export { EvolutionMilestoneCard } from './EvolutionMilestoneCard';
 export { HealthDataTable } from './HealthDataTable';
+export { CosmeticRenderer } from './CosmeticRenderer';
+export { CosmeticItem } from './CosmeticItem';
+export { CosmeticGrid } from './CosmeticGrid';
+
+// Achievement components
+export { AchievementBadge } from './AchievementBadge';
+export { AchievementProgress } from './AchievementProgress';
+export { AchievementTimeline } from './AchievementTimeline';
+
+// Streak components
+export { StreakDisplay } from './StreakDisplay';
+export { StreakMilestoneProgress } from './StreakMilestoneProgress';
+
+// Challenge components
+export { ChallengeCard } from './ChallengeCard';
+export { WeeklyChallenges } from './WeeklyChallenges';
+
+// Notification components
+export { NotificationToast } from './NotificationToast';
 
 // Habitat components
 export { ParallaxLayer, AnimatedParallaxLayer } from './habitat';

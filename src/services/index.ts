@@ -70,3 +70,41 @@ export {
   clearScenePreference,
   getDefaultScene,
 } from './HabitatPreferencesService';
+
+// Achievement Services
+export {
+  AchievementService,
+  getAchievementService,
+  resetAchievementService,
+  ACHIEVEMENT_CATALOG,
+} from './AchievementService';
+
+// Streak Services
+export { StreakService, getStreakService, resetStreakService } from './StreakService';
+
+// Challenge Services
+export { ChallengeService, getChallengeService, resetChallengeService } from './ChallengeService';
+
+// Cosmetic Services
+export {
+  CosmeticService,
+  getCosmeticService,
+  resetCosmeticService,
+  COSMETIC_CATALOG,
+  LAYER_ORDER,
+} from './CosmeticService';
+
+// Achievement Notification Services
+export {
+  AchievementNotificationService,
+  getAchievementNotificationService,
+  resetAchievementNotificationService,
+} from './AchievementNotificationService';
+export type {
+  NotificationType,
+  NotificationPriority,
+  AchievementNotification,
+  NotificationDisplayOptions,
+  NotificationListener,
+  NotificationDismissListener,
+} from './AchievementNotificationService';

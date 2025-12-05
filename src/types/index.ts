@@ -8,6 +8,51 @@
 // Re-export Result type utilities
 export { Result, success, failure, isSuccess, isFailure, unwrap, unwrapOr } from './result';
 
+// Re-export Achievement types
+export type {
+  AchievementCategory,
+  RarityTier,
+  UnlockConditionType,
+  ComparisonType,
+  UnlockCondition,
+  AchievementProgress,
+  Achievement,
+  AchievementStatistics,
+  AchievementUnlockResult,
+  AchievementStorageData,
+} from './achievements';
+
+// Re-export Streak types
+export type {
+  StreakRecord,
+  StreakState,
+  StreakMilestone,
+  StreakUpdate,
+  StreakStorageData,
+} from './streaks';
+export { STREAK_MILESTONES } from './streaks';
+
+// Re-export Challenge types
+export type {
+  ChallengeObjectiveType,
+  ChallengeObjective,
+  ChallengeReward,
+  Challenge,
+  ChallengeStorageData,
+} from './challenges';
+
+// Re-export Cosmetic types
+export type {
+  CosmeticCategory,
+  PixelData,
+  CosmeticRenderData,
+  Cosmetic,
+  EquippedCosmetics,
+  CosmeticInventory,
+  CosmeticLayer,
+  CosmeticStorageData,
+} from './cosmetics';
+
 // Re-export Habitat types
 export type {
   SceneType,

@@ -20,6 +20,11 @@ export interface ExportData {
   userProfile: any;
   healthDataCache: any;
   evolutionRecords: any[];
+  // Gamification data (Requirements: 6.4)
+  achievements: any;
+  streaks: any;
+  challenges: any;
+  cosmetics: any;
   metadata: {
     platform: string;
     appVersion: string;
@@ -46,25 +51,42 @@ export class DataManagementService {
    */
   static async exportAllData(): Promise<{ success: boolean; filePath?: string; error?: string }> {
     try {
-      // Gather all data
-      const [userProfile, healthCache, evolutionRecords] = await Promise.all([
+      // Gather all data including gamification data (Requirements: 6.4)
+      const [
+        userProfile,
+        healthCache,
+        evolutionRecords,
+        achievementData,
+        streakData,
+        challengeData,
+        cosmeticData,
+      ] = await Promise.all([
         StorageService.getUserProfile(),
         SecureStorageService.getHealthDataCache(),
         StorageService.getEvolutionRecords(),
+        StorageService.getAchievementData(),
+        StorageService.getStreakData(),
+        StorageService.getChallengeData(),
+        StorageService.getCosmeticData(),
       ]);
 
       // Create export data structure
       const exportData: ExportData = {
         exportDate: new Date().toISOString(),
-        exportVersion: '1.0',
+        exportVersion: '1.1',
         userProfile,
         healthDataCache: healthCache,
         evolutionRecords,
+        // Gamification data (Requirements: 6.4)
+        achievements: achievementData,
+        streaks: streakData,
+        challenges: challengeData,
+        cosmetics: cosmeticData,
         metadata: {
           platform: Platform.OS,
           appVersion: this.APP_VERSION,
           dataRetentionPolicy:
-            'Health data: 30 days, Emotional state history: 90 days, Evolution records: Permanent',
+            'Health data: 30 days, Emotional state history: 90 days, Evolution records: Permanent, Gamification data: Permanent',
         },
       };
 
@@ -286,23 +308,45 @@ export class DataManagementService {
     userProfileExists: boolean;
     healthDataEntries: number;
     evolutionRecords: number;
+    achievementsEarned: number;
+    currentStreak: number;
+    cosmeticsOwned: number;
     estimatedSize: string;
   }> {
     try {
-      const [userProfile, healthCache, evolutionRecords] = await Promise.all([
+      const [
+        userProfile,
+        healthCache,
+        evolutionRecords,
+        achievementData,
+        streakData,
+        cosmeticData,
+      ] = await Promise.all([
         StorageService.getUserProfile(),
         SecureStorageService.getHealthDataCache(),
         StorageService.getEvolutionRecords(),
+        StorageService.getAchievementData(),
+        StorageService.getStreakData(),
+        StorageService.getCosmeticData(),
       ]);
 
       const healthDataEntries = healthCache ? Object.keys(healthCache).length : 0;
       const evolutionCount = evolutionRecords.length;
+      const achievementsEarned =
+        achievementData?.achievements?.filter(
+          (a: { unlockedAt?: string }) => a.unlockedAt !== undefined
+        ).length || 0;
+      const currentStreak = streakData?.state?.currentStreak || 0;
+      const cosmeticsOwned = cosmeticData?.inventory?.items?.length || 0;
 
       // Estimate size (rough calculation)
       const estimatedBytes =
         JSON.stringify(userProfile || {}).length +
         JSON.stringify(healthCache || {}).length +
-        JSON.stringify(evolutionRecords).length;
+        JSON.stringify(evolutionRecords).length +
+        JSON.stringify(achievementData || {}).length +
+        JSON.stringify(streakData || {}).length +
+        JSON.stringify(cosmeticData || {}).length;
 
       const estimatedSize = this.formatBytes(estimatedBytes);
 
@@ -310,6 +354,9 @@ export class DataManagementService {
         userProfileExists: userProfile !== null,
         healthDataEntries,
         evolutionRecords: evolutionCount,
+        achievementsEarned,
+        currentStreak,
+        cosmeticsOwned,
         estimatedSize,
       };
     } catch (error) {
@@ -318,6 +365,9 @@ export class DataManagementService {
         userProfileExists: false,
         healthDataEntries: 0,
         evolutionRecords: 0,
+        achievementsEarned: 0,
+        currentStreak: 0,
+        cosmeticsOwned: 0,
         estimatedSize: '0 B',
       };
     }

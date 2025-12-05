@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,15 @@ import {
   Pressable,
   GestureResponderEvent,
 } from 'react-native';
-import { Symbi8BitCanvas } from '../components/Symbi8BitCanvas';
+import { CosmeticRenderer } from '../components/CosmeticRenderer';
 import { BreathingExercise } from '../components/BreathingExercise';
 import { EvolutionCelebration } from '../components/EvolutionCelebration';
+import { StreakDisplay } from '../components/StreakDisplay';
 import { HabitatManager, HabitatManagerHandle } from '../components/habitat';
 import { useHealthDataStore } from '../stores/healthDataStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
+import { useStreakStore } from '../stores/streakStore';
+import { useCosmeticStore } from '../stores/cosmeticStore';
 import {
   useHealthDataInitialization,
   useEvolutionProgress,
@@ -70,6 +73,16 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const { emotionalState, healthMetrics, lastUpdated, isLoading, error, setError, clearError } =
     useHealthDataStore();
   const { profile } = useUserPreferencesStore();
+
+  // Gamification store hooks (Requirements: 2.4, 5.5)
+  const { currentStreak, longestStreak, initialize: initializeStreak } = useStreakStore();
+  const { initialize: initializeCosmetics } = useCosmeticStore();
+
+  // Initialize gamification stores on mount
+  useEffect(() => {
+    initializeStreak();
+    initializeCosmetics();
+  }, [initializeStreak, initializeCosmetics]);
 
   // Custom hooks for extracted logic
   const { isInitializing, refreshing, handleRefresh } = useHealthDataInitialization();
@@ -199,6 +212,15 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
     () => navigation.navigate('EvolutionHistory'),
     [navigation]
   );
+  // Gamification navigation handlers (Requirements: 1.3, 5.1)
+  const handleNavigateToAchievements = useCallback(
+    () => navigation.navigate('Achievements'),
+    [navigation]
+  );
+  const handleNavigateToCustomization = useCallback(
+    () => navigation.navigate('CustomizationStudio'),
+    [navigation]
+  );
 
   /**
    * Start breathing exercise session
@@ -261,13 +283,10 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
    * Handle screen tap for habitat particle effects
    * Triggers burst effect at tap location
    */
-  const handleScreenTap = useCallback(
-    (event: GestureResponderEvent) => {
-      const { locationX, locationY } = event.nativeEvent;
-      habitatRef.current?.triggerBackgroundTap({ x: locationX, y: locationY });
-    },
-    []
-  );
+  const handleScreenTap = useCallback((event: GestureResponderEvent) => {
+    const { locationX, locationY } = event.nativeEvent;
+    habitatRef.current?.triggerBackgroundTap({ x: locationX, y: locationY });
+  }, []);
 
   return (
     <View style={styles.screenContainer}>
@@ -324,7 +343,7 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           </Animated.View>
         )}
 
-        {/* Symbi Ghost with Tamagotchi Frame */}
+        {/* Symbi Ghost with Tamagotchi Frame - Now with Cosmetics (Requirement 5.5) */}
         <View style={styles.symbiContainer}>
           {isLoading ? (
             <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
@@ -335,11 +354,12 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
                 style={styles.frameImage}
                 resizeMode="contain">
                 <View style={styles.ghostScreenArea}>
-                  <Symbi8BitCanvas
+                  <CosmeticRenderer
                     key={`ghost-${emotionalState}`}
                     emotionalState={emotionalState}
                     size={Math.min(SCREEN_WIDTH * 0.5, 220)}
                     onPoke={handleSymbiPoke}
+                    showCosmetics={true}
                   />
                 </View>
               </ImageBackground>
@@ -419,6 +439,33 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
             />
           </View>
           <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+        </View>
+
+        {/* Streak Display (Requirement 2.4) */}
+        <View style={styles.streakContainer}>
+          <StreakDisplay
+            currentStreak={currentStreak}
+            longestStreak={longestStreak}
+            style={styles.streakCard}
+          />
+        </View>
+
+        {/* Quick Access Buttons for Achievements & Customization (Requirements 1.3, 5.1) */}
+        <View style={styles.quickAccessContainer}>
+          <TouchableOpacity
+            style={styles.quickAccessButton}
+            onPress={handleNavigateToAchievements}
+            accessibilityLabel="View achievements">
+            <Text style={styles.quickAccessIcon}>🏆</Text>
+            <Text style={styles.quickAccessText}>Achievements</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickAccessButton}
+            onPress={handleNavigateToCustomization}
+            accessibilityLabel="Customize Symbi">
+            <Text style={styles.quickAccessIcon}>🎨</Text>
+            <Text style={styles.quickAccessText}>Customize</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Threshold Indicators */}
@@ -878,6 +925,39 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.bodySize,
     fontWeight: 'bold',
     color: TEXT_COLORS.secondary,
+  },
+  streakContainer: {
+    paddingHorizontal: LAYOUT.horizontalPadding,
+    marginBottom: LAYOUT.horizontalPadding,
+  },
+  streakCard: {
+    borderWidth: 2,
+    borderColor: HALLOWEEN_COLORS.primary,
+  },
+  quickAccessContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: LAYOUT.horizontalPadding,
+    marginBottom: LAYOUT.horizontalPadding,
+    gap: 12,
+  },
+  quickAccessButton: {
+    flex: 1,
+    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    borderRadius: LAYOUT.cardBorderRadius,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: BORDER_COLORS.secondary,
+    ...SHADOWS.card,
+  },
+  quickAccessIcon: {
+    fontSize: 28,
+    marginBottom: 8,
+  },
+  quickAccessText: {
+    fontSize: TYPOGRAPHY.smallSize,
+    fontWeight: '600',
+    color: HALLOWEEN_COLORS.primaryLight,
   },
   thresholdsContainer: {
     flexDirection: 'row',

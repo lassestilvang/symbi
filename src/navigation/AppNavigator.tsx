@@ -7,6 +7,8 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { MainScreen } from '../screens/MainScreen';
 import { EvolutionGalleryScreen } from '../screens/EvolutionGalleryScreen';
 import { EvolutionHistoryScreen } from '../screens/EvolutionHistoryScreen';
+import { AchievementsScreen } from '../screens/AchievementsScreen';
+import { CustomizationStudioScreen } from '../screens/CustomizationStudioScreen';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
@@ -117,6 +119,16 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="EvolutionHistory"
           component={EvolutionHistoryScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Achievements"
+          component={AchievementsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CustomizationStudio"
+          component={CustomizationStudioScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
