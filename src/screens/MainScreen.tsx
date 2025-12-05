@@ -91,10 +91,8 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   // Custom hooks for extracted logic
   const { isInitializing, refreshing, handleRefresh } = useHealthDataInitialization();
   const { isOffline } = useNetworkStatus({ autoRefreshOnReconnect: true });
-  const { stateChangeNotification, notificationOpacity } = useStateChangeNotification(
-    emotionalState,
-    { isInitializing }
-  );
+  // State change notification hook - kept for potential future use
+  useStateChangeNotification(emotionalState, { isInitializing });
 
   // Evolution progress hook
   const {
@@ -338,13 +336,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>⚠️ {error}</Text>
           </View>
-        )}
-
-        {/* State change notification */}
-        {stateChangeNotification && (
-          <Animated.View style={[styles.notificationContainer, { opacity: notificationOpacity }]}>
-            <Text style={styles.notificationText}>✨ {stateChangeNotification}</Text>
-          </Animated.View>
         )}
 
         {/* Symbi Ghost with Tamagotchi Frame - Now with Cosmetics (Requirement 5.5) */}
@@ -763,25 +754,6 @@ const styles = StyleSheet.create({
     color: TEXT_COLORS.error,
     fontSize: TYPOGRAPHY.smallSize,
     textAlign: 'center',
-  },
-  notificationContainer: {
-    position: 'absolute',
-    top: 80,
-    left: LAYOUT.horizontalPadding,
-    right: LAYOUT.horizontalPadding,
-    padding: 12,
-    backgroundColor: HALLOWEEN_COLORS.primary,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: HALLOWEEN_COLORS.primaryLight,
-    ...SHADOWS.card,
-    zIndex: 1000,
-  },
-  notificationText: {
-    color: TEXT_COLORS.primary,
-    fontSize: TYPOGRAPHY.smallSize,
-    textAlign: 'center',
-    fontWeight: 'bold',
   },
   symbiContainer: {
     alignItems: 'center',
