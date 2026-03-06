@@ -138,3 +138,87 @@ export const DECORATION_ICONS = {
   /** Bat emoji (🦇) */
   bat: '🦇',
 } as const;
+
+/**
+ * UI Layout Constants
+ *
+ * Centralized layout values to avoid magic numbers in styles.
+ */
+export const LAYOUT = {
+  /** Maximum content width for responsive layouts */
+  maxContentWidth: 600,
+  /** Standard horizontal padding */
+  horizontalPadding: 20,
+  /** Standard border radius for cards */
+  cardBorderRadius: 12,
+  /** Standard border radius for buttons */
+  buttonBorderRadius: 12,
+  /** Standard border radius for progress bars */
+  progressBarRadius: 12,
+} as const;
+
+/**
+ * Typography Constants
+ */
+export const TYPOGRAPHY = {
+  /** Title font size */
+  titleSize: 32,
+  /** Large heading font size */
+  headingSize: 24,
+  /** Body text font size */
+  bodySize: 16,
+  /** Small text font size */
+  smallSize: 14,
+  /** Caption font size */
+  captionSize: 12,
+} as const;
+
+/**
+ * Shadow Presets
+ *
+ * Reusable shadow configurations for consistent elevation.
+ */
+export const SHADOWS = {
+  /** Standard card shadow */
+  card: {
+    shadowColor: HALLOWEEN_COLORS.primaryLight,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  /** Subtle shadow for secondary elements */
+  subtle: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+} as const;
+
+/**
+ * Text Colors
+ */
+export const TEXT_COLORS = {
+  /** Primary text color */
+  primary: '#ffffff',
+  /** Secondary/muted text color */
+  secondary: '#a78bfa',
+  /** Disabled/hint text color */
+  muted: '#6b7280',
+  /** Error text color */
+  error: '#FCA5A5',
+} as const;
+
+/**
+ * Border Colors
+ */
+export const BORDER_COLORS = {
+  /** Primary border color */
+  primary: HALLOWEEN_COLORS.primary,
+  /** Secondary border color */
+  secondary: '#374151',
+  /** Error border color */
+  error: '#DC2626',
+} as const;

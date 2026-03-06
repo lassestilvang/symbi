@@ -9,6 +9,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useHealthDataStore } from '../stores/healthDataStore';
 import { ManualHealthDataService } from '../services/ManualHealthDataService';
 import { EmotionalStateCalculator } from '../services/EmotionalStateCalculator';
@@ -19,6 +20,7 @@ interface ManualEntryScreenProps {
 }
 
 export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete }) => {
+  const navigation = useNavigation();
   const [stepCount, setStepCount] = useState('');
   const [sleepHours, setSleepHours] = useState('');
   const [hrv, setHrv] = useState('');
@@ -91,19 +93,15 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({ onComplete
         'rule-based'
       );
 
-      Alert.alert('Success', 'Your health data has been saved!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            setStepCount('');
-            setSleepHours('');
-            setHrv('');
-            if (onComplete) {
-              onComplete();
-            }
-          },
-        },
-      ]);
+      // Clear form and navigate back
+      setStepCount('');
+      setSleepHours('');
+      setHrv('');
+      if (onComplete) {
+        onComplete();
+      }
+      // Navigate back to main screen
+      navigation.goBack();
     } catch (error) {
       console.error('Error saving health data:', error);
       Alert.alert('Error', 'Failed to save health data. Please try again.');
@@ -197,12 +195,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1a2e',
+    alignItems: 'center',
   },
   content: {
     flex: 1,
-    paddingHorizontal: 32,
+    paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 32,
+    maxWidth: 600,
+    width: '100%',
   },
   title: {
     fontSize: 28,

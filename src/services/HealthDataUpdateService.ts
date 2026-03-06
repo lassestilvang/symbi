@@ -4,7 +4,13 @@ import { StorageService } from './StorageService';
 import { useSymbiStateStore } from '../stores/symbiStateStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { useHealthDataStore } from '../stores/healthDataStore';
-import { HealthDataCache, HealthDataType, HealthMetrics } from '../types';
+import { useAchievementStore } from '../stores/achievementStore';
+import { useStreakStore } from '../stores/streakStore';
+import { HealthDataCache, HealthDataType, HealthMetrics, EmotionalState } from '../types';
+import { getAchievementService } from './AchievementService';
+import { getStreakService } from './StreakService';
+import { getChallengeService } from './ChallengeService';
+import { EvolutionSystem } from './EvolutionSystem';
 
 /**
  * HealthDataUpdateService
@@ -13,11 +19,18 @@ import { HealthDataCache, HealthDataType, HealthMetrics } from '../types';
  * Coordinates between health data services, emotional state calculator,
  * and state stores.
  *
- * Requirements: 1.5, 4.1, 4.2, 4.3, 14.1, 14.3
+ * Also integrates with the gamification system:
+ * - Triggers achievement checks on health data updates
+ * - Connects emotional state results to streak tracking
+ * - Updates challenge progress in real-time
+ * - Tracks daily state for evolution system
+ *
+ * Requirements: 1.1, 1.5, 2.1, 3.5, 4.1, 4.2, 4.3, 14.1, 14.3
  */
 export class HealthDataUpdateService {
   private static healthDataService: HealthDataService | null = null;
   private static isInitialized = false;
+  private static gamificationInitialized = false;
 
   /**
    * Initialize the health data service based on user preferences
@@ -36,6 +49,40 @@ export class HealthDataUpdateService {
 
     // Load cached data first to show something immediately
     await this.loadCachedHealthData();
+
+    // Initialize gamification services
+    await this.initializeGamification();
+  }
+
+  /**
+   * Initialize gamification services (achievements, streaks, challenges)
+   * Requirements: 1.1, 2.1, 3.5
+   */
+  private static async initializeGamification(): Promise<void> {
+    if (this.gamificationInitialized) return;
+
+    try {
+      // Initialize achievement service
+      const achievementService = getAchievementService();
+      await achievementService.initialize();
+
+      // Initialize streak service
+      const streakService = getStreakService();
+      await streakService.initialize();
+
+      // Initialize challenge service
+      const challengeService = getChallengeService();
+      await challengeService.initialize();
+
+      // Initialize stores
+      await useAchievementStore.getState().initialize();
+      await useStreakStore.getState().initialize();
+
+      this.gamificationInitialized = true;
+      console.log('[HealthDataUpdateService] Gamification services initialized');
+    } catch (error) {
+      console.error('[HealthDataUpdateService] Error initializing gamification:', error);
+    }
   }
 
   /**
@@ -114,6 +161,9 @@ export class HealthDataUpdateService {
       healthStore.setLoading(false);
 
       console.log(`Health data updated: ${steps} steps → ${emotionalState} state`);
+
+      // Trigger gamification updates (Requirements: 1.1, 2.1, 3.5)
+      await this.updateGamificationSystems(metrics, emotionalState);
     } catch (error) {
       console.error('Error updating daily health data:', error);
 
@@ -125,6 +175,166 @@ export class HealthDataUpdateService {
       await this.loadCachedHealthData();
 
       throw error;
+    }
+  }
+
+  /**
+   * Update gamification systems with new health data
+   * Requirements: 1.1, 2.1, 3.5
+   *
+   * @param metrics - Current health metrics
+   * @param emotionalState - Calculated emotional state
+   */
+  private static async updateGamificationSystems(
+    metrics: HealthMetrics,
+    emotionalState: EmotionalState
+  ): Promise<void> {
+    try {
+      await this.initializeGamification();
+
+      const today = this.getDateKey(new Date());
+
+      // 1. Check for achievement milestones (Requirement 1.1)
+      await this.checkAchievementMilestones(metrics);
+
+      // 2. Update streak tracking based on emotional state (Requirement 2.1)
+      await this.updateStreakTracking(today, emotionalState);
+
+      // 3. Update challenge progress (Requirement 3.5)
+      await this.updateChallengeProgress(metrics);
+
+      // 4. Track daily state for evolution system
+      await this.trackEvolutionProgress(emotionalState);
+
+      console.log('[HealthDataUpdateService] Gamification systems updated');
+    } catch (error) {
+      console.error('[HealthDataUpdateService] Error updating gamification:', error);
+      // Don't throw - gamification errors shouldn't break health data flow
+    }
+  }
+
+  /**
+   * Check for achievement milestones based on health metrics
+   * Requirement 1.1: WHEN a user reaches a defined milestone THEN record achievement
+   */
+  private static async checkAchievementMilestones(metrics: HealthMetrics): Promise<void> {
+    try {
+      const achievementService = getAchievementService();
+      const newAchievements = await achievementService.checkMilestone(metrics);
+
+      if (newAchievements.length > 0) {
+        // Refresh achievement store to reflect new unlocks
+        useAchievementStore.getState().refreshAchievements();
+        console.log(
+          `[HealthDataUpdateService] Unlocked ${newAchievements.length} achievement(s):`,
+          newAchievements.map(a => a.name)
+        );
+      }
+    } catch (error) {
+      console.error('[HealthDataUpdateService] Error checking achievements:', error);
+    }
+  }
+
+  /**
+   * Update streak tracking based on emotional state
+   * Requirement 2.1: WHEN user meets daily health criteria THEN increment streak
+   *
+   * Criteria: User is in Active or Vibrant state (positive states)
+   */
+  private static async updateStreakTracking(
+    date: string,
+    emotionalState: EmotionalState
+  ): Promise<void> {
+    try {
+      const streakService = getStreakService();
+
+      // Determine if user met daily criteria (Active or Vibrant states)
+      const positiveStates = [EmotionalState.ACTIVE, EmotionalState.VIBRANT];
+      const metCriteria = positiveStates.includes(emotionalState);
+
+      const update = await streakService.recordDailyProgress(date, metCriteria);
+
+      // Refresh streak store
+      useStreakStore.getState().refreshStreak();
+
+      if (update.milestoneReached) {
+        console.log(
+          `[HealthDataUpdateService] Streak milestone reached: ${update.milestoneReached.days} days`
+        );
+      }
+
+      if (update.wasReset) {
+        console.log('[HealthDataUpdateService] Streak was reset');
+      }
+    } catch (error) {
+      console.error('[HealthDataUpdateService] Error updating streak:', error);
+    }
+  }
+
+  /**
+   * Update challenge progress with current health data
+   * Requirement 3.5: WHILE challenge is active THEN track progress in real-time
+   */
+  private static async updateChallengeProgress(metrics: HealthMetrics): Promise<void> {
+    try {
+      const challengeService = getChallengeService();
+      await challengeService.initialize();
+
+      // Get weekly health data for challenge calculations
+      const weeklyData = await this.getWeeklyHealthData();
+
+      // Create current day's cache entry
+      const today = this.getDateKey(new Date());
+      const currentData: HealthDataCache = {
+        date: today,
+        steps: metrics.steps,
+        sleepHours: metrics.sleepHours,
+        hrv: metrics.hrv,
+        emotionalState: EmotionalState.RESTING, // Will be overwritten
+        calculationMethod: 'rule-based',
+        lastUpdated: new Date(),
+      };
+
+      // Update all challenge progress
+      await challengeService.updateAllChallengeProgress(currentData, weeklyData);
+    } catch (error) {
+      console.error('[HealthDataUpdateService] Error updating challenges:', error);
+    }
+  }
+
+  /**
+   * Track daily emotional state for evolution system
+   */
+  private static async trackEvolutionProgress(emotionalState: EmotionalState): Promise<void> {
+    try {
+      await EvolutionSystem.trackDailyState(emotionalState);
+    } catch (error) {
+      console.error('[HealthDataUpdateService] Error tracking evolution:', error);
+    }
+  }
+
+  /**
+   * Get health data for the current week
+   */
+  private static async getWeeklyHealthData(): Promise<HealthDataCache[]> {
+    try {
+      const cache = await StorageService.getHealthDataCache();
+      if (!cache) return [];
+
+      // Get start of current week (Monday)
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+      const weekStart = new Date(today.setDate(diff));
+      weekStart.setHours(0, 0, 0, 0);
+
+      const weekStartKey = this.getDateKey(weekStart);
+
+      // Filter cache entries for current week
+      return Object.values(cache).filter(entry => entry.date >= weekStartKey);
+    } catch (error) {
+      console.error('[HealthDataUpdateService] Error getting weekly data:', error);
+      return [];
     }
   }
 
@@ -258,5 +468,6 @@ export class HealthDataUpdateService {
     }
     this.healthDataService = null;
     this.isInitialized = false;
+    this.gamificationInitialized = false;
   }
 }

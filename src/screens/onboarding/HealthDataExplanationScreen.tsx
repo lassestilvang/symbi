@@ -83,6 +83,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingTop: 60,
     paddingBottom: 32,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   title: {
     fontSize: 28,
@@ -154,6 +157,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 32,
     paddingBottom: 48,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   backButton: {
     paddingVertical: 12,

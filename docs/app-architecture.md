@@ -481,22 +481,26 @@ For detailed information, see [Evolution History Page Design](./.kiro/specs/evol
 The application uses centralized theme constants for consistent styling:
 
 **HALLOWEEN_COLORS**:
+
 - Primary purple palette (#7C3AED, #5B21B6, #9333EA)
 - Accent colors (orange, green)
 - Background colors (darkBg, cardBg)
 - Text colors (ghostWhite)
 
 **STATE_COLORS**:
+
 - Color mapping for each emotional state
 - Used in timelines, badges, and indicators
 - Consistent visual language across components
 
 **METRIC_CONFIG**:
+
 - Configuration for each health metric (steps, sleep, HRV)
 - Includes labels, colors, suffixes, and decimal precision
 - Type-safe metric operations
 
 **Benefits**:
+
 - Single source of truth for styling
 - Eliminates ~250 lines of duplicated code
 - Easy theme updates and maintenance
@@ -507,20 +511,22 @@ The application uses centralized theme constants for consistent styling:
 Centralized date formatting functions:
 
 ```typescript
-formatShortDate(date)      // "11/16"
-formatMediumDate(date)     // "Nov 16"
-formatFullDate(date)       // "Monday, November 16, 2025"
-formatWeekday(date)        // "Mon"
-formatDisplayDate(date)    // "Nov 16, 2025"
+formatShortDate(date); // "11/16"
+formatMediumDate(date); // "Nov 16"
+formatFullDate(date); // "Monday, November 16, 2025"
+formatWeekday(date); // "Mon"
+formatDisplayDate(date); // "Nov 16, 2025"
 ```
 
 **Usage**:
+
 - Charts: Short dates for axis labels
 - Timelines: Medium dates for readability
 - Modals: Full dates for detailed views
 - Tables: Display dates for data rows
 
 **Benefits**:
+
 - Consistent date formatting across app
 - Locale-aware formatting
 - Easy to update format patterns
@@ -531,19 +537,21 @@ formatDisplayDate(date)    // "Nov 16, 2025"
 Type-safe health metric operations:
 
 ```typescript
-getMetricValue(point, type)        // Extract metric value
-hasMetricValue(point, type)        // Check if metric exists
-filterByMetric(data, type)         // Filter data by metric
-formatMetricValue(value, type)     // Format with suffix
-getMetricConfig(type)              // Get metric configuration
+getMetricValue(point, type); // Extract metric value
+hasMetricValue(point, type); // Check if metric exists
+filterByMetric(data, type); // Filter data by metric
+formatMetricValue(value, type); // Format with suffix
+getMetricConfig(type); // Get metric configuration
 ```
 
 **Type Safety**:
+
 ```typescript
 type MetricType = 'steps' | 'sleep' | 'hrv';
 ```
 
 **Benefits**:
+
 - Type-safe metric operations
 - Eliminates null/undefined errors
 - Consistent value formatting
@@ -552,24 +560,27 @@ type MetricType = 'steps' | 'sleep' | 'hrv';
 ### Component Composition Patterns
 
 **Memoization Strategy**:
+
 ```typescript
 // Component level
 export const Component = React.memo(({ props }) => {
   // Hook level
   const value = useMemo(() => expensiveCalc(), [deps]);
   const handler = useCallback(() => action(), [deps]);
-  
+
   return <View>...</View>;
 });
 ```
 
 **Benefits**:
+
 - Prevents unnecessary re-renders
 - Optimizes expensive calculations
 - Improves scroll performance
 - Reduces battery consumption
 
 **Extraction Pattern**:
+
 ```typescript
 // Extract sub-components for better separation
 const Tooltip: React.FC<Props> = ({ data }) => {
@@ -587,6 +598,7 @@ export const Chart: React.FC<Props> = ({ data }) => {
 ```
 
 **Benefits**:
+
 - Better code organization
 - Easier testing
 - Improved readability
@@ -610,12 +622,14 @@ const debounce = <T extends (...args: unknown[]) => unknown>(
 ```
 
 **Usage**:
+
 - Time range filter changes (300ms debounce)
 - Chart updates on data changes
 - Search input handling
 - Scroll position tracking
 
 **Benefits**:
+
 - Reduces unnecessary API calls
 - Prevents UI jank
 - Improves battery life
@@ -635,6 +649,7 @@ const statistics = useMemo(() => {
 ```
 
 **Benefits**:
+
 - Calculations only run when dependencies change
 - Prevents redundant processing
 - Improves render performance
@@ -652,6 +667,7 @@ const { isLandscape, cardWidth } = useMemo(() => {
 ```
 
 **Benefits**:
+
 - Responsive layout calculations cached
 - Smooth orientation transitions
 - Consistent card sizing
