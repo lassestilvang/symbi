@@ -13,11 +13,13 @@ import {
   ImageBackground,
   Pressable,
   GestureResponderEvent,
+  Image,
 } from 'react-native';
 import { CosmeticRenderer } from '../components/CosmeticRenderer';
 import { BreathingExercise } from '../components/BreathingExercise';
 import { EvolutionCelebration } from '../components/EvolutionCelebration';
 import { StreakDisplay } from '../components/StreakDisplay';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 import { HabitatManager, HabitatManagerHandle } from '../components/habitat';
 import { useHealthDataStore } from '../stores/healthDataStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
@@ -50,6 +52,9 @@ import {
 // Import tamagotchi frame image
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const tamagotchiFrameImage = require('../assets/images/tamagotchi-frame.png');
+// Import app logo
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const appLogo = require('../../assets/icon.png');
 
 /**
  * MainScreen Component
@@ -72,7 +77,14 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   // Store hooks
   const { emotionalState, healthMetrics, lastUpdated, isLoading, error, setError, clearError } =
     useHealthDataStore();
-  const { profile } = useUserPreferencesStore();
+  const { profile, updatePreferences } = useUserPreferencesStore();
+
+  // Tutorial state - show only on first visit
+  const showTutorial = profile?.preferences.hasSeenTutorial === false;
+
+  const handleTutorialComplete = useCallback(async () => {
+    await updatePreferences({ hasSeenTutorial: true });
+  }, [updatePreferences]);
 
   // Gamification store hooks (Requirements: 2.4, 5.5)
   const { currentStreak, longestStreak, initialize: initializeStreak } = useStreakStore();
@@ -87,10 +99,8 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   // Custom hooks for extracted logic
   const { isInitializing, refreshing, handleRefresh } = useHealthDataInitialization();
   const { isOffline } = useNetworkStatus({ autoRefreshOnReconnect: true });
-  const { stateChangeNotification, notificationOpacity } = useStateChangeNotification(
-    emotionalState,
-    { isInitializing }
-  );
+  // State change notification hook - kept for potential future use
+  useStateChangeNotification(emotionalState, { isInitializing });
 
   // Evolution progress hook
   const {
@@ -199,10 +209,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   );
 
   // Navigation handlers
-  const handleConfigureThresholds = useCallback(
-    () => navigation.navigate('Thresholds'),
-    [navigation]
-  );
   const handleOpenSettings = useCallback(() => navigation.navigate('Settings'), [navigation]);
   const handleNavigateToManualEntry = useCallback(
     () => navigation.navigate('ManualEntry'),
@@ -314,7 +320,11 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         {/* Header with settings button */}
         <View style={styles.header}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Symbi</Text>
+            <Image source={appLogo} style={styles.headerLogo} />
+            <View style={styles.titleTextContainer}>
+              <Text style={styles.title}>Symbi</Text>
+              <Text style={styles.tagline}>Your Biometric Tamagotchi</Text>
+            </View>
             {isOffline && (
               <View style={styles.offlineIndicator}>
                 <Text style={styles.offlineText}>📡 Offline</Text>
@@ -336,24 +346,17 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           </View>
         )}
 
-        {/* State change notification */}
-        {stateChangeNotification && (
-          <Animated.View style={[styles.notificationContainer, { opacity: notificationOpacity }]}>
-            <Text style={styles.notificationText}>✨ {stateChangeNotification}</Text>
-          </Animated.View>
-        )}
-
         {/* Symbi Ghost with Tamagotchi Frame - Now with Cosmetics (Requirement 5.5) */}
         <View style={styles.symbiContainer}>
-          {isLoading ? (
-            <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
-          ) : (
-            <View style={styles.tamagotchiFrame}>
-              <ImageBackground
-                source={tamagotchiFrameImage}
-                style={styles.frameImage}
-                resizeMode="contain">
-                <View style={styles.ghostScreenArea}>
+          <View style={styles.tamagotchiFrame}>
+            <ImageBackground
+              source={tamagotchiFrameImage}
+              style={styles.frameImage}
+              resizeMode="contain">
+              <View style={styles.ghostScreenArea}>
+                {isLoading || isInitializing ? (
+                  <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
+                ) : (
                   <CosmeticRenderer
                     key={`ghost-${emotionalState}`}
                     emotionalState={emotionalState}
@@ -361,20 +364,10 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
                     onPoke={handleSymbiPoke}
                     showCosmetics={true}
                   />
-                </View>
-              </ImageBackground>
-            </View>
-          )}
-        </View>
-
-        {/* Emotional State Label */}
-        <View style={styles.stateContainer}>
-          <Text style={styles.stateName}>{stateName}</Text>
-          {__DEV__ && (
-            <Text style={styles.debugText}>
-              Debug: {emotionalState} | Steps: {healthMetrics.steps}
-            </Text>
-          )}
+                )}
+              </View>
+            </ImageBackground>
+          </View>
         </View>
 
         {/* Manual Entry Button */}
@@ -388,9 +381,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           </View>
         )}
 
-        {/* Test Buttons (DEV only) */}
-        {__DEV__ && <TestButtons />}
-
         {/* Health Metrics Display */}
         <View style={styles.metricsContainer}>
           <View style={styles.metricCard}>
@@ -399,6 +389,46 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
             <Text style={styles.metricSubtext}>
               Goal: {thresholds.activeThreshold.toLocaleString()}
             </Text>
+            {/* Progress Bar - inside card */}
+            <View style={styles.inCardProgressContainer}>
+              <View style={styles.inCardProgressBarBackground}>
+                <View
+                  style={[
+                    styles.inCardProgressBarFill,
+                    {
+                      width: `${progress}%`,
+                      backgroundColor: progressColor,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.inCardProgressText}>{Math.round(progress)}%</Text>
+            </View>
+
+            {/* Step Thresholds - inline display */}
+            <View style={styles.inlineThresholdsContainer}>
+              <View style={styles.inlineThresholdItem}>
+                <Text style={styles.inlineThresholdValue}>
+                  &lt; {thresholds.sadThreshold.toLocaleString()}
+                </Text>
+                <Text style={styles.inlineThresholdLabel}>Sad</Text>
+              </View>
+              <View style={styles.inlineThresholdDivider} />
+              <View style={styles.inlineThresholdItem}>
+                <Text style={styles.inlineThresholdValue}>
+                  {thresholds.sadThreshold.toLocaleString()} -{' '}
+                  {thresholds.activeThreshold.toLocaleString()}
+                </Text>
+                <Text style={styles.inlineThresholdLabel}>Resting</Text>
+              </View>
+              <View style={styles.inlineThresholdDivider} />
+              <View style={styles.inlineThresholdItem}>
+                <Text style={styles.inlineThresholdValue}>
+                  &gt; {thresholds.activeThreshold.toLocaleString()}
+                </Text>
+                <Text style={styles.inlineThresholdLabel}>Active</Text>
+              </View>
+            </View>
           </View>
 
           {/* Phase 2: Sleep and HRV metrics */}
@@ -423,22 +453,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
               )}
             </View>
           )}
-        </View>
-
-        {/* Progress Bar */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBarBackground}>
-            <View
-              style={[
-                styles.progressBarFill,
-                {
-                  width: `${progress}%`,
-                  backgroundColor: progressColor,
-                },
-              ]}
-            />
-          </View>
-          <Text style={styles.progressText}>{Math.round(progress)}%</Text>
         </View>
 
         {/* Streak Display (Requirement 2.4) */}
@@ -468,29 +482,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Threshold Indicators */}
-        <View style={styles.thresholdsContainer}>
-          <View style={styles.thresholdItem}>
-            <Text style={styles.thresholdLabel}>Sad</Text>
-            <Text style={styles.thresholdValue}>
-              &lt; {thresholds.sadThreshold.toLocaleString()}
-            </Text>
-          </View>
-          <View style={styles.thresholdItem}>
-            <Text style={styles.thresholdLabel}>Resting</Text>
-            <Text style={styles.thresholdValue}>
-              {thresholds.sadThreshold.toLocaleString()} -{' '}
-              {thresholds.activeThreshold.toLocaleString()}
-            </Text>
-          </View>
-          <View style={styles.thresholdItem}>
-            <Text style={styles.thresholdLabel}>Active</Text>
-            <Text style={styles.thresholdValue}>
-              &gt; {thresholds.activeThreshold.toLocaleString()}
-            </Text>
-          </View>
-        </View>
-
         {/* Evolution Progress Indicator */}
         {evolutionEligibility && (
           <EvolutionProgressSection
@@ -511,17 +502,6 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
             <Text style={styles.calmButtonText}>🧘 Calm your Symbi</Text>
           </TouchableOpacity>
         )}
-
-        {/* Configure Thresholds Button */}
-        <TouchableOpacity
-          style={styles.configureButton}
-          onPress={handleConfigureThresholds}
-          accessibilityLabel="Configure thresholds">
-          <Text style={styles.configureButtonText}>⚡ Configure Thresholds</Text>
-        </TouchableOpacity>
-
-        {/* Last Updated */}
-        <Text style={styles.lastUpdated}>Last updated: {formattedLastUpdated}</Text>
 
         {/* Breathing Exercise Modal */}
         <Modal visible={showBreathingExercise} animationType="slide" presentationStyle="fullScreen">
@@ -559,15 +539,33 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         accessibilityLabel="Trigger habitat effect">
         <Text style={styles.fabText}>✨</Text>
       </Pressable>
+
+      {/* Debug Panel (DEV only) - Fixed to right side */}
+      {__DEV__ && (
+        <DebugPanel
+          emotionalState={emotionalState}
+          steps={healthMetrics.steps}
+          lastUpdated={formattedLastUpdated}
+        />
+      )}
+
+      {/* Tutorial Overlay - shows only on first visit */}
+      <TutorialOverlay visible={showTutorial} onComplete={handleTutorialComplete} />
     </View>
   );
 };
 
 /**
- * Test Buttons Component (DEV only)
- * Extracted to reduce MainScreen complexity
+ * Debug Panel Component (DEV only)
+ * Fixed panel on right side with state controls and debug info
  */
-const TestButtons: React.FC = () => {
+interface DebugPanelProps {
+  emotionalState: EmotionalState;
+  steps: number;
+  lastUpdated: string;
+}
+
+const DebugPanel: React.FC<DebugPanelProps> = ({ emotionalState, steps, lastUpdated }) => {
   const handleSetSad = useCallback(() => {
     useHealthDataStore
       .getState()
@@ -587,19 +585,24 @@ const TestButtons: React.FC = () => {
   }, []);
 
   return (
-    <View style={styles.testButtonsContainer}>
-      <TouchableOpacity style={[styles.testButton, styles.testButtonSad]} onPress={handleSetSad}>
-        <Text style={styles.testButtonText}>😢 Sad</Text>
+    <View style={styles.debugPanel}>
+      <Text style={styles.debugPanelTitle}>🛠 Debug</Text>
+      <Text style={styles.debugPanelText}>State: {emotionalState}</Text>
+      <Text style={styles.debugPanelText}>Steps: {steps}</Text>
+      <Text style={styles.debugPanelText}>Updated: {lastUpdated}</Text>
+      <View style={styles.debugPanelDivider} />
+      <TouchableOpacity style={[styles.debugButton, styles.debugButtonSad]} onPress={handleSetSad}>
+        <Text style={styles.debugButtonText}>😢</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.testButton, styles.testButtonResting]}
+        style={[styles.debugButton, styles.debugButtonResting]}
         onPress={handleSetResting}>
-        <Text style={styles.testButtonText}>😌 Rest</Text>
+        <Text style={styles.debugButtonText}>😌</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.testButton, styles.testButtonActive]}
+        style={[styles.debugButton, styles.debugButtonActive]}
         onPress={handleSetActive}>
-        <Text style={styles.testButtonText}>🎉 Active</Text>
+        <Text style={styles.debugButtonText}>🎉</Text>
       </TouchableOpacity>
     </View>
   );
@@ -696,19 +699,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: LAYOUT.horizontalPadding,
-    paddingTop: LAYOUT.horizontalPadding,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginHorizontal: LAYOUT.horizontalPadding,
+    marginTop: LAYOUT.horizontalPadding,
+    marginBottom: 10,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
+  },
+  headerLogo: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+  },
+  titleTextContainer: {
+    flexDirection: 'column',
   },
   title: {
-    fontSize: TYPOGRAPHY.titleSize,
+    fontSize: TYPOGRAPHY.headingSize,
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.primaryLight,
+    lineHeight: TYPOGRAPHY.headingSize + 2,
+  },
+  tagline: {
+    fontSize: 11,
+    color: TEXT_COLORS.secondary,
+    marginTop: -2,
   },
   offlineIndicator: {
     backgroundColor: BORDER_COLORS.secondary,
@@ -739,25 +762,6 @@ const styles = StyleSheet.create({
     color: TEXT_COLORS.error,
     fontSize: TYPOGRAPHY.smallSize,
     textAlign: 'center',
-  },
-  notificationContainer: {
-    position: 'absolute',
-    top: 80,
-    left: LAYOUT.horizontalPadding,
-    right: LAYOUT.horizontalPadding,
-    padding: 12,
-    backgroundColor: HALLOWEEN_COLORS.primary,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: HALLOWEEN_COLORS.primaryLight,
-    ...SHADOWS.card,
-    zIndex: 1000,
-  },
-  notificationText: {
-    color: TEXT_COLORS.primary,
-    fontSize: TYPOGRAPHY.smallSize,
-    textAlign: 'center',
-    fontWeight: 'bold',
   },
   symbiContainer: {
     alignItems: 'center',
@@ -795,7 +799,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     letterSpacing: 1,
   },
-  debugText: {
+  _unusedDebugText: {
     color: TEXT_COLORS.muted,
     fontSize: TYPOGRAPHY.captionSize,
     marginTop: 4,
@@ -817,43 +821,64 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  testButtonsContainer: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingHorizontal: LAYOUT.horizontalPadding,
-    marginBottom: LAYOUT.horizontalPadding,
-  },
-  testButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+  debugPanel: {
+    position: 'absolute',
+    right: 8,
+    top: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderRadius: 8,
-    alignItems: 'center',
+    padding: 8,
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
+    zIndex: 1001,
+    minWidth: 80,
   },
-  testButtonSad: {
+  debugPanelTitle: {
+    color: HALLOWEEN_COLORS.primaryLight,
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  debugPanelText: {
+    color: TEXT_COLORS.muted,
+    fontSize: 9,
+    marginBottom: 2,
+  },
+  debugPanelDivider: {
+    height: 1,
+    backgroundColor: BORDER_COLORS.secondary,
+    marginVertical: 6,
+  },
+  debugButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  debugButtonSad: {
     backgroundColor: STATE_COLORS.sad,
   },
-  testButtonResting: {
+  debugButtonResting: {
     backgroundColor: HALLOWEEN_COLORS.primary,
   },
-  testButtonActive: {
+  debugButtonActive: {
     backgroundColor: STATE_COLORS.active,
   },
-  testButtonText: {
-    color: TEXT_COLORS.primary,
-    fontSize: TYPOGRAPHY.smallSize,
-    fontWeight: 'bold',
+  debugButtonText: {
+    fontSize: 14,
   },
   metricsContainer: {
     paddingHorizontal: LAYOUT.horizontalPadding,
     marginBottom: LAYOUT.horizontalPadding,
   },
   metricCard: {
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
     borderRadius: 16,
     padding: LAYOUT.horizontalPadding,
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: HALLOWEEN_COLORS.primary,
   },
   metricLabel: {
@@ -873,6 +898,63 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.smallSize,
     color: TEXT_COLORS.muted,
   },
+  inCardProgressContainer: {
+    width: '100%',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  inCardProgressBarBackground: {
+    height: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(124, 58, 237, 0.5)',
+  },
+  inCardProgressBarFill: {
+    height: '100%',
+    borderRadius: 10,
+  },
+  inCardProgressText: {
+    textAlign: 'center',
+    marginTop: 6,
+    fontSize: TYPOGRAPHY.headingSize,
+    fontWeight: 'bold',
+    color: HALLOWEEN_COLORS.ghostWhite,
+  },
+  inlineThresholdsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: BORDER_COLORS.secondary,
+    width: '100%',
+  },
+  inlineThresholdItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  inlineThresholdValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: HALLOWEEN_COLORS.primaryLight,
+    textAlign: 'center',
+  },
+  inlineThresholdLabel: {
+    fontSize: 10,
+    color: TEXT_COLORS.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 2,
+  },
+  inlineThresholdDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: BORDER_COLORS.secondary,
+  },
   additionalMetricsRow: {
     flexDirection: 'row',
     gap: 12,
@@ -880,12 +962,12 @@ const styles = StyleSheet.create({
   },
   smallMetricCard: {
     flex: 1,
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
     borderRadius: LAYOUT.cardBorderRadius,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: BORDER_COLORS.secondary,
+    borderColor: HALLOWEEN_COLORS.primary,
   },
   smallMetricIcon: {
     fontSize: 24,
@@ -903,29 +985,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: HALLOWEEN_COLORS.primaryLight,
   },
-  progressContainer: {
-    paddingHorizontal: LAYOUT.horizontalPadding,
-    marginBottom: LAYOUT.horizontalPadding,
-  },
-  progressBarBackground: {
-    height: 24,
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
-    borderRadius: LAYOUT.progressBarRadius,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: BORDER_COLORS.secondary,
-  },
-  progressBarFill: {
-    height: '100%',
-    borderRadius: 10,
-  },
-  progressText: {
-    textAlign: 'center',
-    marginTop: 8,
-    fontSize: TYPOGRAPHY.bodySize,
-    fontWeight: 'bold',
-    color: TEXT_COLORS.secondary,
-  },
+
   streakContainer: {
     paddingHorizontal: LAYOUT.horizontalPadding,
     marginBottom: LAYOUT.horizontalPadding,
@@ -942,13 +1002,12 @@ const styles = StyleSheet.create({
   },
   quickAccessButton: {
     flex: 1,
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
     borderRadius: LAYOUT.cardBorderRadius,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: BORDER_COLORS.secondary,
-    ...SHADOWS.card,
+    borderColor: HALLOWEEN_COLORS.primary,
   },
   quickAccessIcon: {
     fontSize: 28,
@@ -985,10 +1044,10 @@ const styles = StyleSheet.create({
   evolutionProgressContainer: {
     marginHorizontal: LAYOUT.horizontalPadding,
     marginBottom: LAYOUT.horizontalPadding,
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
     borderRadius: LAYOUT.cardBorderRadius,
     padding: 16,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: HALLOWEEN_COLORS.primary,
   },
   evolutionProgressHeader: {
@@ -1064,20 +1123,6 @@ const styles = StyleSheet.create({
     ...SHADOWS.card,
   },
   calmButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: TEXT_COLORS.primary,
-  },
-  configureButton: {
-    marginHorizontal: LAYOUT.horizontalPadding,
-    backgroundColor: HALLOWEEN_COLORS.primary,
-    borderRadius: LAYOUT.buttonBorderRadius,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: LAYOUT.horizontalPadding,
-    ...SHADOWS.card,
-  },
-  configureButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: TEXT_COLORS.primary,

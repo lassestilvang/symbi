@@ -87,7 +87,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: HALLOWEEN_COLORS.cardBg,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
     borderRadius: LAYOUT.cardBorderRadius,
     padding: 16,
   },

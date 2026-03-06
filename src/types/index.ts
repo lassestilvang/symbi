@@ -153,6 +153,7 @@ export interface UserPreferences {
   soundEnabled: boolean;
   theme: 'light' | 'dark' | 'auto';
   analyticsEnabled: boolean;
+  hasSeenTutorial: boolean;
 }
 
 /**

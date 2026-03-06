@@ -386,6 +386,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 32,
+    maxWidth: LAYOUT.maxContentWidth,
+    width: '100%',
+    alignSelf: 'center',
   },
   statsSection: {
     padding: LAYOUT.horizontalPadding,

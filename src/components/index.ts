@@ -30,6 +30,9 @@ export { WeeklyChallenges } from './WeeklyChallenges';
 // Notification components
 export { NotificationToast } from './NotificationToast';
 
+// Tutorial components
+export { TutorialOverlay } from './TutorialOverlay';
+
 // Habitat components
 export { ParallaxLayer, AnimatedParallaxLayer } from './habitat';
 export { AmbientElement } from './habitat';

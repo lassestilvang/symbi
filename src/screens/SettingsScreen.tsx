@@ -190,6 +190,25 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           )}
         </View>
 
+        {/* Habitat Scene Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Habitat Scene</Text>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Current Scene</Text>
+              <Text style={styles.settingValue}>{SCENE_REGISTRY[currentScene]?.name}</Text>
+            </View>
+          </View>
+
+          <View style={styles.sceneSelectorContainer}>
+            <SceneSelector
+              initialScene={currentScene}
+              onSceneChange={scene => setCurrentScene(scene)}
+            />
+          </View>
+        </View>
+
         {/* Data Source Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Data Source</Text>
@@ -273,25 +292,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             onPress={() => navigation?.navigate('CustomizationStudio')}>
             <Text style={styles.buttonText}>🎨 Customize Symbi</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Habitat Scene Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Habitat Scene</Text>
-
-          <View style={styles.settingRow}>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Current Scene</Text>
-              <Text style={styles.settingValue}>{SCENE_REGISTRY[currentScene]?.name}</Text>
-            </View>
-          </View>
-
-          <View style={styles.sceneSelectorContainer}>
-            <SceneSelector
-              initialScene={currentScene}
-              onSceneChange={scene => setCurrentScene(scene)}
-            />
-          </View>
         </View>
 
         {/* Preferences Section */}
