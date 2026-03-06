@@ -5,6 +5,7 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import ErrorReportingService from './src/services/ErrorReportingService';
 import { SENTRY_CONFIG } from './src/config/sentry.config';
 import { Platform, View, StyleSheet } from 'react-native';
+import { NotificationToast } from './src/components';
 
 /**
  * Initialize error reporting and global error handlers
@@ -109,6 +110,7 @@ export default function App() {
         <View style={styles.contentWrapper}>
           <AppNavigator />
         </View>
+        <NotificationToast />
       </View>
       <StatusBar style="light" />
     </SafeAreaProvider>

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- **Documentation Audit** (2025-12-05)
+  - Updated `SETUP.md` with current project status (Phase 1 & 2 complete)
+  - Updated folder structure to reflect all current components, services, hooks
+  - Added missing dependencies to setup documentation
+  - Updated `.kiro/steering/structure.md` with complete project structure
+  - Added `src/constants/` and `src/utils/` directories to documentation
+  - Added all 25+ services, 6 hooks, and 15+ components to structure docs
+  - Updated `DOCUMENTATION-INDEX.md` with current date
+  - Synchronized documentation with actual codebase state
+
 ### Added
 
 - **Utility Modules**: Centralized helper functions (2025-11-16)

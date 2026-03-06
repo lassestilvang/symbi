@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const appLogo = require('../../../assets/icon.png');
 
 interface WelcomeScreenProps {
   onNext: () => void;
@@ -10,7 +13,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext, onSkip }) 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.emoji}>👻</Text>
+        <View style={styles.logoContainer}>
+          <Image source={appLogo} style={styles.logo} />
+        </View>
         <Text style={styles.title}>Welcome to Symbi</Text>
         <Text style={styles.subtitle}>Your Biometric Tamagotchi</Text>
         <Text style={styles.description}>
@@ -45,6 +50,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  logoContainer: {
+    marginBottom: 24,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    borderRadius: 24,
   },
   emoji: {
     fontSize: 120,
@@ -76,6 +92,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 32,
     paddingBottom: 48,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   skipButton: {
     paddingVertical: 12,

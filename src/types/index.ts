@@ -5,6 +5,88 @@
  * Requirements: 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.4, 8.4
  */
 
+// Re-export Result type utilities
+export { Result, success, failure, isSuccess, isFailure, unwrap, unwrapOr } from './result';
+
+// Re-export Achievement types
+export type {
+  AchievementCategory,
+  RarityTier,
+  UnlockConditionType,
+  ComparisonType,
+  UnlockCondition,
+  AchievementProgress,
+  Achievement,
+  AchievementStatistics,
+  AchievementUnlockResult,
+  AchievementStorageData,
+} from './achievements';
+
+// Re-export Streak types
+export type {
+  StreakRecord,
+  StreakState,
+  StreakMilestone,
+  StreakUpdate,
+  StreakStorageData,
+} from './streaks';
+export { STREAK_MILESTONES } from './streaks';
+
+// Re-export Challenge types
+export type {
+  ChallengeObjectiveType,
+  ChallengeObjective,
+  ChallengeReward,
+  Challenge,
+  ChallengeStorageData,
+} from './challenges';
+
+// Re-export Cosmetic types
+export type {
+  CosmeticCategory,
+  PixelData,
+  CosmeticRenderData,
+  Cosmetic,
+  EquippedCosmetics,
+  CosmeticInventory,
+  CosmeticLayer,
+  CosmeticStorageData,
+} from './cosmetics';
+
+// Re-export Habitat types
+export type {
+  SceneType,
+  TimePhase,
+  QualityLevel,
+  AmbientElementType,
+  ParticleType,
+  InteractionEffectType,
+  HabitatConfig,
+  HabitatManagerProps,
+  SceneRendererProps,
+  Position,
+  Dimensions,
+  TimePhaseColors,
+  TimePhaseConfig,
+  TimeManagerConfig,
+  SceneModifiers,
+  QualitySettings,
+  PerformanceMetrics,
+  ParallaxLayerProps,
+  LayerDefinition,
+  LayerElement,
+  AnimationConfig,
+  AmbientElementProps,
+  AmbientElementDefinition,
+  ParticleSystemProps,
+  Particle,
+  ParticleConfig,
+  SceneDefinition,
+  InteractionEffect,
+  HabitatState,
+  HabitatPreferences,
+} from './habitat';
+
 // ============================================================================
 // Enums
 // ============================================================================
@@ -71,6 +153,7 @@ export interface UserPreferences {
   soundEnabled: boolean;
   theme: 'light' | 'dark' | 'auto';
   analyticsEnabled: boolean;
+  hasSeenTutorial: boolean;
 }
 
 /**
