@@ -726,8 +726,8 @@ This comprehensive checklist ensures Symbi is ready for App Store and Google Pla
 - [ ] Ready for submission
 - [ ] Needs fixes before submission
 
-**Tester Signature**: ******\_\_\_******
-**Date**: ******\_\_\_******
+**Tester Signature**: **\*\***\_\_\_**\*\***
+**Date**: **\*\***\_\_\_**\*\***
 ```
 
 ---

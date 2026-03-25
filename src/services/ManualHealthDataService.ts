@@ -16,14 +16,6 @@ interface ValidationConfig {
   fieldName: string;
 }
 
-interface HealthDataUpdate {
-  steps?: number;
-  sleepHours?: number;
-  hrv?: number;
-  mindfulMinutes?: number;
-  timestamp: Date;
-}
-
 export class ManualHealthDataService extends HealthDataService {
   private static readonly STORAGE_KEY = 'manual_health_data';
 
@@ -168,8 +160,7 @@ export class ManualHealthDataService extends HealthDataService {
       }
 
       // Notify subscribers with properly typed data
-      const updateData: HealthDataUpdate = { [field]: value, timestamp: date };
-      this.notifyUpdate(dataType, updateData);
+      this.notifyUpdate(dataType, { value, timestamp: date });
 
       return true;
     } catch (error) {

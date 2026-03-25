@@ -26,7 +26,8 @@ import { EvolutionMilestoneCard } from '../components/EvolutionMilestoneCard';
 import { HealthDataTable } from '../components/HealthDataTable';
 
 // Debounce utility for performance optimization
-const debounce = <T extends (...args: unknown[]) => unknown>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const debounce = <T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
