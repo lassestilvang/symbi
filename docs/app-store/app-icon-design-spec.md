@@ -7,6 +7,7 @@ The Symbi app icon features the Halloween-themed ghost character in a vibrant pu
 ## Visual Elements
 
 ### Primary Element: Symbi Ghost
+
 - **Position**: Centered
 - **Size**: 60-70% of icon space
 - **Style**: Rounded, friendly ghost shape
@@ -18,14 +19,16 @@ The Symbi app icon features the Halloween-themed ghost character in a vibrant pu
   - Ethereal glow around character
 
 ### Background
+
 - **Style**: Gradient
-- **Colors**: 
+- **Colors**:
   - Top: #9333EA (lighter purple)
   - Bottom: #7C3AED (darker purple)
 - **Effect**: Subtle radial gradient emanating from Symbi
 - **Texture**: Smooth, no noise or patterns
 
 ### Accent Elements
+
 - **Glow**: Soft purple glow around Symbi (#A855F7 at 30% opacity)
 - **Particles**: 2-3 small sparkle/star particles (optional)
 - **Shadow**: Subtle drop shadow beneath Symbi for depth
@@ -44,6 +47,7 @@ White:            #FFFFFF
 ## Typography
 
 **No text should appear in the app icon.**
+
 - App name is displayed by the OS below the icon
 - Keep icon purely visual
 
@@ -66,6 +70,7 @@ White:            #FFFFFF
 ## Size Specifications
 
 ### iOS
+
 - **App Store**: 1024 x 1024 px (PNG, no transparency)
 - **iPhone**: 180 x 180 px (@3x), 120 x 120 px (@2x), 60 x 60 px (@1x)
 - **iPad**: 167 x 167 px (@2x), 152 x 152 px (@2x)
@@ -73,9 +78,10 @@ White:            #FFFFFF
 - **Spotlight**: 120 x 120 px (@3x), 80 x 80 px (@2x), 40 x 40 px (@1x)
 
 ### Android
+
 - **Play Store**: 512 x 512 px (PNG, 32-bit with transparency)
 - **Launcher**: 192 x 192 px (xxxhdpi), 144 x 144 px (xxhdpi), 96 x 96 px (xhdpi)
-- **Adaptive Icon**: 
+- **Adaptive Icon**:
   - Foreground: 432 x 432 px (108 dp at xxxhdpi)
   - Background: 432 x 432 px (108 dp at xxxhdpi)
   - Safe zone: 264 x 264 px (66 dp at xxxhdpi)
@@ -83,11 +89,13 @@ White:            #FFFFFF
 ## Design Variations
 
 ### Standard Icon (iOS & Android)
+
 - Full Symbi character
 - Purple gradient background
 - Subtle glow effect
 
 ### Adaptive Icon (Android)
+
 - **Foreground Layer**: Symbi character only (transparent background)
 - **Background Layer**: Purple gradient
 - **Result**: System can apply various shapes (circle, square, rounded square)
@@ -95,6 +103,7 @@ White:            #FFFFFF
 ## Do's and Don'ts
 
 ### ✅ Do:
+
 - Keep design simple and recognizable
 - Use high contrast for visibility
 - Test at small sizes (29x29 px)
@@ -103,6 +112,7 @@ White:            #FFFFFF
 - Export at highest resolution first, then scale down
 
 ### ❌ Don't:
+
 - Add text or words
 - Use photos or complex imagery
 - Include UI elements (buttons, bars)
@@ -127,6 +137,7 @@ White:            #FFFFFF
 ## Export Settings
 
 ### Figma/Sketch Export
+
 ```
 Format: PNG
 Scale: 1x, 2x, 3x
@@ -135,6 +146,7 @@ Compression: None (for App Store)
 ```
 
 ### Photoshop Export
+
 ```
 Format: PNG-24
 Transparency: No (iOS), Yes (Android)
@@ -178,12 +190,14 @@ Adaptive (Android):
 ## Mockup Preview
 
 Test your icon in context:
+
 - iOS Home Screen mockup
 - Android Home Screen mockup
 - App Store listing mockup
 - Play Store listing mockup
 
 Tools:
+
 - [App Icon Preview](https://appicon.co/)
 - [Icon Slate](https://www.kodlian.com/apps/icon-slate)
 - [Figma iOS/Android UI Kits](https://www.figma.com/community)
@@ -197,6 +211,7 @@ Tools:
 ## Brand Consistency
 
 The app icon should align with:
+
 - App's purple color palette
 - Halloween theme
 - Cute yet spooky aesthetic
@@ -206,6 +221,7 @@ The app icon should align with:
 ## Reference Images
 
 Create a mood board with:
+
 - Other health/fitness app icons
 - Halloween-themed designs
 - Ghost character designs
@@ -233,17 +249,20 @@ Create a mood board with:
 ## Resources
 
 ### Design Tools
+
 - [Figma](https://figma.com) - Free, web-based
 - [Sketch](https://www.sketch.com) - Mac only
 - [Adobe Illustrator](https://www.adobe.com/products/illustrator.html)
 - [Affinity Designer](https://affinity.serif.com/designer/)
 
 ### Icon Generators
+
 - [App Icon Generator](https://appicon.co/)
 - [MakeAppIcon](https://makeappicon.com/)
 - [Icon Kitchen](https://icon.kitchen/)
 
 ### Inspiration
+
 - [Dribbble - App Icons](https://dribbble.com/tags/app_icon)
 - [Behance - Icon Design](https://www.behance.net/search/projects?search=app%20icon)
 - [App Store - Health & Fitness](https://apps.apple.com/us/genre/ios-health-fitness/id6013)

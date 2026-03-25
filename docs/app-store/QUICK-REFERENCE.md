@@ -16,12 +16,14 @@ npm run pre-submit  # Run automated checks
 ## iOS Submission 🍎
 
 ### Build & Upload
+
 ```bash
 eas build --platform ios --profile production
 # Or: Xcode > Product > Archive > Distribute App
 ```
 
 ### App Store Connect Checklist
+
 - [ ] App name: "Symbi - Your Health Companion"
 - [ ] Category: Health & Fitness
 - [ ] Age rating: 4+
@@ -34,6 +36,7 @@ eas build --platform ios --profile production
 - [ ] Submit for review
 
 ### Key Info
+
 - **Bundle ID**: com.symbi.app
 - **Version**: 1.0.0
 - **Build**: 1
@@ -42,12 +45,14 @@ eas build --platform ios --profile production
 ## Android Submission 🤖
 
 ### Build & Upload
+
 ```bash
 eas build --platform android --profile production
 # Or: cd android && ./gradlew bundleRelease
 ```
 
 ### Play Console Checklist
+
 - [ ] App name: "Symbi - Your Health Companion"
 - [ ] Category: Health & Fitness
 - [ ] Age rating: Everyone
@@ -61,6 +66,7 @@ eas build --platform android --profile production
 - [ ] Submit for review
 
 ### Key Info
+
 - **Package**: com.symbi.app
 - **Version**: 1.0.0
 - **Version code**: 1
@@ -69,16 +75,19 @@ eas build --platform android --profile production
 ## Required Assets 📸
 
 ### App Icons
+
 - iOS: 1024x1024 (no transparency)
 - Android: 512x512 (with transparency)
 - Adaptive: 432x432 (foreground + background)
 
 ### Screenshots
+
 - iOS 6.7": 1290 x 2796 (5-8 screenshots)
 - iOS 6.5": 1242 x 2688 (5-8 screenshots)
 - Android: 1080 x 1920 (4-8 screenshots)
 
 ### Other
+
 - Feature graphic (Android): 1024 x 500
 - Preview video (optional): 30 seconds
 
@@ -93,15 +102,18 @@ eas build --platform android --profile production
 ## Privacy & Permissions 🔒
 
 ### iOS HealthKit
+
 - Read: Steps, Sleep, HRV
 - Write: Mindful Minutes
 - Usage: "Symbi uses your step count, sleep data, and heart rate variability to reflect your activity in your digital pet's mood and appearance."
 
 ### Android
+
 - Google Fit (8-13): Activity Recognition
 - Health Connect (14+): Steps, Sleep, HRV, Exercise
 
 ### Data Safety
+
 - Health data: Collected (optional), not shared
 - Analytics: Collected (optional, opt-out), not shared
 - Encrypted: In transit (TLS 1.3) and at rest (AES-256)
@@ -172,11 +184,13 @@ HEALTHKIT/HEALTH CONNECT:
 ## Common Issues & Fixes 🔧
 
 ### iOS
+
 - **Build processing failed**: Check entitlements and Info.plist
 - **HealthKit rejected**: Make usage descriptions more specific
 - **Metadata rejected**: Ensure screenshots show actual app
 
 ### Android
+
 - **Upload failed**: Check signing configuration
 - **Data Safety incomplete**: Complete all sections
 - **Policy violation**: Review Play Store policies
@@ -184,16 +198,19 @@ HEALTHKIT/HEALTH CONNECT:
 ## Post-Submission 📊
 
 ### Day 1
+
 - Verify app is live
 - Monitor crash reports (Sentry)
 - Set up analytics
 
 ### Week 1
+
 - Respond to reviews
 - Track metrics (downloads, DAU)
 - Fix critical bugs
 
 ### Month 1
+
 - Analyze user behavior
 - Plan first update
 - Implement fixes

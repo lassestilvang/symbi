@@ -1,110 +1,84 @@
-# Technology Stack
+---
+inclusion: always
+---
 
-## Core Framework
+# Technology Stack & Code Standards
 
-- **React Native 0.81.5** with Expo ~54.0.22
-- **TypeScript 5.9.2** with strict mode enabled
-- **React 19.2.0**
+## Core Dependencies
 
-## Key Libraries
+| Package             | Version | Purpose                            |
+| ------------------- | ------- | ---------------------------------- |
+| React Native        | 0.81.5  | Mobile framework via Expo ~54.0.22 |
+| TypeScript          | 5.9.2   | Strict mode, no `any` types        |
+| React               | 19.2.0  | UI library                         |
+| Zustand             | 5.0.8   | State management                   |
+| React Navigation    | 7.x     | Native stack navigator             |
+| Lottie React Native | 7.3.4   | Symbi animations                   |
 
-### State Management
-- **Zustand 5.0.8** - Lightweight reactive state management
-- Stores: `healthDataStore`, `userPreferencesStore`, `symbiStateStore`
+## TypeScript Rules (Strict)
 
-### Navigation
-- **React Navigation 7.x** - Native stack navigator
+- Never use `any` type - use `unknown`, generics, or proper interfaces
+- Enable all strict compiler options
+- Use `import type { X }` for type-only imports
+- Define return types explicitly on exported functions
 
-### Animations
-- **Lottie React Native 7.3.4** - Vector animations for Symbi emotional states
+## Code Style (Enforced)
 
-### Storage
-- **AsyncStorage 2.2.0** - Local persistence with encryption
-
-### Health Data
-- **react-native-health 1.19.0** - iOS HealthKit integration
-- **react-native-google-fit 0.22.1** - Android Google Fit integration
-
-### Monitoring
-- **Sentry React Native 7.5.0** - Crash reporting and error tracking
-
-### Utilities
-- **expo-crypto** - Encryption services
-- **expo-file-system** - File operations
-- **@react-native-community/netinfo** - Network status
-
-## Code Style
-
-### Prettier Configuration
-- Single quotes
-- Semicolons required
-- 100 character line width
-- 2 space indentation
-- Trailing commas (ES5)
-- Arrow parens: avoid
-
-### ESLint
-- TypeScript ESLint with strict rules
-- Prettier integration for formatting
-
-## Path Aliases
-
-```typescript
-@components/* → src/components/*
-@services/* → src/services/*
-@hooks/* → src/hooks/*
-@types/* → src/types/*
-@assets/* → src/assets/*
+```
+Quotes:       single
+Semicolons:   required
+Line width:   100 characters max
+Indentation:  2 spaces
+Trailing:     commas (ES5 style)
+Arrow parens: avoid when possible
 ```
 
-## Common Commands
+## Required Path Aliases
 
-```bash
-# Development
-npm start              # Start Expo dev server
-npm run ios            # Run on iOS simulator
-npm run android        # Run on Android emulator
-npm run web            # Run in web browser
+Always use these instead of relative imports:
 
-# Code Quality
-npm run lint           # Run ESLint
-npm run lint:fix       # Fix ESLint issues
-npm run format         # Format with Prettier
+| Alias           | Maps to            |
+| --------------- | ------------------ |
+| `@components/*` | `src/components/*` |
+| `@services/*`   | `src/services/*`   |
+| `@hooks/*`      | `src/hooks/*`      |
+| `@types/*`      | `src/types/*`      |
+| `@assets/*`     | `src/assets/*`     |
 
-# Testing
-npm test               # Run Jest tests
-npm run test:coverage  # Run with coverage report
-npm run test:watch     # Watch mode
+## Platform Implementation
 
-# Pre-submission
-npm run pre-submit     # Run all checks before submission
-```
+| Platform | Health API                | Min Version | Key Permission        |
+| -------- | ------------------------- | ----------- | --------------------- |
+| iOS      | `react-native-health`     | iOS 14.0    | HealthKit entitlement |
+| Android  | `react-native-google-fit` | API 26      | ACTIVITY_RECOGNITION  |
 
-## Build Configuration
+Bundle ID: `com.symbi.app`
 
-### iOS (app.json)
-- Bundle ID: `com.symbi.app`
-- HealthKit entitlement required
-- Background modes: fetch, processing
-- Minimum iOS: 14.0
+## Gemini API (Phase 2+)
 
-### Android (app.json)
-- Package: `com.symbi.app`
-- Permissions: ACTIVITY_RECOGNITION, health data access
-- Minimum Android: 8.0 (API 26)
-
-## API Integration
-
-### Gemini API (Phase 2+)
-- Model: `gemini-2.5-flash-preview-09-2025` for analysis
-- Model: `gemini-2.5-flash-image-preview` for evolution images
-- TLS 1.3 encryption required
-- 10 second timeout with fallback logic
-- Rate limit: 1 request per 24 hours per user
+| Setting    | Value                              |
+| ---------- | ---------------------------------- |
+| Analysis   | `gemini-2.5-flash-preview-09-2025` |
+| Images     | `gemini-2.5-flash-image-preview`   |
+| Timeout    | 10 seconds with fallback           |
+| Rate limit | 1 request per 24 hours per user    |
+| Security   | TLS 1.3 required                   |
 
 ## Performance Targets
 
-- Memory usage: <100MB
-- Battery consumption: <5% per 24 hours
-- Animation frame rate: 60 FPS (10 FPS when backgrounded)
-- API response time: <5 seconds (95th percentile)
+| Metric        | Target                     |
+| ------------- | -------------------------- |
+| Memory        | <100MB                     |
+| Battery       | <5% per 24 hours           |
+| Animation FPS | 60 active, 10 backgrounded |
+| API response  | <5s (p95)                  |
+
+## Commands
+
+| Command              | Purpose                  |
+| -------------------- | ------------------------ |
+| `npm start`          | Expo dev server          |
+| `npm run lint:fix`   | Fix linting issues       |
+| `npm run format`     | Prettier formatting      |
+| `npm test`           | Jest tests               |
+| `npm run pre-submit` | All checks before submit |

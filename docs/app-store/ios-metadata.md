@@ -3,23 +3,29 @@
 ## App Information
 
 ### App Name
+
 **Symbi - Your Health Companion**
 
 ### Subtitle
+
 Transform your health data into a living digital pet
 
 ### Bundle ID
+
 `com.symbi.app`
 
 ### Version
+
 1.0.0
 
 ### Age Rating
+
 4+ (No objectionable content)
 
 ## App Description
 
 ### Short Description (170 characters max)
+
 Meet Symbi, your Halloween-themed digital companion that reflects your real health data through a cute, spooky ghost creature.
 
 ### Full Description
@@ -29,17 +35,20 @@ Meet Symbi, your Halloween-themed digital companion that reflects your real heal
 Symbi is more than just a health tracker—it's your personal digital pet that grows and evolves with your wellness journey. Watch as your adorable Halloween-themed ghost companion reflects your daily activity, sleep, and overall wellbeing through expressive animations and emotional states.
 
 **🎃 Your Health, Visualized**
+
 - Connect to Apple Health to automatically sync your step count, sleep data, and heart rate variability
 - See your Symbi react in real-time to your activity levels
 - Watch your pet transition between emotional states based on your wellness
 
 **👻 Cute Yet Spooky Aesthetic**
+
 - Beautiful purple ghost design with Halloween-themed elements
 - Smooth Lottie animations that bring your Symbi to life
 - Multiple emotional states: Active, Resting, Calm, Vibrant, and more
 - Evolve your Symbi into unique forms as you maintain healthy habits
 
 **🔒 Privacy-First Design**
+
 - All health data processing happens locally on your device
 - You control what data is shared—use automatic sync or manual entry
 - No selling of your personal information, ever
@@ -48,20 +57,23 @@ Symbi is more than just a health tracker—it's your personal digital pet that g
 
 **✨ Key Features**
 
-*Phase 1: Core Experience*
+_Phase 1: Core Experience_
+
 - Automatic step tracking via Apple Health
 - Three basic emotional states (Sad, Resting, Active)
 - Customizable activity thresholds to match your fitness level
 - Manual data entry mode for privacy-conscious users
 - Beautiful onboarding experience
 
-*Phase 2: AI-Powered Insights*
+_Phase 2: AI-Powered Insights_
+
 - Multi-metric health analysis (steps, sleep, HRV)
 - AI-driven emotional state detection with 6 additional states
 - Personalized wellness insights
 - Fallback to local processing if you prefer
 
-*Phase 3: Interactive & Evolving*
+_Phase 3: Interactive & Evolving_
+
 - Guided breathing exercises to calm your Symbi
 - Mindful minutes tracking
 - Generative evolution system—watch your Symbi transform after 30 days of healthy habits
@@ -69,6 +81,7 @@ Symbi is more than just a health tracker—it's your personal digital pet that g
 - Optional cloud sync to keep your progress across devices
 
 **🎯 Perfect For**
+
 - Anyone looking to make health tracking more engaging
 - Users who want a visual representation of their wellness
 - People who love digital pets and gamification
@@ -80,6 +93,7 @@ Your Symbi isn't just tracking numbers—it's experiencing your health journey w
 
 **🔐 Your Data, Your Control**
 We believe health data is deeply personal. That's why:
+
 - Raw health data never leaves your device
 - AI analysis uses only aggregated daily metrics
 - You can use the app entirely offline
@@ -87,6 +101,7 @@ We believe health data is deeply personal. That's why:
 - Transparent privacy policy
 
 **📱 Requirements**
+
 - iOS 14.0 or later
 - Optional: Apple Health integration for automatic tracking
 - Internet connection for AI features (optional)
@@ -131,39 +146,48 @@ https://symbi.app
 ## Screenshot Requirements
 
 ### iPhone 6.7" Display (Required)
+
 - Size: 1290 x 2796 pixels
 - Quantity: 3-10 screenshots
 
 **Screenshot 1: Main Screen**
+
 - Show Symbi in Active state with step count
 - Highlight the main animation
 - Caption: "Meet Your Health Companion"
 
 **Screenshot 2: Emotional States**
+
 - Show multiple emotional states side by side
 - Caption: "Your Symbi Reflects Your Wellness"
 
 **Screenshot 3: Health Data Integration**
+
 - Show Apple Health permission screen or data display
 - Caption: "Seamlessly Connects to Apple Health"
 
 **Screenshot 4: Customization**
+
 - Show threshold configuration screen
 - Caption: "Customize to Your Fitness Level"
 
 **Screenshot 5: Evolution**
+
 - Show evolution celebration or gallery
 - Caption: "Watch Your Symbi Evolve"
 
 ### iPhone 6.5" Display (Required)
+
 - Size: 1242 x 2688 pixels
 - Same screenshots as above, resized
 
 ### iPhone 5.5" Display (Optional)
+
 - Size: 1242 x 2208 pixels
 - Same screenshots as above, resized
 
 ### iPad Pro 12.9" Display (Optional)
+
 - Size: 2048 x 2732 pixels
 - Optimized layouts for tablet
 
@@ -174,6 +198,7 @@ https://symbi.app
 **Resolution**: Match screenshot dimensions
 
 **Suggested Content**:
+
 1. App icon animation (2s)
 2. Onboarding flow quick preview (5s)
 3. Symbi reacting to health data (8s)
@@ -208,16 +233,19 @@ Start your journey with Symbi today! 👻💜
 ## App Store Connect Configuration
 
 ### Pricing and Availability
+
 - **Price**: Free
 - **Availability**: All territories
 
 ### App Privacy
 
 **Data Collection**:
+
 - Health & Fitness: Step count, sleep data, HRV (optional)
 - Usage Data: Anonymous analytics (optional, opt-out available)
 
 **Data Usage**:
+
 - App Functionality: Health data used to power Symbi's emotional states
 - Analytics: Anonymous usage patterns (no health data)
 
@@ -227,20 +255,24 @@ Start your journey with Symbi today! 👻💜
 ### HealthKit Entitlements
 
 **Required Entitlements**:
+
 - `com.apple.developer.healthkit`
 - `com.apple.developer.healthkit.access`
 
 **Permissions Requested**:
+
 - Read: Step Count, Sleep Analysis, Heart Rate Variability
 - Write: Mindful Minutes
 
 **Usage Descriptions** (already in Info.plist):
+
 - NSHealthShareUsageDescription: "Symbi uses your step count, sleep data, and heart rate variability to reflect your activity in your digital pet's mood and appearance."
 - NSHealthUpdateUsageDescription: "Symbi writes mindful minutes when you complete wellness activities with your pet."
 
 ### Background Modes
 
 **Enabled Modes**:
+
 - Background fetch
 - Background processing
 
@@ -249,15 +281,18 @@ Start your journey with Symbi today! 👻💜
 ### App Review Information
 
 **Contact Information**:
+
 - First Name: [Your First Name]
 - Last Name: [Your Last Name]
 - Phone Number: [Your Phone Number]
 - Email: [Your Email]
 
 **Demo Account** (if required):
+
 - Not required—app works without account
 
 **Notes for Reviewer**:
+
 ```
 Thank you for reviewing Symbi!
 
@@ -327,6 +362,7 @@ Please feel free to contact us if you have any questions!
 **Respond Promptly**: Answer any reviewer questions within 24 hours
 
 **If Rejected**:
+
 1. Read rejection reason carefully
 2. Address all issues mentioned
 3. Update app or metadata as needed

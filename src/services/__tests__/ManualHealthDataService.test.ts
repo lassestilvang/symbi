@@ -134,8 +134,8 @@ describe('ManualHealthDataService', () => {
     it('should handle storage errors gracefully', async () => {
       (StorageService.set as jest.Mock).mockRejectedValue(new Error('Storage error'));
 
-      const result = await service.saveStepCount(5000);
-      expect(result).toBe(false);
+      // The service now throws on storage errors instead of returning false
+      await expect(service.saveStepCount(5000)).rejects.toThrow('Storage error');
     });
 
     it('should handle retrieval errors', async () => {
@@ -155,9 +155,11 @@ describe('ManualHealthDataService', () => {
 
       await service.saveStepCount(5000);
 
+      // The callback now receives {value, timestamp} format
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          steps: 5000,
+          value: 5000,
+          timestamp: expect.any(Date),
         })
       );
     });

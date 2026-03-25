@@ -4,14 +4,7 @@
   "description": "Automatically runs linting and tests when files are modified to ensure code quality and catch issues early",
   "version": "1",
   "when": {
-    "type": "fileEdited",
-    "patterns": [
-      "src/**/*.ts",
-      "src/**/*.tsx",
-      "App.tsx",
-      "*.ts",
-      "*.tsx"
-    ]
+    "type": "userTriggered"
   },
   "then": {
     "type": "askAgent",

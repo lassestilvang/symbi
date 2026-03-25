@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,27 +10,51 @@ import {
   ActivityIndicator,
   Animated,
   Modal,
+  ImageBackground,
+  Pressable,
+  GestureResponderEvent,
+  Image,
 } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
-import { SymbiAnimation } from '../components/SymbiAnimation';
+import { CosmeticRenderer } from '../components/CosmeticRenderer';
 import { BreathingExercise } from '../components/BreathingExercise';
 import { EvolutionCelebration } from '../components/EvolutionCelebration';
+import { StreakDisplay } from '../components/StreakDisplay';
+import { TutorialOverlay } from '../components/TutorialOverlay';
+import { HabitatManager, HabitatManagerHandle } from '../components/habitat';
 import { useHealthDataStore } from '../stores/healthDataStore';
-import { useSymbiStateStore } from '../stores/symbiStateStore';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
-import { HealthDataUpdateService } from '../services/HealthDataUpdateService';
-import { getBackgroundSyncService } from '../services/BackgroundSyncService';
+import { useStreakStore } from '../stores/streakStore';
+import { useCosmeticStore } from '../stores/cosmeticStore';
+import {
+  useHealthDataInitialization,
+  useEvolutionProgress,
+  useStateChangeNotification,
+  useNetworkStatus,
+  useBackgroundSync,
+} from '../hooks';
 import {
   InteractiveSessionManager,
   SessionType,
   SessionResult,
   createHealthDataService,
-  EvolutionSystem,
-  EvolutionEligibility,
-  EvolutionResult,
-  AIBrainService,
 } from '../services';
-import { EmotionalState, HealthDataType } from '../types';
+import { EmotionalState } from '../types';
+import {
+  HALLOWEEN_COLORS,
+  STATE_COLORS,
+  LAYOUT,
+  TYPOGRAPHY,
+  SHADOWS,
+  TEXT_COLORS,
+  BORDER_COLORS,
+} from '../constants/theme';
+
+// Import tamagotchi frame image
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const tamagotchiFrameImage = require('../assets/images/tamagotchi-frame.png');
+// Import app logo
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const appLogo = require('../../assets/icon.png');
 
 /**
  * MainScreen Component
@@ -50,459 +74,116 @@ interface MainScreenProps {
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
+  // Store hooks
+  const { emotionalState, healthMetrics, lastUpdated, isLoading, error, setError, clearError } =
+    useHealthDataStore();
+  const { profile, updatePreferences } = useUserPreferencesStore();
+
+  // Tutorial state - show only on first visit
+  const showTutorial = profile?.preferences.hasSeenTutorial === false;
+
+  const handleTutorialComplete = useCallback(async () => {
+    await updatePreferences({ hasSeenTutorial: true });
+  }, [updatePreferences]);
+
+  // Gamification store hooks (Requirements: 2.4, 5.5)
+  const { currentStreak, longestStreak, initialize: initializeStreak } = useStreakStore();
+  const { initialize: initializeCosmetics } = useCosmeticStore();
+
+  // Initialize gamification stores on mount
+  useEffect(() => {
+    initializeStreak();
+    initializeCosmetics();
+  }, [initializeStreak, initializeCosmetics]);
+
+  // Custom hooks for extracted logic
+  const { isInitializing, refreshing, handleRefresh } = useHealthDataInitialization();
+  const { isOffline } = useNetworkStatus({ autoRefreshOnReconnect: true });
+  // State change notification hook - kept for potential future use
+  useStateChangeNotification(emotionalState, { isInitializing });
+
+  // Evolution progress hook
   const {
-    emotionalState,
-    healthMetrics,
-    lastUpdated,
-    isLoading,
-    error,
-    setLoading,
-    setError,
-    clearError,
-  } = useHealthDataStore();
-  const { profile } = useUserPreferencesStore();
-  const symbiState = useSymbiStateStore();
-  const [refreshing, setRefreshing] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
-  const [stateChangeNotification, setStateChangeNotification] = useState<string | null>(null);
-  const [isOffline, setIsOffline] = useState(false);
-  const [hasNoData, setHasNoData] = useState(false);
+    evolutionEligibility,
+    showEvolutionNotification,
+    isEvolutionInProgress,
+    showEvolutionCelebration,
+    evolutionResult,
+    handleTriggerEvolution,
+    handleEvolutionCelebrationClose,
+    checkEvolutionProgress,
+  } = useEvolutionProgress({
+    onError: setError,
+  });
+
+  // Background sync
+  useBackgroundSync({ enabled: !isInitializing });
+
+  // Habitat ref for triggering effects
+  const habitatRef = useRef<HabitatManagerHandle>(null);
+
+  // Local state
   const [showBreathingExercise, setShowBreathingExercise] = useState(false);
-  const [evolutionEligibility, setEvolutionEligibility] = useState<EvolutionEligibility | null>(
-    null
-  );
-  const [showEvolutionNotification, setShowEvolutionNotification] = useState(false);
-  const [isEvolutionInProgress, setIsEvolutionInProgress] = useState(false);
-  const [showEvolutionCelebration, setShowEvolutionCelebration] = useState(false);
-  const [evolutionResult, setEvolutionResult] = useState<EvolutionResult | null>(null);
   const [sessionManager] = useState(() => {
     const healthService = createHealthDataService(profile?.preferences.dataSource);
     return new InteractiveSessionManager(healthService);
   });
 
-  // Animation for state change notification
-  const notificationOpacity = useRef(new Animated.Value(0)).current;
-  const previousStateRef = useRef<EmotionalState>(emotionalState);
-
   // Get thresholds for progress calculation
-  const thresholds = profile?.thresholds || {
-    sadThreshold: 2000,
-    activeThreshold: 8000,
-  };
+  const thresholds = useMemo(
+    () =>
+      profile?.thresholds || {
+        sadThreshold: 2000,
+        activeThreshold: 8000,
+      },
+    [profile?.thresholds]
+  );
 
-  /**
-   * Initialize and fetch health data on component mount
-   */
-  useEffect(() => {
-    initializeHealthData();
-    startBackgroundSync();
-    setupNetworkListener();
-    checkEvolutionProgress();
-
-    // Cleanup on unmount
-    return () => {
-      stopBackgroundSync();
-    };
-  }, []);
-
-  /**
-   * Track daily emotional state and check evolution progress
-   */
-  useEffect(() => {
+  // Check evolution progress when emotional state changes
+  React.useEffect(() => {
     if (!isInitializing && emotionalState) {
-      // Track today's emotional state
-      EvolutionSystem.trackDailyState(emotionalState).catch(err => {
-        console.error('Error tracking daily state:', err);
-      });
-
-      // Check evolution eligibility
       checkEvolutionProgress();
     }
-  }, [emotionalState, isInitializing]);
-
-  /**
-   * Monitor emotional state changes and show notification
-   */
-  useEffect(() => {
-    if (previousStateRef.current !== emotionalState && !isInitializing) {
-      showStateChangeNotification(previousStateRef.current, emotionalState);
-      previousStateRef.current = emotionalState;
-    }
-  }, [emotionalState, isInitializing]);
-
-  /**
-   * Initialize health data service and fetch today's data
-   */
-  const initializeHealthData = async () => {
-    try {
-      setIsInitializing(true);
-      setLoading(true);
-      clearError();
-      setHasNoData(false);
-
-      // Initialize the health data update service
-      await HealthDataUpdateService.initialize();
-
-      // Fetch today's health data
-      await HealthDataUpdateService.updateDailyHealthData();
-
-      // Check if we have any data
-      if (healthMetrics.steps === 0 && !lastUpdated) {
-        setHasNoData(true);
-      }
-
-      setIsInitializing(false);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error initializing health data:', err);
-      setIsInitializing(false);
-      setLoading(false);
-
-      // Try to load cached data as fallback
-      const cachedData = await HealthDataUpdateService.getTodayHealthData();
-      if (cachedData) {
-        setError('Using cached data from previous update');
-        setHasNoData(false);
-      } else {
-        // Determine error type and show appropriate message
-        const errorMessage = getErrorMessage(err);
-        setError(errorMessage);
-        setHasNoData(true);
-      }
-    }
-  };
-
-  /**
-   * Check evolution progress and eligibility
-   * Requirements: 8.1
-   */
-  const checkEvolutionProgress = async () => {
-    try {
-      const eligibility = await EvolutionSystem.checkEvolutionEligibility();
-      setEvolutionEligibility(eligibility);
-
-      // Show notification if evolution is available
-      if (eligibility.eligible && !showEvolutionNotification) {
-        setShowEvolutionNotification(true);
-      }
-    } catch (error) {
-      console.error('Error checking evolution progress:', error);
-    }
-  };
-
-  /**
-   * Trigger evolution event
-   * Requirements: 8.2, 8.3, 8.4
-   */
-  const handleTriggerEvolution = async () => {
-    try {
-      setIsEvolutionInProgress(true);
-      setError(null);
-
-      // Get Gemini API key from environment or config
-      // TODO: Replace with actual API key from secure storage
-      const apiKey = (process.env.GEMINI_API_KEY as string) || 'YOUR_API_KEY_HERE';
-      const aiService = new AIBrainService(apiKey);
-
-      // Trigger evolution
-      const result = await EvolutionSystem.triggerEvolution(aiService);
-
-      if (result.success) {
-        // Update Symbi state with new appearance
-        useSymbiStateStore.getState().setEvolutionLevel(result.evolutionLevel);
-        useSymbiStateStore.getState().setCustomAppearance(result.newAppearanceUrl);
-
-        // Show celebration modal
-        setEvolutionResult(result);
-        setShowEvolutionCelebration(true);
-        setShowEvolutionNotification(false);
-
-        // Refresh evolution progress
-        await checkEvolutionProgress();
-      } else {
-        setError('Evolution failed. Please try again later.');
-      }
-
-      setIsEvolutionInProgress(false);
-    } catch (error) {
-      console.error('Error triggering evolution:', error);
-      setError('Failed to trigger evolution. Please try again.');
-      setIsEvolutionInProgress(false);
-    }
-  };
-
-  /**
-   * Handle evolution celebration close
-   */
-  const handleEvolutionCelebrationClose = () => {
-    setShowEvolutionCelebration(false);
-    setEvolutionResult(null);
-  };
-
-  /**
-   * Get user-friendly error message based on error type
-   */
-  const getErrorMessage = (err: unknown): string => {
-    const error = err as Error;
-    const errorString = error?.message || error?.toString() || '';
-
-    // Permission errors
-    if (errorString.includes('permission') || errorString.includes('authorized')) {
-      return 'Health data permissions not granted. Please enable in Settings.';
-    }
-
-    // No data available
-    if (errorString.includes('no data') || errorString.includes('not available')) {
-      return 'No health data available yet. Try walking a bit!';
-    }
-
-    // Network errors
-    if (errorString.includes('network') || errorString.includes('connection')) {
-      return 'Network error. Using cached data if available.';
-    }
-
-    // Generic error
-    return 'Unable to load health data. Please try again.';
-  };
-
-  /**
-   * Setup network connectivity listener
-   */
-  const setupNetworkListener = () => {
-    const unsubscribe = NetInfo.addEventListener(state => {
-      setIsOffline(!state.isConnected);
-
-      // If we come back online, try to refresh data
-      if (state.isConnected && !isInitializing) {
-        console.log('Network restored, refreshing data...');
-        HealthDataUpdateService.refreshHealthData().catch(err => {
-          console.error('Error refreshing after network restore:', err);
-        });
-      }
-    });
-
-    return unsubscribe;
-  };
-
-  /**
-   * Start background sync for health data updates
-   * Listens for health data changes and updates emotional state
-   */
-  const startBackgroundSync = async () => {
-    try {
-      const backgroundSync = getBackgroundSyncService();
-
-      // Start syncing step count data
-      await backgroundSync.startBackgroundSync([HealthDataType.STEPS], async (dataType, data) => {
-        console.log('Background update received:', dataType, data);
-
-        // Update health data when new data arrives
-        await HealthDataUpdateService.updateDailyHealthData();
-      });
-
-      console.log('Background sync started');
-    } catch (err) {
-      console.error('Error starting background sync:', err);
-    }
-  };
-
-  /**
-   * Stop background sync
-   */
-  const stopBackgroundSync = () => {
-    try {
-      const backgroundSync = getBackgroundSyncService();
-      backgroundSync.stopBackgroundSync();
-      console.log('Background sync stopped');
-    } catch (err) {
-      console.error('Error stopping background sync:', err);
-    }
-  };
-
-  /**
-   * Show subtle notification when emotional state changes
-   */
-  const showStateChangeNotification = (oldState: EmotionalState, newState: EmotionalState) => {
-    const oldName = oldState.charAt(0).toUpperCase() + oldState.slice(1);
-    const newName = newState.charAt(0).toUpperCase() + newState.slice(1);
-
-    setStateChangeNotification(`${oldName} → ${newName}`);
-
-    // Fade in
-    Animated.sequence([
-      Animated.timing(notificationOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      // Hold
-      Animated.delay(2000),
-      // Fade out
-      Animated.timing(notificationOpacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setStateChangeNotification(null);
-    });
-  };
+  }, [emotionalState, isInitializing, checkEvolutionProgress]);
 
   /**
    * Calculate progress percentage based on step count and thresholds
    */
-  const calculateProgress = (): number => {
+  const progress = useMemo(() => {
     const steps = healthMetrics.steps;
-
-    if (steps >= thresholds.activeThreshold) {
-      return 100;
-    }
-
-    if (steps <= 0) {
-      return 0;
-    }
-
-    // Calculate progress between 0 and activeThreshold
+    if (steps >= thresholds.activeThreshold) return 100;
+    if (steps <= 0) return 0;
     return Math.min(100, (steps / thresholds.activeThreshold) * 100);
-  };
+  }, [healthMetrics.steps, thresholds.activeThreshold]);
 
   /**
    * Get color for progress bar based on emotional state
    */
-  const getProgressColor = (): string => {
+  const progressColor = useMemo(() => {
     switch (emotionalState) {
       case EmotionalState.SAD:
-        return '#5B21B6'; // Dark purple
+        return STATE_COLORS.sad;
       case EmotionalState.RESTING:
-        return '#7C3AED'; // Medium purple
+        return HALLOWEEN_COLORS.primary;
       case EmotionalState.ACTIVE:
-        return '#9333EA'; // Bright purple
+        return STATE_COLORS.active;
       default:
-        return '#7C3AED';
+        return HALLOWEEN_COLORS.primary;
     }
-  };
-
-  /**
-   * Get emoji for emotional state
-   */
-  const getStateEmoji = (): string => {
-    switch (emotionalState) {
-      case EmotionalState.SAD:
-        return '😢';
-      case EmotionalState.RESTING:
-        return '😌';
-      case EmotionalState.ACTIVE:
-        return '🎉';
-      case EmotionalState.VIBRANT:
-        return '✨';
-      case EmotionalState.CALM:
-        return '🧘';
-      case EmotionalState.TIRED:
-        return '😴';
-      case EmotionalState.STRESSED:
-        return '😰';
-      case EmotionalState.ANXIOUS:
-        return '😟';
-      case EmotionalState.RESTED:
-        return '😊';
-      default:
-        return '👻';
-    }
-  };
+  }, [emotionalState]);
 
   /**
    * Get display name for emotional state
    */
-  const getStateName = (): string => {
-    return emotionalState.charAt(0).toUpperCase() + emotionalState.slice(1);
-  };
-
-  /**
-   * Handle pull-to-refresh
-   * Manually refreshes health data from the health data provider
-   */
-  const handleRefresh = async () => {
-    try {
-      setRefreshing(true);
-      clearError();
-
-      // Refresh health data
-      await HealthDataUpdateService.refreshHealthData();
-
-      setRefreshing(false);
-    } catch (err) {
-      console.error('Error refreshing health data:', err);
-      setRefreshing(false);
-      setError('Failed to refresh health data');
-    }
-  };
-
-  /**
-   * Navigate to threshold configuration
-   */
-  const handleConfigureThresholds = () => {
-    navigation.navigate('Thresholds');
-  };
-
-  /**
-   * Navigate to settings
-   */
-  const handleOpenSettings = () => {
-    navigation.navigate('Settings');
-  };
-
-  /**
-   * Start breathing exercise session
-   * Requirements: 7.1, 7.2
-   */
-  const handleStartBreathingExercise = async () => {
-    try {
-      await sessionManager.startSession(SessionType.BREATHING_EXERCISE, 5);
-      setShowBreathingExercise(true);
-    } catch (error) {
-      console.error('Error starting breathing exercise:', error);
-      setError('Failed to start breathing exercise');
-    }
-  };
-
-  /**
-   * Handle breathing exercise completion
-   * Requirements: 7.3, 7.4, 7.5
-   */
-  const handleBreathingComplete = async (result: SessionResult) => {
-    setShowBreathingExercise(false);
-
-    if (result.success) {
-      // Update emotional state to Calm (interactive session overrides AI/rule-based)
-      useHealthDataStore.getState().setEmotionalState(EmotionalState.CALM, 'rule-based');
-
-      // Show success notification
-      showStateChangeNotification(emotionalState, EmotionalState.CALM);
-
-      // Refresh health data to reflect the mindful minutes
-      await HealthDataUpdateService.refreshHealthData();
-    }
-  };
-
-  /**
-   * Handle breathing exercise cancellation
-   */
-  const handleBreathingCancel = () => {
-    setShowBreathingExercise(false);
-  };
-
-  /**
-   * Check if "Calm your Symbi" button should be shown
-   * Requirements: 7.1
-   */
-  const shouldShowCalmButton = (): boolean => {
-    return emotionalState === EmotionalState.STRESSED || emotionalState === EmotionalState.ANXIOUS;
-  };
+  const stateName = useMemo(
+    () => emotionalState.charAt(0).toUpperCase() + emotionalState.slice(1),
+    [emotionalState]
+  );
 
   /**
    * Format last updated time
    */
-  const formatLastUpdated = (): string => {
+  const formattedLastUpdated = useMemo(() => {
     if (!lastUpdated) return 'Never';
 
     const now = new Date();
@@ -517,290 +198,550 @@ export const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
 
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
-  };
+  }, [lastUpdated]);
 
-  const progress = calculateProgress();
-  const progressColor = getProgressColor();
+  /**
+   * Check if "Calm your Symbi" button should be shown
+   */
+  const shouldShowCalmButton = useMemo(
+    () => emotionalState === EmotionalState.STRESSED || emotionalState === EmotionalState.ANXIOUS,
+    [emotionalState]
+  );
+
+  // Navigation handlers
+  const handleOpenSettings = useCallback(() => navigation.navigate('Settings'), [navigation]);
+  const handleNavigateToManualEntry = useCallback(
+    () => navigation.navigate('ManualEntry'),
+    [navigation]
+  );
+  const handleNavigateToEvolutionHistory = useCallback(
+    () => navigation.navigate('EvolutionHistory'),
+    [navigation]
+  );
+  // Gamification navigation handlers (Requirements: 1.3, 5.1)
+  const handleNavigateToAchievements = useCallback(
+    () => navigation.navigate('Achievements'),
+    [navigation]
+  );
+  const handleNavigateToCustomization = useCallback(
+    () => navigation.navigate('CustomizationStudio'),
+    [navigation]
+  );
+
+  /**
+   * Start breathing exercise session
+   */
+  const handleStartBreathingExercise = useCallback(async () => {
+    try {
+      await sessionManager.startSession(SessionType.BREATHING_EXERCISE, 5);
+      setShowBreathingExercise(true);
+    } catch (err) {
+      if (__DEV__) {
+        console.error('Error starting breathing exercise:', err);
+      }
+      setError('Failed to start breathing exercise');
+    }
+  }, [sessionManager, setError]);
+
+  /**
+   * Handle breathing exercise completion
+   */
+  const handleBreathingComplete = useCallback(async (result: SessionResult) => {
+    setShowBreathingExercise(false);
+
+    if (result.success) {
+      useHealthDataStore.getState().setEmotionalState(EmotionalState.CALM, 'rule-based');
+    }
+  }, []);
+
+  const handleBreathingCancel = useCallback(() => {
+    setShowBreathingExercise(false);
+  }, []);
+
+  /**
+   * Handle Symbi poke/tap interaction
+   */
+  const handleSymbiPoke = useCallback(() => {
+    if (__DEV__) {
+      console.log('Symbi poked! Current state:', emotionalState);
+    }
+  }, [emotionalState]);
+
+  /**
+   * Handle pull-to-refresh with error clearing
+   */
+  const onRefresh = useCallback(async () => {
+    clearError();
+    await handleRefresh();
+  }, [clearError, handleRefresh]);
+
+  /**
+   * Handle habitat background interaction
+   * Requirement: 7.1 - Click/tap triggers localized particle burst
+   */
+  const handleHabitatInteraction = useCallback((point: { x: number; y: number }) => {
+    if (__DEV__) {
+      console.log('Habitat interaction at:', point);
+    }
+  }, []);
+
+  /**
+   * Handle screen tap for habitat particle effects
+   * Triggers burst effect at tap location
+   */
+  const handleScreenTap = useCallback((event: GestureResponderEvent) => {
+    const { locationX, locationY } = event.nativeEvent;
+    habitatRef.current?.triggerBackgroundTap({ x: locationX, y: locationY });
+  }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          tintColor="#9333EA"
-          colors={['#9333EA']}
-        />
-      }>
-      {/* Header with settings button */}
-      <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Symbi</Text>
-          {isOffline && (
-            <View style={styles.offlineIndicator}>
-              <Text style={styles.offlineText}>📡 Offline</Text>
+    <View style={styles.screenContainer}>
+      {/* Habitat Background - positioned behind all content */}
+      {/* Requirements: 1.1, 7.3 - Render animated background, handle interactions */}
+      <HabitatManager
+        ref={habitatRef}
+        emotionalState={emotionalState}
+        isVisible={true}
+        onInteraction={handleHabitatInteraction}
+        reducedMotion={false}
+      />
+
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={HALLOWEEN_COLORS.primaryLight}
+            colors={[HALLOWEEN_COLORS.primaryLight]}
+          />
+        }>
+        {/* Header with settings button */}
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <Image source={appLogo} style={styles.headerLogo} />
+            <View style={styles.titleTextContainer}>
+              <Text style={styles.title}>Symbi</Text>
+              <Text style={styles.tagline}>Your Biometric Tamagotchi</Text>
+            </View>
+            {isOffline && (
+              <View style={styles.offlineIndicator}>
+                <Text style={styles.offlineText}>📡 Offline</Text>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={handleOpenSettings}
+            accessibilityLabel="Open settings">
+            <Text style={styles.settingsIcon}>⚙️</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Error message */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>⚠️ {error}</Text>
+          </View>
+        )}
+
+        {/* Symbi Ghost with Tamagotchi Frame - Now with Cosmetics (Requirement 5.5) */}
+        <View style={styles.symbiContainer}>
+          <View style={styles.tamagotchiFrame}>
+            <ImageBackground
+              source={tamagotchiFrameImage}
+              style={styles.frameImage}
+              resizeMode="contain">
+              <View style={styles.ghostScreenArea}>
+                {isLoading || isInitializing ? (
+                  <ActivityIndicator size="large" color={HALLOWEEN_COLORS.primaryLight} />
+                ) : (
+                  <CosmeticRenderer
+                    key={`ghost-${emotionalState}`}
+                    emotionalState={emotionalState}
+                    size={Math.min(SCREEN_WIDTH * 0.5, 220)}
+                    onPoke={handleSymbiPoke}
+                    showCosmetics={true}
+                  />
+                )}
+              </View>
+            </ImageBackground>
+          </View>
+        </View>
+
+        {/* Manual Entry Button */}
+        {profile?.preferences.dataSource === 'manual' && (
+          <View style={styles.manualEntryContainer}>
+            <TouchableOpacity
+              style={styles.manualEntryButton}
+              onPress={handleNavigateToManualEntry}>
+              <Text style={styles.manualEntryButtonText}>📝 Enter Steps Manually</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Health Metrics Display */}
+        <View style={styles.metricsContainer}>
+          <View style={styles.metricCard}>
+            <Text style={styles.metricLabel}>Steps Today</Text>
+            <Text style={styles.metricValue}>{healthMetrics.steps.toLocaleString()}</Text>
+            <Text style={styles.metricSubtext}>
+              Goal: {thresholds.activeThreshold.toLocaleString()}
+            </Text>
+            {/* Progress Bar - inside card */}
+            <View style={styles.inCardProgressContainer}>
+              <View style={styles.inCardProgressBarBackground}>
+                <View
+                  style={[
+                    styles.inCardProgressBarFill,
+                    {
+                      width: `${progress}%`,
+                      backgroundColor: progressColor,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.inCardProgressText}>{Math.round(progress)}%</Text>
+            </View>
+
+            {/* Step Thresholds - inline display */}
+            <View style={styles.inlineThresholdsContainer}>
+              <View style={styles.inlineThresholdItem}>
+                <Text style={styles.inlineThresholdValue}>
+                  &lt; {thresholds.sadThreshold.toLocaleString()}
+                </Text>
+                <Text style={styles.inlineThresholdLabel}>Sad</Text>
+              </View>
+              <View style={styles.inlineThresholdDivider} />
+              <View style={styles.inlineThresholdItem}>
+                <Text style={styles.inlineThresholdValue}>
+                  {thresholds.sadThreshold.toLocaleString()} -{' '}
+                  {thresholds.activeThreshold.toLocaleString()}
+                </Text>
+                <Text style={styles.inlineThresholdLabel}>Resting</Text>
+              </View>
+              <View style={styles.inlineThresholdDivider} />
+              <View style={styles.inlineThresholdItem}>
+                <Text style={styles.inlineThresholdValue}>
+                  &gt; {thresholds.activeThreshold.toLocaleString()}
+                </Text>
+                <Text style={styles.inlineThresholdLabel}>Active</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Phase 2: Sleep and HRV metrics */}
+          {(healthMetrics.sleepHours !== undefined || healthMetrics.hrv !== undefined) && (
+            <View style={styles.additionalMetricsRow}>
+              {healthMetrics.sleepHours !== undefined && (
+                <View style={styles.smallMetricCard}>
+                  <Text style={styles.smallMetricIcon}>😴</Text>
+                  <Text style={styles.smallMetricLabel}>Sleep</Text>
+                  <Text style={styles.smallMetricValue}>
+                    {healthMetrics.sleepHours.toFixed(1)}h
+                  </Text>
+                </View>
+              )}
+
+              {healthMetrics.hrv !== undefined && (
+                <View style={styles.smallMetricCard}>
+                  <Text style={styles.smallMetricIcon}>❤️</Text>
+                  <Text style={styles.smallMetricLabel}>HRV</Text>
+                  <Text style={styles.smallMetricValue}>{Math.round(healthMetrics.hrv)}ms</Text>
+                </View>
+              )}
             </View>
           )}
         </View>
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={handleOpenSettings}
-          accessibilityLabel="Open settings">
-          <Text style={styles.settingsIcon}>⚙️</Text>
-        </TouchableOpacity>
-      </View>
 
-      {/* Error message */}
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>⚠️ {error}</Text>
-        </View>
-      )}
-
-      {/* State change notification */}
-      {stateChangeNotification && (
-        <Animated.View style={[styles.notificationContainer, { opacity: notificationOpacity }]}>
-          <Text style={styles.notificationText}>✨ {stateChangeNotification}</Text>
-        </Animated.View>
-      )}
-
-      {/* Symbi Animation */}
-      <View style={styles.symbiContainer}>
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#9333EA" />
-            <Text style={styles.loadingText}>Loading Symbi...</Text>
-          </View>
-        ) : hasNoData ? (
-          <View style={styles.noDataContainer}>
-            <Text style={styles.noDataEmoji}>👻</Text>
-            <Text style={styles.noDataText}>Waiting for today's data...</Text>
-            <Text style={styles.noDataSubtext}>
-              {profile?.preferences.dataSource === 'manual'
-                ? 'Tap "Enter Steps" to add your activity'
-                : 'Start moving to see your Symbi come alive!'}
-            </Text>
-            {profile?.preferences.dataSource === 'manual' && (
-              <TouchableOpacity
-                style={styles.manualEntryButton}
-                onPress={() => navigation.navigate('ManualEntry')}>
-                <Text style={styles.manualEntryButtonText}>Enter Steps</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        ) : (
-          <SymbiAnimation
-            emotionalState={symbiState.emotionalState || emotionalState}
-            evolutionLevel={symbiState.evolutionLevel}
-            customAppearance={symbiState.customAppearanceUrl}
-            style={styles.animation}
-          />
-        )}
-      </View>
-
-      {/* Emotional State Label */}
-      <View style={styles.stateContainer}>
-        <Text style={styles.stateEmoji}>{getStateEmoji()}</Text>
-        <Text style={styles.stateName}>{getStateName()}</Text>
-      </View>
-
-      {/* Health Metrics Display */}
-      <View style={styles.metricsContainer}>
-        <View style={styles.metricCard}>
-          <Text style={styles.metricLabel}>Steps Today</Text>
-          <Text style={styles.metricValue}>{healthMetrics.steps.toLocaleString()}</Text>
-          <Text style={styles.metricSubtext}>
-            Goal: {thresholds.activeThreshold.toLocaleString()}
-          </Text>
-        </View>
-
-        {/* Phase 2: Sleep and HRV metrics */}
-        {(healthMetrics.sleepHours !== undefined || healthMetrics.hrv !== undefined) && (
-          <View style={styles.additionalMetricsRow}>
-            {healthMetrics.sleepHours !== undefined && (
-              <View style={styles.smallMetricCard}>
-                <Text style={styles.smallMetricIcon}>😴</Text>
-                <Text style={styles.smallMetricLabel}>Sleep</Text>
-                <Text style={styles.smallMetricValue}>{healthMetrics.sleepHours.toFixed(1)}h</Text>
-              </View>
-            )}
-
-            {healthMetrics.hrv !== undefined && (
-              <View style={styles.smallMetricCard}>
-                <Text style={styles.smallMetricIcon}>❤️</Text>
-                <Text style={styles.smallMetricLabel}>HRV</Text>
-                <Text style={styles.smallMetricValue}>{Math.round(healthMetrics.hrv)}ms</Text>
-              </View>
-            )}
-          </View>
-        )}
-      </View>
-
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBarBackground}>
-          <View
-            style={[
-              styles.progressBarFill,
-              {
-                width: `${progress}%`,
-                backgroundColor: progressColor,
-              },
-            ]}
+        {/* Streak Display (Requirement 2.4) */}
+        <View style={styles.streakContainer}>
+          <StreakDisplay
+            currentStreak={currentStreak}
+            longestStreak={longestStreak}
+            style={styles.streakCard}
           />
         </View>
-        <Text style={styles.progressText}>{Math.round(progress)}%</Text>
-      </View>
 
-      {/* Threshold Indicators */}
-      <View style={styles.thresholdsContainer}>
-        <View style={styles.thresholdItem}>
-          <Text style={styles.thresholdLabel}>Sad</Text>
-          <Text style={styles.thresholdValue}>&lt; {thresholds.sadThreshold.toLocaleString()}</Text>
+        {/* Quick Access Buttons for Achievements & Customization (Requirements 1.3, 5.1) */}
+        <View style={styles.quickAccessContainer}>
+          <TouchableOpacity
+            style={styles.quickAccessButton}
+            onPress={handleNavigateToAchievements}
+            accessibilityLabel="View achievements">
+            <Text style={styles.quickAccessIcon}>🏆</Text>
+            <Text style={styles.quickAccessText}>Achievements</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickAccessButton}
+            onPress={handleNavigateToCustomization}
+            accessibilityLabel="Customize Symbi">
+            <Text style={styles.quickAccessIcon}>🎨</Text>
+            <Text style={styles.quickAccessText}>Customize</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.thresholdItem}>
-          <Text style={styles.thresholdLabel}>Resting</Text>
-          <Text style={styles.thresholdValue}>
-            {thresholds.sadThreshold.toLocaleString()} -{' '}
-            {thresholds.activeThreshold.toLocaleString()}
-          </Text>
-        </View>
-        <View style={styles.thresholdItem}>
-          <Text style={styles.thresholdLabel}>Active</Text>
-          <Text style={styles.thresholdValue}>
-            &gt; {thresholds.activeThreshold.toLocaleString()}
-          </Text>
-        </View>
-      </View>
 
-      {/* Evolution Progress Indicator (Phase 3) */}
-      {evolutionEligibility && (
-        <View style={styles.evolutionProgressContainer}>
-          <View style={styles.evolutionProgressHeader}>
-            <Text style={styles.evolutionProgressTitle}>✨ Evolution Progress</Text>
-            {showEvolutionNotification && evolutionEligibility.eligible && (
-              <View style={styles.evolutionReadyBadge}>
-                <Text style={styles.evolutionReadyText}>Ready!</Text>
-              </View>
-            )}
-          </View>
+        {/* Evolution Progress Indicator */}
+        {evolutionEligibility && (
+          <EvolutionProgressSection
+            evolutionEligibility={evolutionEligibility}
+            showEvolutionNotification={showEvolutionNotification}
+            isEvolutionInProgress={isEvolutionInProgress}
+            onTriggerEvolution={handleTriggerEvolution}
+            onNavigateToHistory={handleNavigateToEvolutionHistory}
+          />
+        )}
 
-          <View style={styles.evolutionProgressBar}>
-            <View
-              style={[
-                styles.evolutionProgressFill,
-                {
-                  width: `${Math.min(100, (evolutionEligibility.daysInPositiveState / evolutionEligibility.daysRequired) * 100)}%`,
-                },
-              ]}
-            />
-          </View>
+        {/* Calm your Symbi Button */}
+        {shouldShowCalmButton && (
+          <TouchableOpacity
+            style={styles.calmButton}
+            onPress={handleStartBreathingExercise}
+            accessibilityLabel="Calm your Symbi">
+            <Text style={styles.calmButtonText}>🧘 Calm your Symbi</Text>
+          </TouchableOpacity>
+        )}
 
-          <Text style={styles.evolutionProgressText}>
-            {evolutionEligibility.daysInPositiveState} / {evolutionEligibility.daysRequired} days
-            {evolutionEligibility.eligible
-              ? ' - Evolution available!'
-              : ' in Active or Vibrant state'}
-          </Text>
+        {/* Breathing Exercise Modal */}
+        <Modal visible={showBreathingExercise} animationType="slide" presentationStyle="fullScreen">
+          <BreathingExercise
+            sessionManager={sessionManager}
+            duration={5}
+            onComplete={handleBreathingComplete}
+            onCancel={handleBreathingCancel}
+          />
+        </Modal>
 
-          {/* Evolution Trigger Button */}
-          {evolutionEligibility.eligible && (
-            <TouchableOpacity
-              style={styles.evolutionButton}
-              onPress={handleTriggerEvolution}
-              disabled={isEvolutionInProgress}
-              accessibilityLabel="Trigger evolution">
-              {isEvolutionInProgress ? (
-                <ActivityIndicator size="small" color="#ffffff" />
-              ) : (
-                <Text style={styles.evolutionButtonText}>🌟 Evolve Your Symbi!</Text>
-              )}
-            </TouchableOpacity>
-          )}
-        </View>
+        {/* Evolution Celebration Modal */}
+        {evolutionResult && (
+          <EvolutionCelebration
+            visible={showEvolutionCelebration}
+            evolutionLevel={evolutionResult.evolutionLevel}
+            appearanceUrl={evolutionResult.newAppearanceUrl}
+            onClose={handleEvolutionCelebrationClose}
+          />
+        )}
+      </ScrollView>
+
+      {/* Floating Action Button for Habitat Interaction */}
+      <Pressable
+        style={styles.fab}
+        onPress={() => {
+          // Trigger burst at random position in upper half of screen
+          const x = Math.random() * SCREEN_WIDTH;
+          const y = 100 + Math.random() * 300;
+          if (__DEV__) {
+            console.log('[MainScreen] FAB pressed, triggering burst at:', { x, y });
+          }
+          habitatRef.current?.triggerBackgroundTap({ x, y });
+        }}
+        accessibilityLabel="Trigger habitat effect">
+        <Text style={styles.fabText}>✨</Text>
+      </Pressable>
+
+      {/* Debug Panel (DEV only) - Fixed to right side */}
+      {__DEV__ && (
+        <DebugPanel
+          emotionalState={emotionalState}
+          steps={healthMetrics.steps}
+          lastUpdated={formattedLastUpdated}
+        />
       )}
 
-      {/* Calm your Symbi Button (Phase 3) */}
-      {shouldShowCalmButton() && (
-        <TouchableOpacity
-          style={styles.calmButton}
-          onPress={handleStartBreathingExercise}
-          accessibilityLabel="Calm your Symbi">
-          <Text style={styles.calmButtonText}>🧘 Calm your Symbi</Text>
-        </TouchableOpacity>
-      )}
+      {/* Tutorial Overlay - shows only on first visit */}
+      <TutorialOverlay visible={showTutorial} onComplete={handleTutorialComplete} />
+    </View>
+  );
+};
 
-      {/* Configure Thresholds Button */}
-      <TouchableOpacity
-        style={styles.configureButton}
-        onPress={handleConfigureThresholds}
-        accessibilityLabel="Configure thresholds">
-        <Text style={styles.configureButtonText}>⚡ Configure Thresholds</Text>
+/**
+ * Debug Panel Component (DEV only)
+ * Fixed panel on right side with state controls and debug info
+ */
+interface DebugPanelProps {
+  emotionalState: EmotionalState;
+  steps: number;
+  lastUpdated: string;
+}
+
+const DebugPanel: React.FC<DebugPanelProps> = ({ emotionalState, steps, lastUpdated }) => {
+  const handleSetSad = useCallback(() => {
+    useHealthDataStore
+      .getState()
+      .updateHealthData({ steps: 500 }, EmotionalState.SAD, 'rule-based');
+  }, []);
+
+  const handleSetResting = useCallback(() => {
+    useHealthDataStore
+      .getState()
+      .updateHealthData({ steps: 5000 }, EmotionalState.RESTING, 'rule-based');
+  }, []);
+
+  const handleSetActive = useCallback(() => {
+    useHealthDataStore
+      .getState()
+      .updateHealthData({ steps: 10000 }, EmotionalState.ACTIVE, 'rule-based');
+  }, []);
+
+  return (
+    <View style={styles.debugPanel}>
+      <Text style={styles.debugPanelTitle}>🛠 Debug</Text>
+      <Text style={styles.debugPanelText}>State: {emotionalState}</Text>
+      <Text style={styles.debugPanelText}>Steps: {steps}</Text>
+      <Text style={styles.debugPanelText}>Updated: {lastUpdated}</Text>
+      <View style={styles.debugPanelDivider} />
+      <TouchableOpacity style={[styles.debugButton, styles.debugButtonSad]} onPress={handleSetSad}>
+        <Text style={styles.debugButtonText}>😢</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.debugButton, styles.debugButtonResting]}
+        onPress={handleSetResting}>
+        <Text style={styles.debugButtonText}>😌</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.debugButton, styles.debugButtonActive]}
+        onPress={handleSetActive}>
+        <Text style={styles.debugButtonText}>🎉</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-      {/* Last Updated */}
-      <Text style={styles.lastUpdated}>Last updated: {formatLastUpdated()}</Text>
+/**
+ * Evolution Progress Section Component
+ * Extracted to reduce MainScreen complexity
+ */
+interface EvolutionProgressSectionProps {
+  evolutionEligibility: {
+    eligible: boolean;
+    daysInPositiveState: number;
+    daysRequired: number;
+  };
+  showEvolutionNotification: boolean;
+  isEvolutionInProgress: boolean;
+  onTriggerEvolution: () => void;
+  onNavigateToHistory: () => void;
+}
 
-      {/* Breathing Exercise Modal */}
-      <Modal visible={showBreathingExercise} animationType="slide" presentationStyle="fullScreen">
-        <BreathingExercise
-          sessionManager={sessionManager}
-          duration={5}
-          onComplete={handleBreathingComplete}
-          onCancel={handleBreathingCancel}
-        />
-      </Modal>
+const EvolutionProgressSection: React.FC<EvolutionProgressSectionProps> = ({
+  evolutionEligibility,
+  showEvolutionNotification,
+  isEvolutionInProgress,
+  onTriggerEvolution,
+  onNavigateToHistory,
+}) => {
+  const progressPercentage = Math.min(
+    100,
+    (evolutionEligibility.daysInPositiveState / evolutionEligibility.daysRequired) * 100
+  );
 
-      {/* Evolution Celebration Modal */}
-      {evolutionResult && (
-        <EvolutionCelebration
-          visible={showEvolutionCelebration}
-          evolutionLevel={evolutionResult.evolutionLevel}
-          appearanceUrl={evolutionResult.newAppearanceUrl}
-          onClose={handleEvolutionCelebrationClose}
-        />
+  return (
+    <View style={styles.evolutionProgressContainer}>
+      <View style={styles.evolutionProgressHeader}>
+        <Text style={styles.evolutionProgressTitle}>✨ Evolution Progress</Text>
+        <View style={styles.evolutionProgressHeaderRight}>
+          {showEvolutionNotification && evolutionEligibility.eligible && (
+            <View style={styles.evolutionReadyBadge}>
+              <Text style={styles.evolutionReadyText}>Ready!</Text>
+            </View>
+          )}
+          <TouchableOpacity
+            onPress={onNavigateToHistory}
+            accessibilityLabel="View evolution history">
+            <Text style={styles.viewHistoryLink}>📊 View History</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.evolutionProgressBar}>
+        <View style={[styles.evolutionProgressFill, { width: `${progressPercentage}%` }]} />
+      </View>
+
+      <Text style={styles.evolutionProgressText}>
+        {evolutionEligibility.daysInPositiveState} / {evolutionEligibility.daysRequired} days
+        {evolutionEligibility.eligible ? ' - Evolution available!' : ' in Active or Vibrant state'}
+      </Text>
+
+      {evolutionEligibility.eligible && (
+        <TouchableOpacity
+          style={styles.evolutionButton}
+          onPress={onTriggerEvolution}
+          disabled={isEvolutionInProgress}
+          accessibilityLabel="Trigger evolution">
+          {isEvolutionInProgress ? (
+            <ActivityIndicator size="small" color="#ffffff" />
+          ) : (
+            <Text style={styles.evolutionButtonText}>🌟 Evolve Your Symbi!</Text>
+          )}
+        </TouchableOpacity>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    backgroundColor: HALLOWEEN_COLORS.darkBg,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: 'transparent', // Allow habitat to show through
   },
   contentContainer: {
     paddingBottom: 40,
+    maxWidth: LAYOUT.maxContentWidth,
+    width: '100%',
+    alignSelf: 'center',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginHorizontal: LAYOUT.horizontalPadding,
+    marginTop: LAYOUT.horizontalPadding,
+    marginBottom: 10,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
+  },
+  headerLogo: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+  },
+  titleTextContainer: {
+    flexDirection: 'column',
   },
   title: {
-    fontSize: 32,
+    fontSize: TYPOGRAPHY.headingSize,
     fontWeight: 'bold',
-    color: '#9333EA',
+    color: HALLOWEEN_COLORS.primaryLight,
+    lineHeight: TYPOGRAPHY.headingSize + 2,
+  },
+  tagline: {
+    fontSize: 11,
+    color: TEXT_COLORS.secondary,
+    marginTop: -2,
   },
   offlineIndicator: {
-    backgroundColor: '#374151',
+    backgroundColor: BORDER_COLORS.secondary,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
   },
   offlineText: {
-    fontSize: 12,
-    color: '#9CA3AF',
+    fontSize: TYPOGRAPHY.captionSize,
+    color: TEXT_COLORS.muted,
   },
   settingsButton: {
     padding: 8,
@@ -809,125 +750,140 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   errorContainer: {
-    marginHorizontal: 20,
+    marginHorizontal: LAYOUT.horizontalPadding,
     marginTop: 10,
     padding: 12,
     backgroundColor: '#7F1D1D',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#DC2626',
+    borderColor: BORDER_COLORS.error,
   },
   errorText: {
-    color: '#FCA5A5',
-    fontSize: 14,
+    color: TEXT_COLORS.error,
+    fontSize: TYPOGRAPHY.smallSize,
     textAlign: 'center',
-  },
-  notificationContainer: {
-    marginHorizontal: 20,
-    marginTop: 10,
-    padding: 12,
-    backgroundColor: '#7C3AED',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#9333EA',
-    shadowColor: '#9333EA',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  notificationText: {
-    color: '#ffffff',
-    fontSize: 14,
-    textAlign: 'center',
-    fontWeight: 'bold',
   },
   symbiContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-    minHeight: 300,
+    marginTop: LAYOUT.horizontalPadding,
+    marginBottom: 10,
   },
-  loadingContainer: {
+  tamagotchiFrame: {
+    height: 500,
+    width: 500,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 300,
   },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#a78bfa',
-  },
-  noDataContainer: {
+  frameImage: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 300,
-    paddingHorizontal: 40,
   },
-  noDataEmoji: {
-    fontSize: 64,
-    marginBottom: 16,
-    opacity: 0.5,
-  },
-  noDataText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#9333EA',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  noDataSubtext: {
-    fontSize: 14,
-    color: '#6b7280',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  manualEntryButton: {
-    marginTop: 20,
-    backgroundColor: '#7C3AED',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  manualEntryButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  animation: {
-    width: Math.min(SCREEN_WIDTH * 0.8, 350),
-    height: Math.min(SCREEN_WIDTH * 0.8, 350),
+  ghostScreenArea: {
+    width: '60%',
+    height: '60%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -50,
   },
   stateContainer: {
     alignItems: 'center',
-    marginBottom: 30,
-  },
-  stateEmoji: {
-    fontSize: 48,
-    marginBottom: 8,
+    marginBottom: LAYOUT.horizontalPadding,
   },
   stateName: {
-    fontSize: 28,
+    fontSize: TYPOGRAPHY.titleSize,
     fontWeight: 'bold',
-    color: '#9333EA',
+    color: HALLOWEEN_COLORS.primaryLight,
     textTransform: 'capitalize',
+    letterSpacing: 1,
+  },
+  _unusedDebugText: {
+    color: TEXT_COLORS.muted,
+    fontSize: TYPOGRAPHY.captionSize,
+    marginTop: 4,
+  },
+  manualEntryContainer: {
+    paddingHorizontal: LAYOUT.horizontalPadding,
+    marginBottom: LAYOUT.horizontalPadding,
+  },
+  manualEntryButton: {
+    backgroundColor: HALLOWEEN_COLORS.primary,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: LAYOUT.buttonBorderRadius,
+    alignItems: 'center',
+    ...SHADOWS.card,
+  },
+  manualEntryButtonText: {
+    color: TEXT_COLORS.primary,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  debugPanel: {
+    position: 'absolute',
+    right: 8,
+    top: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    borderRadius: 8,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
+    zIndex: 1001,
+    minWidth: 80,
+  },
+  debugPanelTitle: {
+    color: HALLOWEEN_COLORS.primaryLight,
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  debugPanelText: {
+    color: TEXT_COLORS.muted,
+    fontSize: 9,
+    marginBottom: 2,
+  },
+  debugPanelDivider: {
+    height: 1,
+    backgroundColor: BORDER_COLORS.secondary,
+    marginVertical: 6,
+  },
+  debugButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  debugButtonSad: {
+    backgroundColor: STATE_COLORS.sad,
+  },
+  debugButtonResting: {
+    backgroundColor: HALLOWEEN_COLORS.primary,
+  },
+  debugButtonActive: {
+    backgroundColor: STATE_COLORS.active,
+  },
+  debugButtonText: {
+    fontSize: 14,
   },
   metricsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: LAYOUT.horizontalPadding,
+    marginBottom: LAYOUT.horizontalPadding,
   },
   metricCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
     borderRadius: 16,
-    padding: 20,
+    padding: LAYOUT.horizontalPadding,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#7C3AED',
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
   },
   metricLabel: {
-    fontSize: 14,
-    color: '#a78bfa',
+    fontSize: TYPOGRAPHY.smallSize,
+    color: TEXT_COLORS.secondary,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -935,12 +891,69 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#9333EA',
+    color: HALLOWEEN_COLORS.primaryLight,
     marginBottom: 4,
   },
   metricSubtext: {
-    fontSize: 14,
-    color: '#6b7280',
+    fontSize: TYPOGRAPHY.smallSize,
+    color: TEXT_COLORS.muted,
+  },
+  inCardProgressContainer: {
+    width: '100%',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  inCardProgressBarBackground: {
+    height: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(124, 58, 237, 0.5)',
+  },
+  inCardProgressBarFill: {
+    height: '100%',
+    borderRadius: 10,
+  },
+  inCardProgressText: {
+    textAlign: 'center',
+    marginTop: 6,
+    fontSize: TYPOGRAPHY.headingSize,
+    fontWeight: 'bold',
+    color: HALLOWEEN_COLORS.ghostWhite,
+  },
+  inlineThresholdsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: BORDER_COLORS.secondary,
+    width: '100%',
+  },
+  inlineThresholdItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  inlineThresholdValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: HALLOWEEN_COLORS.primaryLight,
+    textAlign: 'center',
+  },
+  inlineThresholdLabel: {
+    fontSize: 10,
+    color: TEXT_COLORS.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 2,
+  },
+  inlineThresholdDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: BORDER_COLORS.secondary,
   },
   additionalMetricsRow: {
     flexDirection: 'row',
@@ -949,12 +962,12 @@ const styles = StyleSheet.create({
   },
   smallMetricCard: {
     flex: 1,
-    backgroundColor: '#16213e',
-    borderRadius: 12,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
+    borderRadius: LAYOUT.cardBorderRadius,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#374151',
+    borderColor: HALLOWEEN_COLORS.primary,
   },
   smallMetricIcon: {
     fontSize: 24,
@@ -962,43 +975,53 @@ const styles = StyleSheet.create({
   },
   smallMetricLabel: {
     fontSize: 11,
-    color: '#a78bfa',
+    color: TEXT_COLORS.secondary,
     marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   smallMetricValue: {
-    fontSize: 20,
+    fontSize: LAYOUT.horizontalPadding,
     fontWeight: 'bold',
-    color: '#9333EA',
+    color: HALLOWEEN_COLORS.primaryLight,
   },
-  progressContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+
+  streakContainer: {
+    paddingHorizontal: LAYOUT.horizontalPadding,
+    marginBottom: LAYOUT.horizontalPadding,
   },
-  progressBarBackground: {
-    height: 24,
-    backgroundColor: '#16213e',
-    borderRadius: 12,
-    overflow: 'hidden',
+  streakCard: {
     borderWidth: 2,
-    borderColor: '#374151',
+    borderColor: HALLOWEEN_COLORS.primary,
   },
-  progressBarFill: {
-    height: '100%',
-    borderRadius: 10,
+  quickAccessContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: LAYOUT.horizontalPadding,
+    marginBottom: LAYOUT.horizontalPadding,
+    gap: 12,
   },
-  progressText: {
-    textAlign: 'center',
-    marginTop: 8,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#a78bfa',
+  quickAccessButton: {
+    flex: 1,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
+    borderRadius: LAYOUT.cardBorderRadius,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
+  },
+  quickAccessIcon: {
+    fontSize: 28,
+    marginBottom: 8,
+  },
+  quickAccessText: {
+    fontSize: TYPOGRAPHY.smallSize,
+    fontWeight: '600',
+    color: HALLOWEEN_COLORS.primaryLight,
   },
   thresholdsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: LAYOUT.horizontalPadding,
     marginBottom: 30,
   },
   thresholdItem: {
@@ -1007,25 +1030,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   thresholdLabel: {
-    fontSize: 12,
-    color: '#9333EA',
+    fontSize: TYPOGRAPHY.captionSize,
+    color: HALLOWEEN_COLORS.primaryLight,
     fontWeight: 'bold',
     marginBottom: 4,
     textTransform: 'uppercase',
   },
   thresholdValue: {
     fontSize: 11,
-    color: '#6b7280',
+    color: TEXT_COLORS.muted,
     textAlign: 'center',
   },
   evolutionProgressContainer: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    backgroundColor: '#16213e',
-    borderRadius: 12,
+    marginHorizontal: LAYOUT.horizontalPadding,
+    marginBottom: LAYOUT.horizontalPadding,
+    backgroundColor: 'rgba(22, 33, 62, 0.9)',
+    borderRadius: LAYOUT.cardBorderRadius,
     padding: 16,
-    borderWidth: 2,
-    borderColor: '#7C3AED',
+    borderWidth: 1,
+    borderColor: HALLOWEEN_COLORS.primary,
   },
   evolutionProgressHeader: {
     flexDirection: 'row',
@@ -1034,96 +1057,96 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   evolutionProgressTitle: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.bodySize,
     fontWeight: 'bold',
-    color: '#9333EA',
+    color: HALLOWEEN_COLORS.primaryLight,
+  },
+  evolutionProgressHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   evolutionReadyBadge: {
-    backgroundColor: '#10B981',
+    backgroundColor: STATE_COLORS.active,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   evolutionReadyText: {
-    fontSize: 12,
+    fontSize: TYPOGRAPHY.captionSize,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: TEXT_COLORS.primary,
+  },
+  viewHistoryLink: {
+    fontSize: TYPOGRAPHY.smallSize,
+    color: HALLOWEEN_COLORS.primaryLight,
+    fontWeight: 'bold',
   },
   evolutionProgressBar: {
     height: 12,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: HALLOWEEN_COLORS.darkBg,
     borderRadius: 6,
     overflow: 'hidden',
     marginBottom: 8,
   },
   evolutionProgressFill: {
     height: '100%',
-    backgroundColor: '#9333EA',
+    backgroundColor: HALLOWEEN_COLORS.primaryLight,
     borderRadius: 6,
   },
   evolutionProgressText: {
     fontSize: 13,
-    color: '#a78bfa',
+    color: TEXT_COLORS.secondary,
     textAlign: 'center',
   },
   evolutionButton: {
     marginTop: 12,
-    backgroundColor: '#9333EA',
+    backgroundColor: HALLOWEEN_COLORS.primaryLight,
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: LAYOUT.horizontalPadding,
     borderRadius: 8,
     alignItems: 'center',
-    shadowColor: '#9333EA',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    ...SHADOWS.card,
   },
   evolutionButtonText: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.bodySize,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: TEXT_COLORS.primary,
   },
   calmButton: {
-    marginHorizontal: 20,
-    backgroundColor: '#10B981',
-    borderRadius: 12,
+    marginHorizontal: LAYOUT.horizontalPadding,
+    backgroundColor: STATE_COLORS.active,
+    borderRadius: LAYOUT.buttonBorderRadius,
     padding: 16,
     alignItems: 'center',
     marginBottom: 12,
-    shadowColor: '#10B981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    ...SHADOWS.card,
   },
   calmButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  configureButton: {
-    marginHorizontal: 20,
-    backgroundColor: '#7C3AED',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: '#9333EA',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  configureButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
+    color: TEXT_COLORS.primary,
   },
   lastUpdated: {
     textAlign: 'center',
-    fontSize: 12,
-    color: '#6b7280',
-    marginBottom: 20,
+    fontSize: TYPOGRAPHY.captionSize,
+    color: TEXT_COLORS.muted,
+    marginBottom: LAYOUT.horizontalPadding,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: HALLOWEEN_COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.card,
+    zIndex: 1000,
+  },
+  fabText: {
+    fontSize: 24,
   },
 });

@@ -5,9 +5,10 @@ This document outlines a practical, phased approach to building the "Symbi" app,
 ## 1. Core Feature Map
 
 First, let's break the app's DNA into three core components:
-1. **The "Symbi" (The Pet):** The digital creature itself. This is the core UI. Its state (visuals, animation, behavior) is the *output*.
-2. **The Data Connection (The Senses):** The link to the user's real-world data. This is the *input*. (e.g., HealthKit, Google Fit).
-3. **The "Brain" (The Logic):** The system that decides *how* the input (data) affects the output (pet). This can range from simple rules to a complex AI.
+
+1. **The "Symbi" (The Pet):** The digital creature itself. This is the core UI. Its state (visuals, animation, behavior) is the _output_.
+2. **The Data Connection (The Senses):** The link to the user's real-world data. This is the _input_. (e.g., HealthKit, Google Fit).
+3. **The "Brain" (The Logic):** The system that decides _how_ the input (data) affects the output (pet). This can range from simple rules to a complex AI.
 
 ## 2. Proposed Tech Stack
 
@@ -26,8 +27,9 @@ Don't try to build the full AI version first. The key is to test the core "nurtu
 ### Phase 1: The MVP (The "Hard-coded" Pet)
 
 **Goal:** Prove the core loop: Does seeing your data reflected in a simple pet motivate you?
+
 - **The "Symbi":** A simple 2D animated character (using Lottie). It has 3-4 distinct states: `Active`, `Resting`, `Sad`.
-- **The Data Connection:** Connect to *only one* data source: **Daily Step Count**.
+- **The Data Connection:** Connect to _only one_ data source: **Daily Step Count**.
 - **The "Brain":** Simple, hard-coded `if/else` logic:
   - `if (steps < 2000)` -> play `Sad` animation.
   - `if (steps > 2000 && steps < 8000)` -> play `Resting` animation.
@@ -37,6 +39,7 @@ Don't try to build the full AI version first. The key is to test the core "nurtu
 ### Phase 2: The "Smart" Pet (Adding Data & AI)
 
 **Goal:** Make the pet feel more responsive and holistic by linking it to multiple data points.
+
 - **The "Symbi":** Upgrade visuals. Maybe a simple 3D model with **Three.js** that can look around.
 - **The Data Connection:** Add **Sleep Data** and **Heart Rate Variability (HRV)** or "Mindful Minutes."
 - **The "Brain":** This is the key upgrade. Instead of `if/else`, you'll use an LLM.
@@ -45,29 +48,32 @@ Don't try to build the full AI version first. The key is to test the core "nurtu
 
      > "You are the 'brain' for a digital pet. Your job is to describe the user's overall state in one or two words based on their health data. Choose from: [Vibrant, Calm, Tired, Stressed, Anxious, Rested, Active].
      >
-     > **Data:**     >
-     > - Sleep: 5.5 hours (goal: 8)     >
-     > - Steps: 4,500 (goal: 8,000)     >
+     > **Data:** >
+     >
+     > - Sleep: 5.5 hours (goal: 8) >
+     > - Steps: 4,500 (goal: 8,000) >
      > - HRV: 35ms (low)
      >
      > **Your (one-word) response is:**"
+
   3. **The AI's Response:** The model will likely respond with `Tired` or `Stressed`.
   4. **Connecting to UI:** Your app takes this `Tired` string and sets the Symbi's state. The Symbi now looks visibly tired.
 
 ### Phase 3: The "Living" Pet (Interaction & Evolution)
 
 **Goal:** Make the Symbi truly interactive and unique to the user.
+
 - **The "Symbi":** Introduce generative evolution. After 30 days of "active" states, use the `gemini-2.5-flash-image-preview` model to generate a new, "evolved" version of the pet. (e.g., Prompt: "a small, cute, happy digital creature, with new glowing blue wings").
-- **The Data Connection:** No new data, but add *write* permissions.
+- **The Data Connection:** No new data, but add _write_ permissions.
 - **The "Brain" & Interaction:** Add the interactive loop.
   1. The "Brain" (from Phase 2) determines the Symbi is `Stressed`.
   2. The Symbi's UI shows it's anxious. A button appears: "Calm your Symbi?"
   3. Tapping it launches a 1-minute guided breathing exercise.
-  4. When complete, the app *writes* a "1 Minute Mindful Session" back to HealthKit.
+  4. When complete, the app _writes_ a "1 Minute Mindful Session" back to HealthKit.
   5. The Symbi's state immediately updates to `Calm`, providing a positive feedback loop.
 
 ## 4. Key Challenges to Solve
 
-- **Health Data Permissions:** This is the most sensitive data a user has. The app's "onboarding" MUST be crystal clear, friendly, and explain *exactly* why it needs each data point (e.g., "We use your Sleep Data to know if your Symbi is rested!").
-- **Battery Life:** Reading data constantly will kill the user's battery. You must rely on **background fetches** or **webhooks** from HealthKit/Google Fit, which notify your app *when* new data is available, rather than your app constantly asking.
+- **Health Data Permissions:** This is the most sensitive data a user has. The app's "onboarding" MUST be crystal clear, friendly, and explain _exactly_ why it needs each data point (e.g., "We use your Sleep Data to know if your Symbi is rested!").
+- **Battery Life:** Reading data constantly will kill the user's battery. You must rely on **background fetches** or **webhooks** from HealthKit/Google Fit, which notify your app _when_ new data is available, rather than your app constantly asking.
 - **The "Brain" Logic:** The most difficult (and most creative) part is mapping data to emotion. "Low sleep + high steps" = "Tired but Productive"? "High sleep + low steps" = "Rested but Lazy"? This "emotional mapping" is the secret sauce of the entire app.

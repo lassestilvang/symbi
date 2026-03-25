@@ -9,6 +9,7 @@ This document describes the CI/CD workflows configured for the Symbi app.
 Runs on every push and pull request to `main` and `develop` branches.
 
 **Jobs:**
+
 - **Lint**: Runs ESLint and Prettier formatting checks
 - **TypeCheck**: Validates TypeScript types
 - **Test**: Runs Jest tests with coverage reporting
@@ -17,6 +18,7 @@ Runs on every push and pull request to `main` and `develop` branches.
 - **Pre-submit**: Runs comprehensive pre-submission checks
 
 **Required Secrets:**
+
 - `EXPO_TOKEN`: Expo authentication token (optional for basic builds)
 
 ### 2. Release Workflow (`.github/workflows/release.yml`)
@@ -24,10 +26,12 @@ Runs on every push and pull request to `main` and `develop` branches.
 Triggers on version tags (e.g., `v1.0.0`).
 
 **Jobs:**
+
 - Builds iOS and Android apps using EAS Build
 - Creates GitHub release with build artifacts
 
 **Required Secrets:**
+
 - `EXPO_TOKEN`: Expo authentication token (required)
 - `GITHUB_TOKEN`: Automatically provided by GitHub Actions
 
@@ -36,6 +40,7 @@ Triggers on version tags (e.g., `v1.0.0`).
 Runs on pull requests to `main` branch.
 
 **Features:**
+
 - Reviews dependency changes for security vulnerabilities
 - Fails on moderate or higher severity issues
 - Blocks GPL-3.0 and AGPL-3.0 licenses
@@ -45,6 +50,7 @@ Runs on pull requests to `main` branch.
 Runs on push, pull requests, and weekly schedule.
 
 **Features:**
+
 - Static code analysis for security vulnerabilities
 - Scans JavaScript/TypeScript code
 - Reports findings to GitHub Security tab
@@ -54,6 +60,7 @@ Runs on push, pull requests, and weekly schedule.
 Runs on pull requests and pushes to `main`.
 
 **Features:**
+
 - Bundle size analysis
 - Performance test execution
 - Reports results in PR summary
@@ -78,6 +85,7 @@ EXPO_TOKEN: Your Expo access token
 ```
 
 To get your Expo token:
+
 ```bash
 npx expo login
 npx expo whoami
@@ -140,11 +148,13 @@ npm test
 ### Build Failures
 
 **iOS build fails:**
+
 - Ensure Xcode version is compatible with React Native 0.81.5
 - Check that HealthKit entitlements are properly configured
 - Verify CocoaPods dependencies are up to date
 
 **Android build fails:**
+
 - Ensure Java 17 is being used
 - Check Gradle configuration in `android/build.gradle`
 - Verify Google Fit permissions are properly declared
@@ -152,16 +162,19 @@ npm test
 ### Test Failures
 
 **Tests timeout:**
+
 - Increase Jest timeout in `jest.config.js`
 - Use `--maxWorkers=2` flag to limit parallelism
 
 **Mock issues:**
+
 - Ensure `__mocks__/react-native.js` is up to date
 - Check that all native modules are properly mocked
 
 ### Dependency Issues
 
 **Dependabot PRs fail:**
+
 - Review breaking changes in dependency changelogs
 - Update mocks and tests as needed
 - Consider pinning problematic dependencies
@@ -169,6 +182,7 @@ npm test
 ## Performance Targets
 
 CI workflows should complete within:
+
 - Lint: < 2 minutes
 - TypeCheck: < 3 minutes
 - Test: < 5 minutes
@@ -196,6 +210,7 @@ GitHub Actions minutes are free for public repositories. For private repositorie
 ## Monitoring
 
 Monitor workflow runs:
+
 - **Actions tab**: View all workflow runs
 - **Insights → Dependency graph**: View dependencies
 - **Security tab**: View security alerts
@@ -204,6 +219,7 @@ Monitor workflow runs:
 ## Future Enhancements
 
 Potential improvements:
+
 - Add E2E testing with Detox or Maestro
 - Implement automatic version bumping
 - Add Slack/Discord notifications for failures

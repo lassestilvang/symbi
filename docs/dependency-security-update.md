@@ -11,6 +11,7 @@ Added npm package override to enforce `js-yaml` version `^4.1.1` across all depe
 ## Changes
 
 ### package.json
+
 ```json
 "overrides": {
   "js-yaml": "^4.1.1"
@@ -30,17 +31,21 @@ While this vulnerability primarily affects server-side YAML parsing and doesn't 
 ## Impact
 
 ### Development
+
 - No breaking changes to development workflow
 - All existing scripts continue to work
 - Build process unaffected
 
 ### Production
+
 - No impact on app runtime behavior
 - No changes to app bundle size
 - No user-facing changes
 
 ### Dependencies Affected
+
 The override ensures that all transitive dependencies using `js-yaml` will use version 4.1.1 or higher:
+
 - ESLint configuration parsing
 - Jest configuration parsing
 - Other development tooling

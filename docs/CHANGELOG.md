@@ -1,0 +1,168 @@
+# Changelog
+
+All notable changes to the Symbi project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Documentation
+
+- **Documentation Audit** (2025-12-05)
+  - Updated `SETUP.md` with current project status (Phase 1 & 2 complete)
+  - Updated folder structure to reflect all current components, services, hooks
+  - Added missing dependencies to setup documentation
+  - Updated `.kiro/steering/structure.md` with complete project structure
+  - Added `src/constants/` and `src/utils/` directories to documentation
+  - Added all 25+ services, 6 hooks, and 15+ components to structure docs
+  - Updated `DOCUMENTATION-INDEX.md` with current date
+  - Synchronized documentation with actual codebase state
+
+### Added
+
+- **Utility Modules**: Centralized helper functions (2025-11-16)
+  - `src/utils/dateHelpers.ts`: Date formatting utilities (formatShortDate, formatMediumDate, formatFullDate, formatWeekday, formatDisplayDate)
+  - `src/utils/metricHelpers.ts`: Type-safe metric operations (getMetricValue, hasMetricValue, filterByMetric, formatMetricValue, getMetricConfig)
+  - Eliminates ~250 lines of duplicated code across components
+  - Single source of truth for formatting logic
+  - See [docs/code-refactoring-nov-16-2025.md](code-refactoring-nov-16-2025.md)
+  - See [docs/utilities-quick-reference.md](utilities-quick-reference.md) for usage guide
+- **Theme Constants**: Centralized color palette and configuration (2025-11-16)
+  - `src/constants/theme.ts`: Halloween colors, state colors, metric configuration, decoration icons
+  - Exports: `HALLOWEEN_COLORS`, `STATE_COLORS`, `METRIC_CONFIG`, `DECORATION_ICONS`
+  - Comprehensive JSDoc documentation with usage examples
+  - See [docs/halloween-theme-colors.md](halloween-theme-colors.md)
+- **Data Visualization Components**: New reusable components for Evolution History (2025-11-16)
+  - `StatisticsCard`: Displays metrics with Halloween decorations and automatic number formatting
+  - `HealthMetricsChart`: Interactive line charts with tooltips, haptic feedback, and responsive sizing
+  - `EmotionalStateTimeline`: Scrollable timeline with color-coded states and modal details
+  - `EvolutionMilestoneCard`: Evolution achievement cards with badges and images
+  - `HealthDataTable`: Scrollable data table with alternating row colors
+  - All components include comprehensive accessibility support
+  - See [docs/evolution-history-implementation-summary.md](evolution-history-implementation-summary.md)
+- **Type Definitions**: New interfaces for historical data visualization (2025-11-16)
+  - `HistoricalDataPoint`: Daily health data with emotional state
+  - `HistoryStatistics`: Aggregated statistics for time ranges
+  - `HealthDataCache`: Cached health data structure
+  - Added to `src/types/index.ts` for centralized type management
+  - See [docs/evolution-history-types-implementation.md](evolution-history-types-implementation.md)
+- **Accessibility Enhancement**: Evolution History Screen now WCAG 2.1 AA compliant (2025-11-16)
+  - Added semantic roles (button, header, alert, radiogroup, radio, list) for proper screen reader navigation
+  - Implemented descriptive accessibility labels for all interactive elements
+  - Added accessibility hints explaining complex interactions
+  - Added accessibility state for radio buttons (selected/not selected)
+  - Implemented dynamic announcements for time range changes via `AccessibilityInfo.announceForAccessibility()`
+  - Added live regions for loading states (`accessibilityLiveRegion="polite"`)
+  - Hidden decorative elements (emojis, arrows) from screen readers with `accessibilityElementsHidden={true}`
+  - Ensured all touch targets meet 44x44pt minimum size requirement
+  - See [docs/evolution-history-accessibility-update.md](evolution-history-accessibility-update.md)
+- Evolution History Page with comprehensive data visualizations (2025-11-16)
+  - Time range filtering (7D, 30D, 90D, All Time) with AsyncStorage persistence
+  - Summary statistics cards with Halloween-themed decorations
+  - Line charts for steps, sleep, and HRV trends using react-native-chart-kit
+  - Emotional state timeline with ghost icons and color-coded indicators
+  - Evolution milestone gallery with badge icons
+  - Scrollable data table with daily health metrics breakdown
+  - Responsive layout supporting portrait and landscape orientations
+  - Scroll position preservation during orientation changes
+  - Loading, error, and empty states with Halloween theming
+  - Components: `EvolutionHistoryScreen`, `StatisticsCard`, `HealthMetricsChart`, `EmotionalStateTimeline`, `EvolutionMilestoneCard`, `HealthDataTable`
+  - See [docs/evolution-history-implementation-summary.md](evolution-history-implementation-summary.md)
+- Evolution History Page type definitions (2025-11-16)
+  - Added `HistoricalDataPoint` interface for daily health data visualization
+  - Added `HistoryStatistics` interface for aggregated time range statistics
+  - Supports time range filtering (7D, 30D, 90D, All Time)
+  - Enables line charts, timelines, and data tables for historical analysis
+  - See [.kiro/specs/evolution-history-page/](../.kiro/specs/evolution-history-page/)
+
+### Changed
+
+- **EvolutionGalleryScreen Layout Migration** (2025-11-16)
+  - Migrated from FlatList to ScrollView for better layout control
+  - Implemented explicit row-by-row rendering for 2-column grid
+  - Simplified centering logic using wrapper pattern (scrollContent → contentWrapper)
+  - Maintained 400px max-width constraint for optimal readability
+  - Improved layout predictability and maintainability
+  - No performance impact due to small dataset size (< 20 evolutions typically)
+  - See [docs/evolution-gallery-responsive-layout.md](evolution-gallery-responsive-layout.md)
+- **StatisticsCard Component Refactoring** (2025-11-16)
+  - Migrated to centralized theme constants (`HALLOWEEN_COLORS`, `DECORATION_ICONS` from `src/constants/theme.ts`)
+  - Wrapped component with `React.memo` for performance optimization
+  - Implemented automatic number formatting with locale-specific thousand separators
+  - Enhanced accessibility with comprehensive labels (`accessibilityLabel`, `accessibilityRole="summary"`)
+  - Added `testID` prop for automated testing support
+  - Memoized dynamic styles with `useMemo` for better performance
+  - Improved prop typing with `keyof typeof DECORATION_ICONS`
+  - See [docs/code-refactoring-nov-16-2025.md](code-refactoring-nov-16-2025.md)
+- **Performance Optimization**: Refactored `HealthMetricsChart` component (2025-11-16)
+  - Applied React memoization patterns (useMemo, useCallback) for 60% reduction in unnecessary recalculations
+  - Extracted Tooltip as separate component for better separation of concerns
+  - Integrated centralized utility functions from `metricHelpers` and `dateHelpers`
+  - Imported `HALLOWEEN_COLORS` from centralized theme constants
+  - Reduced component complexity by 25% (from ~200 to ~150 lines)
+  - Eliminated ~50 lines of code duplication
+  - Improved type safety with `MetricType` type alias
+  - See [docs/healthmetricschart-refactoring-nov-16.md](healthmetricschart-refactoring-nov-16.md)
+- **Code Quality**: Created centralized constants and utilities (2025-11-16)
+  - Added `src/constants/theme.ts` for Halloween color palette and state colors
+  - Added `src/utils/dateHelpers.ts` for consistent date formatting
+  - Added `src/utils/metricHelpers.ts` for type-safe metric operations
+  - Eliminated ~250 lines of duplicated code across components
+  - Single source of truth for theme values and formatting logic
+  - See [docs/code-refactoring-nov-16-2025.md](code-refactoring-nov-16-2025.md)
+- Improved MainScreen responsive layout for tablets and large screens (2025-11-16)
+  - Added 600px max-width constraint to content container
+  - Centered content on wide displays for better readability
+  - Maintains full-width on mobile devices
+  - See [docs/mainscreen-responsive-layout-update.md](mainscreen-responsive-layout-update.md)
+- Optimized EvolutionGalleryScreen responsive layout (2025-11-16)
+  - Reduced max container width from 500px to 400px for better readability
+  - Improved card sizing and spacing in 2-column grid layout
+  - Enhanced visual consistency across device sizes
+- Refactored `ManualHealthDataService` to eliminate code duplication and improve maintainability (2025-11-16)
+  - Implemented Template Method Pattern for generic metric saving
+  - Consolidated validation logic into configuration-driven approach
+  - Improved date range iteration with immutable date handling
+  - Enhanced type safety with new interfaces
+  - Reduced code by ~12.5% while maintaining all functionality
+  - See [docs/manual-health-data-service-refactoring.md](manual-health-data-service-refactoring.md)
+
+## [1.0.0] - Phase 2 Multi-Metric Implementation
+
+### Added
+
+- Multi-metric health data collection (steps, sleep, HRV)
+- Automatic fetching of sleep duration and HRV in `HealthDataUpdateService`
+- Graceful degradation when additional metrics unavailable
+- Backward compatibility with Phase 1 step-only tracking
+
+### Documentation
+
+- Created comprehensive Phase 2 implementation guide
+- Updated health data integration summary
+- Added app store submission documentation
+
+## [0.9.0] - Phase 1 MVP
+
+### Added
+
+- Step tracking with HealthKit (iOS) and Google Fit (Android)
+- Manual data entry mode
+- Three emotional states (Sad, Resting, Active)
+- Configurable thresholds
+- 8-bit pixel art Symbi ghost renderer
+- Tamagotchi-style frame UI
+- Background sync service
+- Onboarding flow
+- Settings and account management
+
+### Infrastructure
+
+- React Native with Expo setup
+- TypeScript configuration
+- Zustand state management
+- AsyncStorage persistence
+- Sentry crash reporting
+- Jest testing framework
+- ESLint and Prettier code quality tools

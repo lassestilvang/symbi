@@ -1,155 +1,129 @@
-# Symbi - Biometric Tamagotchi
+# Symbi
 
-A Halloween-themed digital pet application that reflects your real-world health data through a cute yet spooky ghost creature.
+**Your Biometric Tamagotchi** — A Halloween-themed digital pet that reflects your real-world health through a cute, spooky ghost creature.
+
+![Symbi Screenshot](assets/screenshot.jpeg)
+
+## Features
+
+- **Health-Responsive Ghost**: Your Symbi's mood changes based on your daily steps, sleep, and heart rate variability
+- **Multiple Data Sources**: Connect to Apple HealthKit, Google Fit, or enter data manually (steps, sleep, HRV)
+- **9 Emotional States**: From Sad to Vibrant, watch your ghost react to your wellness
+- **Evolution System**: Maintain healthy habits and watch your Symbi evolve
+- **8-Bit Pixel Art**: Retro-style ghost rendered in a classic Tamagotchi frame
+- **Interactive Habitat**: Tap to trigger Halloween-themed particle effects
+- **Achievement System**: Earn badges and track streaks
+- **Customization Studio**: Personalize your Symbi with cosmetic items
+- **Privacy-First**: All health data processed locally, works fully offline
+
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# Run on specific platform
+npm run ios      # iOS Simulator
+npm run android  # Android Emulator
+npm run web      # Web browser
+```
+
+## Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| React Native | 0.81.5 | Mobile framework |
+| Expo | 54.0.22 | Development platform |
+| TypeScript | 5.9.2 | Type safety |
+| React | 19.2.0 | UI library |
+| Zustand | 5.0.8 | State management |
+| React Navigation | 7.x | Screen navigation |
+| Lottie | 7.3.4 | Animations |
 
 ## Project Structure
 
 ```
-/
-├── src/
-│   ├── components/     # React components
-│   ├── services/       # Business logic and API services
-│   ├── hooks/          # Custom React hooks
-│   ├── types/          # TypeScript type definitions
-│   └── assets/         # Static assets (animations, images)
-│       └── animations/
-│           ├── phase1/ # Basic emotional state animations
-│           ├── phase2/ # Advanced emotional state animations
-│           └── phase3/ # Evolution animations
-├── App.tsx             # Main application entry point
-└── package.json
+src/
+├── components/     # Reusable UI components
+├── screens/        # Full-screen views
+├── services/       # Business logic & APIs
+├── stores/         # Zustand state stores
+├── hooks/          # Custom React hooks
+├── types/          # TypeScript definitions
+├── constants/      # Theme & configuration
+├── utils/          # Helper functions
+└── assets/         # Images & animations
 ```
 
-## Getting Started
+## Health Integration
 
-### Prerequisites
+| Platform | API | Min Version |
+|----------|-----|-------------|
+| iOS | HealthKit | iOS 14.0 |
+| Android | Google Fit | API 26 |
+| All | Manual Entry | — |
 
-- Node.js 18+
-- npm or yarn
-- iOS Simulator (for iOS development)
-- Android Studio (for Android development)
+## Emotional States
 
-### Installation
+Your Symbi displays different moods based on your health metrics:
 
-```bash
-npm install
-```
-
-### Running the App
-
-```bash
-# iOS
-npm run ios
-
-# Android
-npm run android
-
-# Web
-npm run web
-```
+| State | Trigger |
+|-------|---------|
+| 😢 Sad | Low activity (< 2,000 steps) |
+| 😌 Resting | Moderate activity (2,000-8,000 steps) |
+| 🎉 Active | High activity (> 8,000 steps) |
+| ✨ Vibrant | Excellent overall health |
+| 🧘 Calm | Good sleep + low stress |
+| 😴 Tired | Poor sleep quality |
+| 😰 Stressed | High HRV variability |
+| 😟 Anxious | Elevated stress indicators |
+| 😊 Rested | Great sleep recovery |
 
 ## Development
 
-### Code Quality
-
-This project uses ESLint and Prettier for code consistency:
-
 ```bash
-# Run linter
+# Lint code
 npm run lint
+
+# Fix lint issues
+npm run lint:fix
 
 # Format code
 npm run format
 
-# Run pre-submission tests
-npm run pre-submit
-```
-
-### Testing
-
-The project uses Jest with React Native preset for testing:
-
-```bash
-# Run unit tests
+# Run tests
 npm test
 
-# Run tests with coverage
-npm run test:coverage
-
-# Watch mode
-npm run test:watch
-```
-
-**Test Configuration**:
-- Jest preset: `react-native`
-- Test environment: Node.js
-- Transform: ts-jest for TypeScript files
-- Coverage: Excludes node_modules, tests, and config files
-- Transform ignore patterns configured for React Native libraries
-
-### Tech Stack
-
-- **Framework**: React Native (Expo)
-- **Language**: TypeScript
-- **State Management**: Zustand
-- **Navigation**: React Navigation
-- **Animations**: Lottie
-- **Storage**: AsyncStorage
-- **Security**: TLS 1.3, AES-256 encryption, dependency vulnerability management
-
-## Phase Development
-
-### Phase 1: MVP - Basic Emotional States
-
-- Step tracking integration
-- Three emotional states (Sad, Resting, Active)
-- Configurable thresholds
-- Manual data entry mode
-
-### Phase 2: Multi-Metric Health Analysis
-
-- Sleep and HRV tracking
-- AI-powered emotional state analysis (Gemini API)
-- Six additional emotional states
-
-### Phase 3: Interactive Features & Evolution
-
-- Guided wellness activities
-- Generative evolution system
-- Cloud sync and cross-platform support
-
-## App Store Submission
-
-Symbi is ready for submission to the Apple App Store and Google Play Store. See the comprehensive documentation in `docs/app-store/`:
-
-- **Quick Start**: [docs/app-store/QUICK-REFERENCE.md](docs/app-store/QUICK-REFERENCE.md)
-- **Full Guide**: [docs/app-store/submission-guide.md](docs/app-store/submission-guide.md)
-- **iOS Metadata**: [docs/app-store/ios-metadata.md](docs/app-store/ios-metadata.md)
-- **Android Metadata**: [docs/app-store/android-metadata.md](docs/app-store/android-metadata.md)
-- **QA Checklist**: [docs/qa-testing-checklist.md](docs/qa-testing-checklist.md)
-
-### Pre-Submission
-
-Before submitting, run the automated checks:
-
-```bash
+# Run all pre-submission checks
 npm run pre-submit
 ```
 
-### Key Requirements
+## Privacy
 
-- **iOS**: HealthKit entitlement, privacy policy, screenshots
-- **Android**: Health Connect/Google Fit permissions, Data Safety section, feature graphic
-- **Both**: Privacy policy hosted at https://symbi.app/privacy-policy
+Symbi is designed with privacy as a core principle:
 
-## Monitoring
+- Health data is processed locally on your device
+- No health data is sent to external servers
+- Manual entry provides full functionality without health permissions
+- Works completely offline
+- No analytics on health metrics
 
-Crash reporting and monitoring is configured with Sentry:
+## Documentation
 
-- **Setup Guide**: [docs/crash-reporting-setup.md](docs/crash-reporting-setup.md)
-- **Service**: `src/services/ErrorReportingService.ts`
-- **Privacy**: Health data is automatically sanitized from error reports
+Detailed documentation is available in the `/docs` folder:
+
+- [App Architecture](docs/app-architecture.md)
+- [Accessibility Compliance](docs/accessibility-compliance.md)
+- [QA Testing Checklist](docs/qa-testing-checklist.md)
+- [App Store Submission Guide](docs/app-store/submission-guide.md)
 
 ## License
 
-Private project - All rights reserved
+MIT License — see [LICENSE](LICENSE) for details
+
+---
+
+Built with 👻 and 💜

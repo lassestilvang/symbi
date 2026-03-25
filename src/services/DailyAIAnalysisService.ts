@@ -36,7 +36,9 @@ export class DailyAIAnalysisService {
   async initialize(apiKey?: string): Promise<void> {
     // Get API key from storage if not provided
     if (!apiKey) {
-      apiKey = (await StorageService.get<string>(DailyAIAnalysisService.GEMINI_API_KEY_STORAGE)) || undefined;
+      apiKey =
+        (await StorageService.get<string>(DailyAIAnalysisService.GEMINI_API_KEY_STORAGE)) ||
+        undefined;
     }
 
     if (apiKey) {

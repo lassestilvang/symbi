@@ -5,10 +5,23 @@ This document explains how to set up and configure Sentry for crash reporting an
 ## Overview
 
 Symbi uses Sentry for:
+
 - Crash reporting and error tracking
 - Performance monitoring
 - Breadcrumb logging for debugging
 - Privacy-preserving error reports (health data is sanitized)
+
+### Initialization Architecture
+
+The error reporting system is initialized in `App.tsx` with the following features:
+
+- **Automatic Initialization**: Runs on app startup before any other components
+- **Environment Validation**: Validates environment configuration before initialization
+- **Global Error Handlers**: Captures unhandled errors and promise rejections
+- **Platform Tagging**: Automatically tags errors with platform (iOS/Android/Web) and version
+- **Proper Cleanup**: Restores original error handlers on component unmount
+- **Graceful Degradation**: App continues to function if Sentry initialization fails
+- **Initialization State**: Uses React state to prevent race conditions with error handlers
 
 ## Setup Instructions
 
@@ -110,11 +123,13 @@ Configure alerts in Sentry dashboard to monitor app health:
 To get readable stack traces in production:
 
 1. Install Sentry CLI:
+
 ```bash
 npm install -g @sentry/cli
 ```
 
 2. Create `.sentryclirc` file:
+
 ```ini
 [defaults]
 url=https://sentry.io/
@@ -126,11 +141,39 @@ token=your-auth-token
 ```
 
 3. Upload source maps during build:
+
 ```bash
 sentry-cli releases files <release-version> upload-sourcemaps ./dist
 ```
 
 For Expo/EAS builds, this is handled automatically with the Sentry Expo plugin.
+
+## Initialization Flow
+
+The error reporting system follows this initialization sequence:
+
+1. **App Component Mounts**: `App.tsx` renders and triggers useEffect
+2. **Environment Validation**: Validates Sentry environment configuration
+3. **Service Initialization**: Calls `ErrorReportingService.getInstance().initialize()`
+4. **Platform Tagging**: Sets platform and version tags for error context
+5. **Global Handlers Setup**: Registers global error and promise rejection handlers
+6. **Breadcrumb Logging**: Logs "App started" breadcrumb
+7. **State Update**: Sets `isInitialized` to true, allowing app to render
+8. **Cleanup Registration**: Returns cleanup function to restore handlers on unmount
+
+### Error Handler Chain
+
+```
+Error Occurs
+    ↓
+Global Error Handler (App.tsx)
+    ↓
+ErrorReportingService.captureException()
+    ↓
+Sentry SDK (with sanitization)
+    ↓
+Original Error Handler (preserved)
+```
 
 ## Usage in Code
 
@@ -157,6 +200,16 @@ errorReporting.captureMessage('Something went wrong', 'warning', {
 });
 ```
 
+### Automatic Error Capture
+
+Errors are automatically captured in the following scenarios:
+
+1. **Unhandled Exceptions**: Any uncaught error in the app
+2. **Promise Rejections**: Unhandled promise rejections
+3. **Component Errors**: Errors in React component lifecycle
+
+No manual capture needed for these cases - they're handled by the global error handlers in `App.tsx`.
+
 ### Adding Breadcrumbs
 
 ```typescript
@@ -173,12 +226,7 @@ errorReporting.trackUserAction('threshold_updated', {
 });
 
 // Custom breadcrumb
-errorReporting.addBreadcrumb(
-  'Health data fetched',
-  'health',
-  'info',
-  { dataType: 'steps' }
-);
+errorReporting.addBreadcrumb('Health data fetched', 'health', 'info', { dataType: 'steps' });
 ```
 
 ### Setting Context
@@ -214,12 +262,14 @@ The ErrorReportingService automatically sanitizes health data from error reports
 ### Example
 
 **Before sanitization:**
+
 ```
 Error: Failed to process health data
 Context: { steps: 8543, sleepHours: 7.5, hrv: 45 }
 ```
 
 **After sanitization:**
+
 ```
 Error: Failed to process health data
 Context: { steps: [REDACTED], sleepHours: [REDACTED], hrv: [REDACTED] }
@@ -326,16 +376,19 @@ Add a test button in development mode:
 ## Cost Management
 
 Sentry pricing is based on:
+
 - Number of events (errors/transactions)
 - Data retention period
 - Team size
 
 ### Free Tier Limits
+
 - 5,000 errors per month
 - 10,000 performance units per month
 - 30-day data retention
 
 ### Tips to Stay Within Limits
+
 1. Use sampling for performance monitoring (20%)
 2. Filter out noisy errors
 3. Set up proper error boundaries

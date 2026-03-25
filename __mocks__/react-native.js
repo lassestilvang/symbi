@@ -5,13 +5,13 @@ const ReactNative = {
   Platform: {
     OS: 'ios',
     Version: 14,
-    select: jest.fn((obj) => obj.ios || obj.default),
+    select: jest.fn(obj => obj.ios || obj.default),
   },
 
   // StyleSheet
   StyleSheet: {
-    create: jest.fn((styles) => styles),
-    flatten: jest.fn((styles) => styles),
+    create: jest.fn(styles => styles),
+    flatten: jest.fn(styles => styles),
     hairlineWidth: 1,
   },
 
@@ -22,6 +22,9 @@ const ReactNative = {
     removeEventListener: jest.fn(),
   },
 
+  // useWindowDimensions hook
+  useWindowDimensions: jest.fn(() => ({ width: 375, height: 667, scale: 2, fontScale: 1 })),
+
   // AppState
   AppState: {
     currentState: 'active',
@@ -29,9 +32,28 @@ const ReactNative = {
     removeEventListener: jest.fn(),
   },
 
+  // Easing
+  Easing: {
+    linear: jest.fn(t => t),
+    ease: jest.fn(t => t),
+    quad: jest.fn(t => t * t),
+    cubic: jest.fn(t => t * t * t),
+    poly: jest.fn(() => t => t),
+    sin: jest.fn(t => Math.sin(t)),
+    circle: jest.fn(t => t),
+    exp: jest.fn(t => t),
+    elastic: jest.fn(() => t => t),
+    back: jest.fn(() => t => t),
+    bounce: jest.fn(t => t),
+    bezier: jest.fn(() => t => t),
+    in: jest.fn(easing => easing),
+    out: jest.fn(easing => easing),
+    inOut: jest.fn(easing => easing),
+  },
+
   // Animated
   Animated: {
-    Value: jest.fn().mockImplementation((value) => ({
+    Value: jest.fn().mockImplementation(value => ({
       setValue: jest.fn(),
       setOffset: jest.fn(),
       flattenOffset: jest.fn(),
@@ -45,43 +67,68 @@ const ReactNative = {
       animate: jest.fn(),
       _value: value,
     })),
+    multiply: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 1,
+    })),
+    add: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 0,
+    })),
+    subtract: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 0,
+    })),
+    divide: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 1,
+    })),
+    modulo: jest.fn(() => ({
+      setValue: jest.fn(),
+      interpolate: jest.fn(() => ({ setValue: jest.fn() })),
+      _value: 0,
+    })),
     timing: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
     spring: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
     decay: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
     sequence: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
     parallel: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
     stagger: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
     loop: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
     delay: jest.fn(() => ({
-      start: jest.fn((callback) => callback && callback({ finished: true })),
+      start: jest.fn(callback => callback && callback({ finished: true })),
       stop: jest.fn(),
       reset: jest.fn(),
     })),
@@ -89,7 +136,9 @@ const ReactNative = {
     View: React.forwardRef((props, ref) => React.createElement('View', { ...props, ref })),
     Text: React.forwardRef((props, ref) => React.createElement('Text', { ...props, ref })),
     Image: React.forwardRef((props, ref) => React.createElement('Image', { ...props, ref })),
-    ScrollView: React.forwardRef((props, ref) => React.createElement('ScrollView', { ...props, ref })),
+    ScrollView: React.forwardRef((props, ref) =>
+      React.createElement('ScrollView', { ...props, ref })
+    ),
     FlatList: React.forwardRef((props, ref) => React.createElement('FlatList', { ...props, ref })),
   },
 
@@ -97,18 +146,37 @@ const ReactNative = {
   View: React.forwardRef((props, ref) => React.createElement('View', { ...props, ref })),
   Text: React.forwardRef((props, ref) => React.createElement('Text', { ...props, ref })),
   TextInput: React.forwardRef((props, ref) => React.createElement('TextInput', { ...props, ref })),
-  ScrollView: React.forwardRef((props, ref) => React.createElement('ScrollView', { ...props, ref })),
-  TouchableOpacity: React.forwardRef((props, ref) => React.createElement('TouchableOpacity', { ...props, ref })),
-  TouchableHighlight: React.forwardRef((props, ref) => React.createElement('TouchableHighlight', { ...props, ref })),
-  TouchableWithoutFeedback: React.forwardRef((props, ref) => React.createElement('TouchableWithoutFeedback', { ...props, ref })),
+  ScrollView: React.forwardRef((props, ref) =>
+    React.createElement('ScrollView', { ...props, ref })
+  ),
+  TouchableOpacity: React.forwardRef((props, ref) =>
+    React.createElement('TouchableOpacity', { ...props, ref })
+  ),
+  TouchableHighlight: React.forwardRef((props, ref) =>
+    React.createElement('TouchableHighlight', { ...props, ref })
+  ),
+  TouchableWithoutFeedback: React.forwardRef((props, ref) =>
+    React.createElement('TouchableWithoutFeedback', { ...props, ref })
+  ),
   Pressable: React.forwardRef((props, ref) => React.createElement('Pressable', { ...props, ref })),
-  SafeAreaView: React.forwardRef((props, ref) => React.createElement('SafeAreaView', { ...props, ref })),
-  ActivityIndicator: React.forwardRef((props, ref) => React.createElement('ActivityIndicator', { ...props, ref })),
+  SafeAreaView: React.forwardRef((props, ref) =>
+    React.createElement('SafeAreaView', { ...props, ref })
+  ),
+  ActivityIndicator: React.forwardRef((props, ref) =>
+    React.createElement('ActivityIndicator', { ...props, ref })
+  ),
   Image: React.forwardRef((props, ref) => React.createElement('Image', { ...props, ref })),
+  ImageBackground: React.forwardRef((props, ref) =>
+    React.createElement('ImageBackground', { ...props, ref }, props.children)
+  ),
   FlatList: React.forwardRef((props, ref) => React.createElement('FlatList', { ...props, ref })),
-  SectionList: React.forwardRef((props, ref) => React.createElement('SectionList', { ...props, ref })),
+  SectionList: React.forwardRef((props, ref) =>
+    React.createElement('SectionList', { ...props, ref })
+  ),
   Modal: React.forwardRef((props, ref) => React.createElement('Modal', { ...props, ref })),
-  RefreshControl: React.forwardRef((props, ref) => React.createElement('RefreshControl', { ...props, ref })),
+  RefreshControl: React.forwardRef((props, ref) =>
+    React.createElement('RefreshControl', { ...props, ref })
+  ),
   Switch: React.forwardRef((props, ref) => React.createElement('Switch', { ...props, ref })),
   Button: React.forwardRef((props, ref) => React.createElement('Button', { ...props, ref })),
 
@@ -138,8 +206,8 @@ const ReactNative = {
   PixelRatio: {
     get: jest.fn(() => 2),
     getFontScale: jest.fn(() => 1),
-    getPixelSizeForLayoutSize: jest.fn((size) => size * 2),
-    roundToNearestPixel: jest.fn((size) => Math.round(size)),
+    getPixelSizeForLayoutSize: jest.fn(size => size * 2),
+    roundToNearestPixel: jest.fn(size => Math.round(size)),
   },
   BackHandler: {
     addEventListener: jest.fn(() => ({ remove: jest.fn() })),

@@ -50,6 +50,8 @@ module.exports = {
   // Path aliases matching tsconfig.json
   moduleNameMapper: {
     '^react-native$': '<rootDir>/__mocks__/react-native.js',
+    // Mock image imports
+    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/__mocks__/fileMock.js',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
     '^@services/(.*)$': '<rootDir>/src/services/$1',
     '^@screens/(.*)$': '<rootDir>/src/screens/$1',
@@ -63,6 +65,7 @@ module.exports = {
 
   // Setup files
   setupFiles: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setupAfterEnv.js'],
 
   // Use jsdom environment for React Native Testing Library
   testEnvironment: 'jsdom',

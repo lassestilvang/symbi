@@ -13,23 +13,22 @@ module.exports = {
   preset: 'react-native',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          jsx: 'react',
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+        },
       },
-    }],
+    ],
   },
   transformIgnorePatterns: [
     'node_modules/(?!(react-native|@react-native|@react-navigation|lottie-react-native|expo-.*)/)',
   ],
   testMatch: ['**/__tests__/**/*.(test|spec).(ts|tsx|js)'],
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/__tests__/**',
-  ],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/__tests__/**'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
@@ -43,6 +42,7 @@ module.exports = {
 ### React Native Preset
 
 The `preset: 'react-native'` configuration provides:
+
 - React Native-specific module resolution
 - Built-in mocks for React Native APIs
 - Proper handling of React Native's module system
@@ -53,6 +53,7 @@ The `preset: 'react-native'` configuration provides:
 **Environment**: `node`
 
 The Node.js test environment is used instead of `jsdom` because:
+
 - Better performance for React Native tests
 - React Native doesn't run in a browser DOM
 - Faster test execution
@@ -63,6 +64,7 @@ The Node.js test environment is used instead of `jsdom` because:
 **TypeScript Transform**: `ts-jest`
 
 All `.ts` and `.tsx` files are transformed using ts-jest with:
+
 - JSX support enabled (`jsx: 'react'`)
 - ES module interop for better compatibility
 - Synthetic default imports allowed
@@ -70,6 +72,7 @@ All `.ts` and `.tsx` files are transformed using ts-jest with:
 ### Transform Ignore Patterns
 
 The following packages are **not** ignored (they are transformed):
+
 - `react-native` - Core React Native library
 - `@react-native/*` - React Native community packages
 - `@react-navigation/*` - Navigation libraries
@@ -81,6 +84,7 @@ This ensures these packages are properly transformed from ES modules to CommonJS
 ### Module Name Mapper
 
 Path aliases are configured to match `tsconfig.json`:
+
 - `@/*` → `src/*`
 
 This allows tests to use the same import paths as the application code.
@@ -88,15 +92,18 @@ This allows tests to use the same import paths as the application code.
 ### Test File Patterns
 
 Tests are discovered in:
+
 - `**/__tests__/**/*.test.(ts|tsx|js)`
 - `**/__tests__/**/*.spec.(ts|tsx|js)`
 
 ### Coverage Collection
 
 Coverage is collected from:
+
 - All files in `src/**/*.{ts,tsx}`
 
 Coverage excludes:
+
 - Type definition files (`*.d.ts`)
 - Test files (`__tests__/**`)
 - Node modules
@@ -106,6 +113,7 @@ Coverage excludes:
 ### File: `jest.setup.js`
 
 The setup file runs before each test suite and includes:
+
 - React Native mock setup
 - Global test utilities
 - Custom matchers
@@ -135,6 +143,7 @@ npm test -- --testNamePattern="should calculate emotional state"
 ### Coverage Reports
 
 Coverage reports are generated in:
+
 - `coverage/` directory
 - HTML report: `coverage/lcov-report/index.html`
 - Text summary in terminal
@@ -276,10 +285,10 @@ jest.mock('react-native-health');
 describe('HealthKitService', () => {
   it('should fetch step count', async () => {
     (AppleHealthKit.getStepCount as jest.Mock).mockResolvedValue(5000);
-    
+
     const service = new HealthKitService();
     const steps = await service.getStepCount(new Date(), new Date());
-    
+
     expect(steps).toBe(5000);
   });
 });
@@ -292,15 +301,15 @@ describe('HealthKitService', () => {
 #### Issue: Transform errors for React Native modules
 
 **Solution**: Ensure the module is included in `transformIgnorePatterns`:
+
 ```javascript
-transformIgnorePatterns: [
-  'node_modules/(?!(react-native|your-module)/)',
-]
+transformIgnorePatterns: ['node_modules/(?!(react-native|your-module)/)'];
 ```
 
 #### Issue: Path alias not resolving
 
 **Solution**: Check `moduleNameMapper` matches `tsconfig.json` paths:
+
 ```javascript
 moduleNameMapper: {
   '^@/(.*)$': '<rootDir>/src/$1',
@@ -310,6 +319,7 @@ moduleNameMapper: {
 #### Issue: Async tests timing out
 
 **Solution**: Increase timeout or use `waitFor`:
+
 ```typescript
 it('should complete async operation', async () => {
   await waitFor(() => expect(result).toBeDefined(), { timeout: 5000 });
@@ -319,6 +329,7 @@ it('should complete async operation', async () => {
 #### Issue: Memory leaks in tests
 
 **Solution**: Clean up in `afterEach`:
+
 ```typescript
 afterEach(() => {
   jest.clearAllMocks();
@@ -370,6 +381,6 @@ jobs:
 
 ## Revision History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-11-16 | Initial documentation with React Native preset configuration |
+| Version | Date       | Changes                                                      |
+| ------- | ---------- | ------------------------------------------------------------ |
+| 1.0     | 2025-11-16 | Initial documentation with React Native preset configuration |

@@ -14,19 +14,10 @@ Manages reactive health data state including emotional state, health metrics, an
 import { useHealthDataStore } from './stores';
 
 function MyComponent() {
-  const { 
-    emotionalState, 
-    healthMetrics, 
-    updateHealthData,
-    isLoading 
-  } = useHealthDataStore();
+  const { emotionalState, healthMetrics, updateHealthData, isLoading } = useHealthDataStore();
 
   // Update health data and emotional state
-  await updateHealthData(
-    { steps: 8500, sleepHours: 7.5 },
-    EmotionalState.ACTIVE,
-    'rule-based'
-  );
+  await updateHealthData({ steps: 8500, sleepHours: 7.5 }, EmotionalState.ACTIVE, 'rule-based');
 }
 ```
 
@@ -40,12 +31,8 @@ Manages user profile, preferences, thresholds, and goals with automatic persiste
 import { useUserPreferencesStore } from './stores';
 
 function SettingsScreen() {
-  const { 
-    profile, 
-    updatePreferences, 
-    updateThresholds,
-    initializeProfile 
-  } = useUserPreferencesStore();
+  const { profile, updatePreferences, updateThresholds, initializeProfile } =
+    useUserPreferencesStore();
 
   // Initialize on app launch
   useEffect(() => {
@@ -55,13 +42,13 @@ function SettingsScreen() {
   // Update preferences
   await updatePreferences({
     notificationsEnabled: true,
-    theme: 'dark'
+    theme: 'dark',
   });
 
   // Update thresholds
   await updateThresholds({
     sadThreshold: 3000,
-    activeThreshold: 10000
+    activeThreshold: 10000,
   });
 }
 ```
@@ -76,12 +63,12 @@ Manages the Symbi creature's state including emotional state, evolution level, a
 import { useSymbiStateStore } from './stores';
 
 function SymbiComponent() {
-  const { 
-    emotionalState, 
+  const {
+    emotionalState,
     evolutionLevel,
     customAppearanceUrl,
     transitionToState,
-    addEvolutionRecord 
+    addEvolutionRecord,
   } = useSymbiStateStore();
 
   // Transition to new state with animation
@@ -94,7 +81,7 @@ function SymbiComponent() {
     evolutionLevel: 1,
     appearanceUrl: 'https://...',
     daysInPositiveState: 30,
-    dominantStates: [EmotionalState.ACTIVE, EmotionalState.VIBRANT]
+    dominantStates: [EmotionalState.ACTIVE, EmotionalState.VIBRANT],
   });
 }
 ```
@@ -126,16 +113,16 @@ User Action → Store Action → Update State → Persist to AsyncStorage
 
 ```typescript
 import { useEffect } from 'react';
-import { 
-  useHealthDataStore, 
-  useUserPreferencesStore, 
-  useSymbiStateStore 
+import {
+  useHealthDataStore,
+  useUserPreferencesStore,
+  useSymbiStateStore
 } from './stores';
 
 function App() {
   const initializeProfile = useUserPreferencesStore(s => s.initializeProfile);
   const loadEvolutionRecords = useSymbiStateStore(s => s.loadEvolutionRecords);
-  
+
   useEffect(() => {
     // Initialize stores on app launch
     const init = async () => {

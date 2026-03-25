@@ -22,6 +22,7 @@ Before starting the submission process, ensure you have completed:
 ### Step 1: Prepare Your Build
 
 1. **Update Version and Build Number**
+
    ```bash
    # In app.json
    "version": "1.0.0"
@@ -44,10 +45,11 @@ Before starting the submission process, ensure you have completed:
    - Verify entitlements are in app.json
 
 4. **Build for Release**
+
    ```bash
    # Using Expo/EAS
    eas build --platform ios --profile production
-   
+
    # Or using Xcode
    # Product > Archive
    ```
@@ -157,6 +159,7 @@ Before starting the submission process, ensure you have completed:
 ### Step 1: Prepare Your Build
 
 1. **Update Version and Build Number**
+
    ```bash
    # In app.json
    "version": "1.0.0"
@@ -166,6 +169,7 @@ Before starting the submission process, ensure you have completed:
    ```
 
 2. **Generate Signing Key**
+
    ```bash
    # If you don't have a keystore
    keytool -genkeypair -v -storetype PKCS12 -keystore symbi-release.keystore \
@@ -182,10 +186,11 @@ Before starting the submission process, ensure you have completed:
      ```
 
 4. **Build Release APK/AAB**
+
    ```bash
    # Using Expo/EAS
    eas build --platform android --profile production
-   
+
    # Or using Gradle
    cd android
    ./gradlew bundleRelease
@@ -389,29 +394,37 @@ Before starting the submission process, ensure you have completed:
 ### iOS Submission Issues
 
 **Issue: Build Processing Failed**
+
 - Solution: Check for missing entitlements, invalid Info.plist, or code signing issues
 
 **Issue: Missing Compliance**
+
 - Solution: Complete export compliance questionnaire in App Store Connect
 
 **Issue: Metadata Rejected**
+
 - Solution: Review App Store Review Guidelines, update metadata, resubmit
 
 **Issue: HealthKit Permission Rejected**
+
 - Solution: Ensure usage descriptions are clear and specific, show how health data is used
 
 ### Android Submission Issues
 
 **Issue: APK/AAB Upload Failed**
+
 - Solution: Check signing configuration, ensure version code is incremented
 
 **Issue: Data Safety Incomplete**
+
 - Solution: Complete all sections of Data Safety questionnaire
 
 **Issue: Policy Violation**
+
 - Solution: Review Play Store policies, update app or metadata, respond to reviewer
 
 **Issue: Health Connect Not Detected**
+
 - Solution: Ensure permissions are declared in AndroidManifest.xml
 
 ---
@@ -461,6 +474,7 @@ Before starting the submission process, ensure you have completed:
 ## Checklist
 
 ### Pre-Submission
+
 - [ ] All features implemented
 - [ ] QA testing completed
 - [ ] All critical bugs fixed
@@ -472,6 +486,7 @@ Before starting the submission process, ensure you have completed:
 - [ ] Crash reporting configured
 
 ### iOS Submission
+
 - [ ] Build uploaded to App Store Connect
 - [ ] Metadata completed
 - [ ] Screenshots uploaded
@@ -480,6 +495,7 @@ Before starting the submission process, ensure you have completed:
 - [ ] Submitted for review
 
 ### Android Submission
+
 - [ ] AAB uploaded to Play Console
 - [ ] Store listing completed
 - [ ] Data Safety completed
@@ -488,6 +504,7 @@ Before starting the submission process, ensure you have completed:
 - [ ] Submitted for review
 
 ### Post-Submission
+
 - [ ] Monitoring crash reports
 - [ ] Responding to reviews
 - [ ] Tracking metrics

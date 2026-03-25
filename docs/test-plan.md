@@ -46,6 +46,7 @@
 ### In Scope
 
 **Phase 1 Features (MVP)**
+
 - Health data integration (HealthKit, Google Fit)
 - Manual data entry mode
 - Emotional state calculation (Sad, Resting, Active)
@@ -56,12 +57,14 @@
 - Privacy and data management
 
 **Phase 2 Features (If Implemented)**
+
 - Multi-metric health analysis (steps, sleep, HRV)
 - AI-powered emotional state detection
 - Additional emotional states (6 states)
 - Gemini API integration
 
 **Phase 3 Features (If Implemented)**
+
 - Interactive breathing exercises
 - Mindful minutes tracking
 - Evolution system
@@ -69,6 +72,7 @@
 - Cloud sync
 
 **Cross-Cutting Concerns**
+
 - Performance and battery efficiency
 - Security and privacy
 - Error handling and offline support
@@ -90,24 +94,28 @@
 ### Test Levels
 
 #### 1. Unit Testing
+
 - **Scope**: Individual functions and components
 - **Tools**: Jest, React Native Testing Library
 - **Coverage Target**: 70%+ for critical business logic
 - **Responsibility**: Developers
 
 #### 2. Integration Testing
+
 - **Scope**: Component interactions, API integrations
 - **Tools**: Jest, React Native Testing Library
 - **Focus**: Health data services, state management, API clients
 - **Responsibility**: Developers
 
 #### 3. System Testing
+
 - **Scope**: End-to-end user flows
 - **Tools**: Manual testing on real devices
 - **Focus**: Complete user journeys from onboarding to evolution
 - **Responsibility**: QA Team
 
 #### 4. Acceptance Testing
+
 - **Scope**: Requirements verification
 - **Tools**: Manual testing, checklist-based
 - **Focus**: All requirements met, ready for release
@@ -116,18 +124,21 @@
 ### Test Types
 
 #### Functional Testing
+
 - Feature functionality
 - User flows
 - Business logic
 - Data validation
 
 #### Non-Functional Testing
+
 - Performance testing
 - Security testing
 - Usability testing
 - Compatibility testing
 
 #### Regression Testing
+
 - Re-test after bug fixes
 - Verify no new issues introduced
 - Automated where possible
@@ -139,6 +150,7 @@
 ### Hardware
 
 **iOS Devices**
+
 - iPhone 15 Pro (iOS 18.0)
 - iPhone 14 (iOS 17.0)
 - iPhone 12 (iOS 16.0)
@@ -146,6 +158,7 @@
 - iPad Pro 12.9" (iOS 17.0) - Optional
 
 **Android Devices**
+
 - Google Pixel 8 (Android 14)
 - Google Pixel 6 (Android 13)
 - Samsung Galaxy S23 (Android 13, One UI)
@@ -155,6 +168,7 @@
 ### Software
 
 **Development Tools**
+
 - Xcode 15.0+
 - Android Studio Hedgehog+
 - Node.js 18+
@@ -162,6 +176,7 @@
 - React Native 0.81.5
 
 **Testing Tools**
+
 - Jest 30.2.0 (React Native preset, Node.js environment)
 - ts-jest (TypeScript transformer)
 - React Native Testing Library 13.3.3
@@ -170,6 +185,7 @@
 - Sentry (crash reporting)
 
 **Jest Configuration**
+
 - Preset: `react-native`
 - Test environment: Node.js (optimized for performance)
 - Transform ignore patterns: Configured for React Native, Expo, and navigation libraries
@@ -177,6 +193,7 @@
 - Path aliases: Supports `@components`, `@services`, `@hooks`, `@types`, `@assets`
 
 **Health Data Sources**
+
 - Apple Health (iOS)
 - Google Fit (Android 8-13)
 - Health Connect (Android 14+)
@@ -193,21 +210,25 @@
 ## Test Schedule
 
 ### Week 1: Functional Testing
+
 - **Days 1-2**: Onboarding and setup flows
 - **Days 3-4**: Main features (health data, animations, states)
 - **Day 5**: Settings and configuration
 
 ### Week 2: Platform-Specific Testing
+
 - **Days 1-2**: iOS-specific features and integration
 - **Days 3-4**: Android-specific features and integration
 - **Day 5**: Cross-platform comparison
 
 ### Week 3: Non-Functional Testing
+
 - **Days 1-2**: Performance and battery testing
 - **Days 3-4**: Security and privacy testing
 - **Day 5**: Edge cases and error handling
 
 ### Week 4: Final Validation
+
 - **Days 1-2**: Requirements verification
 - **Days 3-4**: Regression testing after fixes
 - **Day 5**: Final sign-off and documentation
@@ -219,6 +240,7 @@
 ## Test Deliverables
 
 ### Test Documentation
+
 - [ ] Test plan (this document)
 - [ ] Test cases and checklists
 - [ ] Test execution reports
@@ -226,6 +248,7 @@
 - [ ] Test summary report
 
 ### Test Artifacts
+
 - [ ] Test data (sample health data)
 - [ ] Test scripts (automated tests)
 - [ ] Screenshots and videos
@@ -233,6 +256,7 @@
 - [ ] Coverage reports
 
 ### Sign-off Documents
+
 - [ ] QA sign-off
 - [ ] Product owner sign-off
 - [ ] Security review sign-off
@@ -270,21 +294,25 @@
 ### High-Risk Areas
 
 #### 1. Health Data Integration
+
 - **Risk**: Permission issues, data access failures
 - **Mitigation**: Extensive testing on multiple devices, fallback to manual entry
 - **Contingency**: Manual entry mode as primary option
 
 #### 2. Battery Performance
+
 - **Risk**: Excessive battery drain from background sync
 - **Mitigation**: Performance testing, optimization, low power mode support
 - **Contingency**: Reduce background sync frequency
 
 #### 3. Animation Performance
+
 - **Risk**: Poor performance on low-end devices
 - **Mitigation**: Test on various devices, optimize animations
 - **Contingency**: Reduce animation complexity, lower frame rate
 
 #### 4. Privacy Compliance
+
 - **Risk**: Privacy policy violations, data leaks
 - **Mitigation**: Security review, privacy review, data sanitization
 - **Contingency**: Remove features that pose privacy risks
@@ -292,11 +320,13 @@
 ### Medium-Risk Areas
 
 #### 5. Cross-Platform Consistency
+
 - **Risk**: Different behavior on iOS vs Android
 - **Mitigation**: Test on both platforms, use platform-agnostic code
 - **Contingency**: Platform-specific implementations if needed
 
 #### 6. API Integration (Phase 2+)
+
 - **Risk**: Gemini API failures, timeouts
 - **Mitigation**: Fallback logic, timeout handling, retry mechanism
 - **Contingency**: Disable AI features, use rule-based logic only
@@ -304,11 +334,13 @@
 ### Low-Risk Areas
 
 #### 7. UI/UX Issues
+
 - **Risk**: Minor visual glitches, usability issues
 - **Mitigation**: Manual testing, user feedback
 - **Contingency**: Fix in post-launch update
 
 #### 8. Edge Cases
+
 - **Risk**: Unexpected user behavior, rare scenarios
 - **Mitigation**: Edge case testing, error handling
 - **Contingency**: Log issues, fix in updates
@@ -339,30 +371,35 @@
 ## Test Execution Process
 
 ### 1. Test Preparation
+
 - Review test plan and test cases
 - Set up test environment
 - Prepare test data
 - Install app on test devices
 
 ### 2. Test Execution
+
 - Execute test cases systematically
 - Document results (pass/fail)
 - Log bugs with details
 - Take screenshots/videos as evidence
 
 ### 3. Bug Reporting
+
 - Use bug tracking system (GitHub Issues, Jira, etc.)
 - Include: Title, Description, Steps to Reproduce, Expected vs Actual, Screenshots
 - Assign severity and priority
 - Assign to developer
 
 ### 4. Bug Verification
+
 - Verify bug fixes
 - Re-test affected areas
 - Perform regression testing
 - Close verified bugs
 
 ### 5. Test Reporting
+
 - Daily status updates
 - Weekly test summary reports
 - Final test summary report
@@ -373,30 +410,35 @@
 ## Roles and Responsibilities
 
 ### QA Lead
+
 - Create test plan and test cases
 - Coordinate testing activities
 - Review test results
 - Report to stakeholders
 
 ### QA Engineers
+
 - Execute test cases
 - Log and track bugs
 - Verify bug fixes
 - Document test results
 
 ### Developers
+
 - Write unit tests
 - Fix bugs
 - Support QA with technical issues
 - Perform code reviews
 
 ### Product Owner
+
 - Define acceptance criteria
 - Review test results
 - Approve release
 - Sign off on testing
 
 ### DevOps
+
 - Set up test environment
 - Deploy builds to TestFlight/Internal Testing
 - Monitor crash reports
@@ -409,6 +451,7 @@
 ### Sample Health Data
 
 **Steps**
+
 - 0 steps (no activity)
 - 1,000 steps (low activity)
 - 5,000 steps (moderate activity)
@@ -416,12 +459,14 @@
 - 20,000 steps (very high activity)
 
 **Sleep (Phase 2)**
+
 - 4 hours (poor sleep)
 - 6 hours (moderate sleep)
 - 8 hours (good sleep)
 - 10 hours (excessive sleep)
 
 **HRV (Phase 2)**
+
 - 20 ms (low HRV, stressed)
 - 50 ms (moderate HRV)
 - 80 ms (high HRV, relaxed)
@@ -514,9 +559,9 @@ Product Owner: _______________  Date: _______________
 
 ## Revision History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-07 | QA Team | Initial test plan |
+| Version | Date       | Author  | Changes           |
+| ------- | ---------- | ------- | ----------------- |
+| 1.0     | 2025-11-07 | QA Team | Initial test plan |
 
 ---
 
@@ -524,6 +569,6 @@ Product Owner: _______________  Date: _______________
 
 **Prepared By**: QA Team  
 **Reviewed By**: Product Owner  
-**Approved By**: Project Manager  
+**Approved By**: Project Manager
 
 **Date**: November 7, 2025

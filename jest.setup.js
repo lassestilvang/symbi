@@ -1,6 +1,6 @@
 // Mock localStorage for Jest environment
 global.localStorage = {
-  getItem: jest.fn((key) => null),
+  getItem: jest.fn(key => null),
   setItem: jest.fn(),
   removeItem: jest.fn(),
   clear: jest.fn(),
@@ -16,10 +16,10 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     mockStorage[key] = value;
     return Promise.resolve();
   }),
-  getItem: jest.fn((key) => {
+  getItem: jest.fn(key => {
     return Promise.resolve(mockStorage[key] || null);
   }),
-  removeItem: jest.fn((key) => {
+  removeItem: jest.fn(key => {
     delete mockStorage[key];
     return Promise.resolve();
   }),
@@ -32,13 +32,13 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 // Mock React Native core modules
 jest.mock('react-native/Libraries/Utilities/Platform', () => ({
   OS: 'ios',
-  select: jest.fn((obj) => obj.ios),
+  select: jest.fn(obj => obj.ios),
 }));
 
 // Mock react-native-health
 jest.mock('react-native-health', () => ({
   default: {
-    isAvailable: jest.fn((callback) => callback(null, true)),
+    isAvailable: jest.fn(callback => callback(null, true)),
     initHealthKit: jest.fn((permissions, callback) => callback(null)),
     getStepCount: jest.fn((options, callback) => callback(null, { value: 5000 })),
     getSleepSamples: jest.fn((options, callback) => callback(null, [])),
@@ -62,21 +62,21 @@ jest.mock('react-native-google-fit', () => ({
 
 // Mock expo-crypto
 jest.mock('expo-crypto', () => ({
-  digestStringAsync: jest.fn((algorithm, data) => 
+  digestStringAsync: jest.fn((algorithm, data) =>
     Promise.resolve('mocked-hash-' + data.substring(0, 10))
   ),
   CryptoDigestAlgorithm: {
     SHA256: 'SHA256',
     SHA512: 'SHA512',
   },
-  getRandomBytes: jest.fn((length) => {
+  getRandomBytes: jest.fn(length => {
     const bytes = new Uint8Array(length);
     for (let i = 0; i < length; i++) {
       bytes[i] = Math.floor(Math.random() * 256);
     }
     return bytes;
   }),
-  getRandomBytesAsync: jest.fn((length) => {
+  getRandomBytesAsync: jest.fn(length => {
     const bytes = new Uint8Array(length);
     for (let i = 0; i < length; i++) {
       bytes[i] = Math.floor(Math.random() * 256);
@@ -131,5 +131,5 @@ jest.mock('@sentry/react-native', () => ({
   setContext: jest.fn(),
   setTag: jest.fn(),
   setExtra: jest.fn(),
-  withScope: jest.fn((callback) => callback({ setTag: jest.fn(), setExtra: jest.fn() })),
+  withScope: jest.fn(callback => callback({ setTag: jest.fn(), setExtra: jest.fn() })),
 }));

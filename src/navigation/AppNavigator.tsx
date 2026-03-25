@@ -6,6 +6,9 @@ import { ManualEntryScreen } from '../screens/ManualEntryScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { MainScreen } from '../screens/MainScreen';
 import { EvolutionGalleryScreen } from '../screens/EvolutionGalleryScreen';
+import { EvolutionHistoryScreen } from '../screens/EvolutionHistoryScreen';
+import { AchievementsScreen } from '../screens/AchievementsScreen';
+import { CustomizationStudioScreen } from '../screens/CustomizationStudioScreen';
 import { useUserPreferencesStore } from '../stores/userPreferencesStore';
 import { PermissionService } from '../services/PermissionService';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
@@ -86,8 +89,12 @@ export const AppNavigator: React.FC = () => {
             fontWeight: 'bold',
           },
         }}>
-        <Stack.Screen name="Main" component={MainScreen} options={{ title: 'Symbi' }} />
-        <Stack.Screen name="Settings" options={{ title: 'Settings' }}>
+        <Stack.Screen
+          name="Main"
+          component={MainScreen}
+          options={{ headerShown: false, title: 'Symbi' }}
+        />
+        <Stack.Screen name="Settings" options={{ headerShown: false, title: 'Symbi - Settings' }}>
           {props => (
             <SettingsScreen
               {...props}
@@ -101,17 +108,32 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="Thresholds"
           component={ThresholdConfigScreen}
-          options={{ title: 'Configure Thresholds' }}
+          options={{ title: 'Symbi - Configure Thresholds' }}
         />
         <Stack.Screen
           name="ManualEntry"
           component={ManualEntryScreen}
-          options={{ title: 'Enter Steps' }}
+          options={{ title: 'Symbi - Enter Steps' }}
         />
         <Stack.Screen
           name="EvolutionGallery"
           component={EvolutionGalleryScreen}
-          options={{ title: 'Evolution Gallery', headerShown: false }}
+          options={{ title: 'Symbi - Evolution Gallery', headerShown: false }}
+        />
+        <Stack.Screen
+          name="EvolutionHistory"
+          component={EvolutionHistoryScreen}
+          options={{ headerShown: false, title: 'Symbi - Evolution History' }}
+        />
+        <Stack.Screen
+          name="Achievements"
+          component={AchievementsScreen}
+          options={{ headerShown: false, title: 'Symbi - Achievements' }}
+        />
+        <Stack.Screen
+          name="CustomizationStudio"
+          component={CustomizationStudioScreen}
+          options={{ headerShown: false, title: 'Symbi - Customize' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

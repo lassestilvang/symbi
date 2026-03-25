@@ -158,7 +158,10 @@ export class AnalyticsService {
   /**
    * Track permission grant/denial
    */
-  static async trackPermissionResult(granted: boolean, dataSource: 'healthkit' | 'googlefit' | 'manual'): Promise<void> {
+  static async trackPermissionResult(
+    granted: boolean,
+    dataSource: 'healthkit' | 'googlefit' | 'manual'
+  ): Promise<void> {
     await this.trackEvent(
       granted ? AnalyticsEvent.PERMISSION_GRANTED : AnalyticsEvent.PERMISSION_DENIED,
       {

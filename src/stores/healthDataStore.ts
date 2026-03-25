@@ -66,25 +66,30 @@ export const useHealthDataStore = create<HealthDataState>((set, _get) => ({
     state: EmotionalState,
     method: 'rule-based' | 'ai'
   ) => {
+    const now = new Date();
     set({
       healthMetrics: metrics,
       emotionalState: state,
       calculationMethod: method,
-      lastUpdated: new Date(),
+      lastUpdated: now,
       error: null,
     });
 
     // Persist to cache
-    const dateKey = new Date().toISOString().split('T')[0];
-    await StorageService.addHealthDataEntry(dateKey, {
+    const dateKey = now.toISOString().split('T')[0];
+    const cacheEntry = {
       date: dateKey,
       steps: metrics.steps,
       sleepHours: metrics.sleepHours,
       hrv: metrics.hrv,
       emotionalState: state,
       calculationMethod: method,
-      lastUpdated: new Date(),
-    });
+      lastUpdated: now,
+    };
+
+    console.log(`[healthDataStore] Saving to cache for ${dateKey}:`, cacheEntry);
+    await StorageService.addHealthDataEntry(dateKey, cacheEntry);
+    console.log(`[healthDataStore] Cache save complete`);
   },
 
   setLoading: (loading: boolean) => {
