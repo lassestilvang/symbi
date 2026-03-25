@@ -370,6 +370,9 @@ const styles = StyleSheet.create({
   tabsContainer: {
     borderBottomWidth: 1,
     borderBottomColor: '#374151',
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   tabsContent: {
     paddingHorizontal: 12,
@@ -401,5 +404,8 @@ const styles = StyleSheet.create({
   gridContainer: {
     flex: 1,
     paddingTop: 16,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
 });

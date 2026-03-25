@@ -20,7 +20,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import type { AnimatedInteractionEffect } from '../../hooks/useHabitatInteraction';
 import type { Dimensions } from '../../types/habitat';
 import { HALLOWEEN_COLORS } from '../../constants/theme';
@@ -45,7 +45,7 @@ interface EffectRendererProps {
 }
 
 /**
- * Burst effect colors
+ * Burst effect colors - Halloween themed
  */
 const BURST_COLORS = [
   HALLOWEEN_COLORS.primaryLight,
@@ -53,7 +53,14 @@ const BURST_COLORS = [
   HALLOWEEN_COLORS.orange,
   '#FFD700', // Gold
   HALLOWEEN_COLORS.ghostWhite,
+  '#00FF88', // Ghostly green
+  '#FF6B6B', // Spooky red
 ];
+
+/**
+ * Halloween emoji particles for burst effect
+ */
+const HALLOWEEN_EMOJIS = ['👻', '🎃', '✨', '💜', '🦇', '⭐', '🌙', '💫'];
 
 /**
  * Ripple effect color
@@ -73,13 +80,15 @@ const BurstEffect: React.FC<EffectRendererProps> = React.memo(({ effect }) => {
   const { position, progress, config } = effect;
   const particleCount = config.particleCount || 12;
 
-  // Generate particles in a circular pattern
+  // Generate particles in a circular pattern - BIGGER and more dramatic
   const particles = useMemo(() => {
-    return Array.from({ length: particleCount }, (_, i) => {
-      const angle = (i / particleCount) * Math.PI * 2;
-      const distance = 30 + Math.random() * 50; // Random distance 30-80px
-      const size = 4 + Math.random() * 6; // Random size 4-10px
+    return Array.from({ length: particleCount * 2 }, (_, i) => {
+      const angle = (i / (particleCount * 2)) * Math.PI * 2 + Math.random() * 0.3;
+      const distance = 80 + Math.random() * 150; // Much bigger: 80-230px
+      const size = 8 + Math.random() * 12; // Bigger particles: 8-20px
       const color = BURST_COLORS[i % BURST_COLORS.length];
+      const isEmoji = i < 8; // First 8 particles are emojis
+      const emoji = HALLOWEEN_EMOJIS[i % HALLOWEEN_EMOJIS.length];
 
       return {
         id: i,
@@ -87,7 +96,10 @@ const BurstEffect: React.FC<EffectRendererProps> = React.memo(({ effect }) => {
         distance,
         size,
         color,
-        delay: Math.random() * 0.2, // Slight random delay for organic feel
+        isEmoji,
+        emoji,
+        delay: Math.random() * 0.15,
+        rotationSpeed: (Math.random() - 0.5) * 720, // Random rotation
       };
     });
   }, [particleCount]);
@@ -99,17 +111,39 @@ const BurstEffect: React.FC<EffectRendererProps> = React.memo(({ effect }) => {
     <View style={[styles.effectContainer, { left: position.x, top: position.y }]}>
       {particles.map(particle => {
         // Adjust progress for particle delay
-        const adjustedProgress = Math.max(0, Math.min(1, (progress - particle.delay) / 0.8));
+        const adjustedProgress = Math.max(0, Math.min(1, (progress - particle.delay) / 0.85));
 
-        // Easing function for natural motion (ease-out)
+        // Easing function for natural motion (ease-out with bounce)
         const easedProgress = 1 - Math.pow(1 - adjustedProgress, 3);
 
         // Calculate particle position
         const x = Math.cos(particle.angle) * particle.distance * easedProgress;
-        const y = Math.sin(particle.angle) * particle.distance * easedProgress;
+        const y =
+          Math.sin(particle.angle) * particle.distance * easedProgress -
+          (particle.isEmoji ? easedProgress * 30 : 0); // Emojis float up slightly
 
-        // Scale down as particle moves outward
-        const scale = 1 - easedProgress * 0.5;
+        // Scale animation
+        const scale = particle.isEmoji
+          ? 1 + Math.sin(adjustedProgress * Math.PI) * 0.3
+          : 1 - easedProgress * 0.5;
+
+        const rotation = particle.rotationSpeed * adjustedProgress;
+
+        if (particle.isEmoji) {
+          return (
+            <View
+              key={particle.id}
+              style={{
+                position: 'absolute',
+                left: x - 16,
+                top: y - 16,
+                opacity: opacity * (1 - easedProgress * 0.2),
+                transform: [{ scale }, { rotate: `${rotation}deg` }],
+              }}>
+              <Text style={{ fontSize: 28 }}>{particle.emoji}</Text>
+            </View>
+          );
+        }
 
         const particleStyle: ViewStyle = {
           position: 'absolute',
@@ -122,8 +156,8 @@ const BurstEffect: React.FC<EffectRendererProps> = React.memo(({ effect }) => {
           opacity: opacity * (1 - easedProgress * 0.3),
           shadowColor: particle.color,
           shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.8,
-          shadowRadius: particle.size,
+          shadowOpacity: 0.9,
+          shadowRadius: particle.size * 1.5,
         };
 
         return <View key={particle.id} style={particleStyle} />;

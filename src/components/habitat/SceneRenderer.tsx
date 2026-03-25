@@ -13,7 +13,8 @@ import {
   StyleSheet,
   Animated,
   Easing,
-  ImageBackground,
+  Image,
+  Platform,
   ImageSourcePropType,
 } from 'react-native';
 import type {
@@ -191,10 +192,52 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   );
 
   /**
+   * Calculate background image dimensions for cover behavior
+   * Ensures image covers entire container while maintaining aspect ratio
+   */
+  const backgroundImageStyle = useMemo(() => {
+    // Image is 1024x1024 (square)
+    const imageAspect = 1;
+    const containerAspect = dimensions.width / dimensions.height;
+
+    let imageWidth: number;
+    let imageHeight: number;
+
+    if (containerAspect > imageAspect) {
+      // Container is wider than image - fit to width
+      imageWidth = dimensions.width;
+      imageHeight = dimensions.width / imageAspect;
+    } else {
+      // Container is taller than image - fit to height
+      imageHeight = dimensions.height;
+      imageWidth = dimensions.height * imageAspect;
+    }
+
+    // Center the image
+    const left = (dimensions.width - imageWidth) / 2;
+    const top = (dimensions.height - imageHeight) / 2;
+
+    return {
+      position: 'absolute' as const,
+      width: imageWidth,
+      height: imageHeight,
+      left,
+      top,
+    };
+  }, [dimensions.width, dimensions.height]);
+
+  /**
    * Render scene background with themed image
+   * Uses manual cover calculation for consistent behavior across platforms
    */
   const renderBackground = () => (
-    <ImageBackground source={backgroundImage} style={styles.backgroundImage} resizeMode="cover" />
+    <View style={styles.backgroundContainer}>
+      <Image
+        source={backgroundImage}
+        style={Platform.OS === 'web' ? backgroundImageStyle : styles.backgroundImage}
+        resizeMode="cover"
+      />
+    </View>
   );
 
   const renderParallaxLayers = () => {
@@ -273,6 +316,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+    overflow: 'hidden',
+  },
+  backgroundContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     overflow: 'hidden',
   },
   backgroundImage: {
